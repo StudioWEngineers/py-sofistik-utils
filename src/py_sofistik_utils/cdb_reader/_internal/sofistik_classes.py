@@ -3,7 +3,7 @@ SOFiSTiKClasses
 ---------------
 
 The `SOFiSTiKClasses` module stores classes and data structures to be used to get access
-and gather data from SOFiSTIK-generated *cdb files.
+and gather data from SOFiSTIK-generated cdb files.
 
 Basically all the class have been copy-pasted from the original `sofistik_daten.py`,
 shipped with the addition of doctrings. Wildcard import of the original file has also been
