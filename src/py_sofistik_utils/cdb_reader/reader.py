@@ -53,7 +53,7 @@ class SOFiSTiKCDBReader:
         self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
 
         self.beam_res = BeamResults(self._dll)
-        self.beam_geo = BeamData(self._dll)
+        self.beam_geo: BeamData = BeamData(self._dll)
         self.beam_load = BeamLoad(self._dll)
         self.beam_stress = BeamStress(self._dll)
 

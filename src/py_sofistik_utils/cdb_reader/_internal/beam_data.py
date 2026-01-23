@@ -38,21 +38,19 @@ from .sofistik_utilities import decode_beam_end_release
 
 class BeamData:
     """The `BeamData` class provides methods and data structure to:
-    * read-only access to the cdb file (only to the part related to the beam geometry);
-    * store these information in a convenient format;
-    * access these information.
+        * read-only access to the cdb file (only to the part related to the beam geometry);
+        * store these information in a convenient format;
+        * access these information.
 
     Beam data are stored in a `pd.DataFrame` with the following columns:
-    * `GROUP`: the beam group number
-    * `ELEM_ID`: the beam number
-    * `STATION`: `np.array` defining the position of the output stations
-    * `ADIMENSIONAL_STATION`: `np.array` defining the position of the output stations
-unitarized by the beam length
-    * `CONNECTIVITY`: `np.array[np.uint64]` containing the start end nodes of the beam
-    * `TRANS_MATRIX`: the beam transformation matrix (3 x 3 `np.array`)
-    * `SPAR`: `np.array` with distances along a continuous beam or parameter values along
-the reference axis
-    * `PROPERTIES`: `list` containing the property number for each station
+        * `GROUP`: the beam group number
+        * `ELEM_ID`: the beam number
+        * `STATION`: `np.array` defining the position of the output stations
+        * `ADIMENSIONAL_STATION`: `np.array` defining the position of the output station unitarized by the beam length
+        * `CONNECTIVITY`: `np.array[np.uint64]` containing the start end nodes of the beam
+        * `TRANS_MATRIX`: the beam transformation matrix (3 x 3 `np.array`)
+        * `SPAR`: `np.array` with distances along a continuous beam or parameter values along the reference axis
+        * `PROPERTIES`: `list` containing the property number for each station
 
     """
     def __init__(self, dll: SofDll) -> None:
