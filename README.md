@@ -6,8 +6,6 @@
 
 Python utilities for the *SOFiSTiK* finite element analysis software.
 
----
-
 > [!IMPORTANT]  
 > **SOFiSTiK is a registered trademark of SOFiSTiK AG.**
 >
