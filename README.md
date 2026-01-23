@@ -1,6 +1,6 @@
 # py-sofistik-utils
 [![PyPI](https://github.com/StudioWEngineers/py-sofistik-utils/actions/workflows/build_and_publish.yml/badge.svg)](https://github.com/StudioWEngineers/py-sofistik-utils/actions/workflows/build_and_publish.yml)
-[![GitHub Release](https://img.shields.io/github/v/release/StudioWEngineers/py-sofistik-utils)](https://github.com/StudioWEngineers/py-sofistik-utils/releases)
+[![PyPI Version](https://img.shields.io/pypi/v/py-sofistik-utils)](https://pypi.org/project/py-sofistik-utils/)
 
 Python utilities for the *SOFiSTiK* finite element analysis software.
 
