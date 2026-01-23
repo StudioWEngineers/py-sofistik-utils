@@ -7,7 +7,7 @@ Python utilities for the *SOFiSTiK* finite element analysis software.
 > [!IMPORTANT]  
 > **SOFiSTiK is a registered trademark of SOFiSTiK AG.**
 >
-> *py-sofistik-utils* is **NOT** affiliated with, endorsed by or vetted by SOFiSTiK AG. It is an open-source collection of tools that interfaces with certain proprietary SOFiSTiK's DLLs, which are **NOT** distributed with this repository and must be supplied by the user. The project is intended for business and educational use.
+> *py-sofistik-utils* is **NOT** affiliated with, endorsed by or vetted by SOFiSTiK AG. It is an open-source collection of tools that interfaces with certain proprietary SOFiSTiK's DLLs, which are **NOT** distributed with this repository nor with the PyPI wheels and must be supplied by the user. The project is intended for business and educational use.
 >
 
 ## Dependencies
