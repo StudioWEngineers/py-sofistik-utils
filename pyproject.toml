@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=80.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py-sofistik-utils"
+version = "0.0.1"
+authors = [
+  { name="StudioWEngineers", email="studio.w.engineers@gmail.com" }
+]
+description = "The Studio W SOFiSTiK package"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.12"
+classifiers = [
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Utilities",
+  "Typing :: Typed",
+  "Development Status :: 4 - Beta"
+]
+dependencies = [
+  "numpy>=2.2.0",
+  "pandas>=3.0.0"
+]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["py_sofistik_utils*"]
+
+[tool.setuptools.package-data]
+"py_sofistik_utils" = ["py.typed"]
