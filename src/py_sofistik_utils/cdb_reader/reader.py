@@ -10,7 +10,7 @@ SOFiSTiK cdb file and serialize its content.
 # third party library imports
 
 # local library specific imports
-from . _internal.beam_data import BeamData
+from . _internal.beam_data import _BeamData
 from . _internal.beam_load import BeamLoad
 from . _internal.beam_results import BeamResults
 from . _internal.beam_stresses import BeamStress
@@ -19,7 +19,7 @@ from . _internal.cable_load import CableLoad
 from . _internal.cable_results import CableResults
 from . _internal.group_data import GroupData
 from . _internal.group_lc_data import GroupLCData
-from . _internal.load_cases import LoadCases
+from . _internal.load_cases import _LoadCases
 from . _internal.nodes import Nodes
 from . _internal.plate_data import PlateData
 from . _internal.property import PropertyData
@@ -53,7 +53,7 @@ class SOFiSTiKCDBReader:
         self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
 
         self.beam_res = BeamResults(self._dll)
-        self.beam_geo: BeamData = BeamData(self._dll)
+        self.beam_geo: _BeamData = _BeamData(self._dll)
         self.beam_load = BeamLoad(self._dll)
         self.beam_stress = BeamStress(self._dll)
 
@@ -72,7 +72,7 @@ class SOFiSTiKCDBReader:
         self.spring_data = SpringData(self._dll)
         self.spring_res = SpringResults(self._dll)
 
-        self.load_case = LoadCases(self._dll)
+        self.load_case: _LoadCases = _LoadCases(self._dll)
         self.properties = PropertyData(self._dll)
         self.sys_info = SysInfo(self._dll)
 

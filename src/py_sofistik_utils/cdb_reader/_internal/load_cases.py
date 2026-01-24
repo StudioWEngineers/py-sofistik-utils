@@ -1,24 +1,3 @@
-"""
-LoadCases
----------
-
-The `LoadCases` class provides methods and data structure to:
-* access and load the keys `12/LC` of the CDB file;
-* store these data in a convenient format;
-* provide access to these data.
-
-Not all the information provided by SOFiSTiK are stored and therefore made available. In
-particular, the information loaded are:
-* Type of load case (key `KIND`);
-* Name of the load case (key `RTEX`);
-* SOFiSTiK source program (key `NAME`);
-* sum of the reaction forces (keys `RX`, `RY` and `RZ`);
-* laod case factors (keys `fact`, `factX`, `factY` and `factZ`);
-* PLC number (key `PLC`);
-* theory (key `THEO`);
-
-For details, please refer to SOFiHELP - CDBase.
-"""
 # standard library imports
 from ctypes import byref, cast, c_char_p, create_string_buffer, c_int, sizeof
 
@@ -31,8 +10,8 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CLC_CTRL
 
 
-class LoadCases:
-    """The `LoadCases` class provides methods and data structure to:
+class _LoadCases:
+    """The `_LoadCases` class provides methods and data structure to:
     * access and load the keys `12/LC` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
@@ -50,7 +29,7 @@ class LoadCases:
     For details, please refer to SOFiHELP - CDBase.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `LoadCases` class.
+        """The initializer of the `_LoadCases` class.
         """
         self._dll = dll
 
