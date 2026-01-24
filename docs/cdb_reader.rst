@@ -10,7 +10,7 @@ Public Classes
 --------------
 
 .. autosummary::
-    :toctree: generated/
+    :toctree: _build/generated/
     :template: class-template.rst
 
     SOFiSTiKCDBReader
@@ -19,7 +19,7 @@ Helper / Internal Classes
 -------------------------
 
 .. autosummary::
-    :toctree: generated/
+    :toctree: _build/generated/
     :template: class-template.rst
 
     _BeamData
