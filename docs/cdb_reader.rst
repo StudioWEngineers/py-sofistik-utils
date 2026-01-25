@@ -28,6 +28,8 @@ Private Classes
     _NodeData
     _NodeResults
     _NodeResiduals
+    _SpringData
+    _SpringResults
     _SysInfo
     _TrussData
     _TrussLoad
