@@ -15,21 +15,25 @@ from . sofistik_utilities import decode_beam_end_release
 
 
 class _BeamData:
-    """The ``BeamData`` class provides methods and data structure to:
-        * read-only access to the cdb file (only to the part related to the beam geometry);
-        * store these information in a convenient format;
-        * access these information.
+    """
+    The ``BeamData`` class provides methods and data structure to:
+
+    * read-only access to the cdb file (only to the part related to the beam geometry);
+    * store these information in a convenient format;
+    * access these information.
 
     Beam data are stored in a :class:`pandas.DataFrame` with the following columns:
-        * GROUP: the beam group number
-        * ELEM_ID: the beam number
-        * STATION: :class:`numpy.ndarray` defining the position of the output stations
-        * ADIMENSIONAL_STATION: :class:`numpy.ndarray` defining the position of the output station unitarized by the beam length
-        * CONNECTIVITY: :class:`numpy.ndarray` containing the start end nodes of the beam
-        * TRANS_MATRIX: the beam transformation matrix (3 x 3 :class:`numpy.ndarray`)
-        * SPAR: :class:`numpy.ndarray` with distances along a continuous beam or parameter values along the reference axis
-        * PROPERTIES: :class:`list` containing the property number for each station
 
+    * ``GROUP``: the beam group number
+    * ``ELEM_ID``: the beam number
+    * ``STATION``: :class:`numpy.ndarray` defining the position of the output stations
+    * ``ADIMENSIONAL_STATION``: :class:`numpy.ndarray` defining the position of the output
+      station unitarized by the beam length
+    * ``CONNECTIVITY``: :class:`numpy.ndarray` containing the start end nodes of the beam
+    * ``TRANS_MATRIX``: the beam transformation matrix (3 x 3 :class:`numpy.ndarray`)
+    * ``SPAR``: :class:`numpy.ndarray` with distances along a continuous beam or parameter
+      values along the reference axis
+    * ``PROPERTIES``: :class:`list` containing the property number for each station
     """
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``BeamData`` class.
