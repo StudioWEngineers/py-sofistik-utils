@@ -2,7 +2,7 @@
 SOFiSTiKCDBReader
 -----------------
 
-The `SOFiSTiKCDBReader` class provides methods and data structure to read-only access to a
+The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only access to a
 SOFiSTiK cdb file and serialize its content.
 """
 # standard library imports
@@ -34,7 +34,7 @@ from . _internal.truss_results import TrussResult
 
 
 class SOFiSTiKCDBReader:
-    """The `SOFiSTiKCDBReader` class provides methods and data structure to read-only
+    """The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only
     access to a SOFiSTiK cdb file and serialize its content.
     """
     def __init__(
@@ -44,7 +44,7 @@ class SOFiSTiKCDBReader:
             path_to_dlls: str,
             version: int = 2023
         ) -> None:
-        """The initializer of the `SOFiSTiKCDBReader` class.
+        """The initializer of the ``SOFiSTiKCDBReader`` class.
         """
         self._echo_level = 0
         self.full_name = path_to_cdb + file_name + ".cdb"
@@ -129,7 +129,7 @@ class SOFiSTiKCDBReader:
         self.is_open = False
 
     def get_echo_level(self) -> int:
-        """return the `echo_level` for this instance of `SOFiSTiKCDBReader`.
+        """return the ``echo_level`` for this instance of ``SOFiSTiKCDBReader``.
         """
         return self._echo_level
 
@@ -148,7 +148,7 @@ class SOFiSTiKCDBReader:
             self.is_open = True
 
     def set_echo_level(self, new_echo_level: int) -> None:
-        """Set the `echo_level` for this instance of `SOFiSTiKCDBReader`.
+        """Set the ``echo_level`` for this instance of ``SOFiSTiKCDBReader``.
         """
         self._echo_level = new_echo_level
         self._dll.set_echo_level(new_echo_level)
