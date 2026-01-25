@@ -20,7 +20,7 @@ from . _internal.cable_results import CableResults
 from . _internal.group_data import GroupData
 from . _internal.group_lc_data import GroupLCData
 from . _internal.load_cases import _LoadCases
-from . _internal.nodes import Nodes
+from . _internal.nodes import _Nodes
 from . _internal.plate_data import PlateData
 from . _internal.property import PropertyData
 from . _internal.sec_group_lc_data import SecondaryGroupLCData
@@ -39,6 +39,7 @@ class SOFiSTiKCDBReader:
     """
     beam_geo: _BeamData
     load_case: _LoadCases
+    nodes: _Nodes
 
     def __init__(
             self,
@@ -68,7 +69,7 @@ class SOFiSTiKCDBReader:
         self.grp_lc_data = GroupLCData(self._dll)
         self.sec_grp_lc_data = SecondaryGroupLCData(self._dll)
 
-        self.nodes = Nodes(self._dll)
+        self.nodes = _Nodes(self._dll)
 
         self.plate_data = PlateData(self._dll)
 

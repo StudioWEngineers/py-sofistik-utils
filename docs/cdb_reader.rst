@@ -15,8 +15,8 @@ Public Classes
 
     SOFiSTiKCDBReader
 
-Helper / Internal Classes
--------------------------
+Private Classes
+---------------
 
 .. autosummary::
     :toctree: _build/generated/
@@ -24,3 +24,7 @@ Helper / Internal Classes
 
     _BeamData
     _LoadCases
+    _Nodes
+    _NodeData
+    _NodeResults
+    _NodeResiduals

@@ -1,21 +1,3 @@
-"""
-NodeData
---------
-
-The `NodeData` class provides methods and data structure to:
-    * access and load the keys `20/00` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-
-Node data are stored in a `pd.DataFrame` with the following columns:
-    * `ID`: the node number
-    * `INT_ID`: the node internal number
-    * `X0`: the X coordinate of the node
-    * `Y0`: the Y coordinate of the node
-    * `Z0`: the Z coordinate of the node
-    * `KFIX`: string defining the boundary conditions defined for the node
-    * `IS_USED`: `bool`, `True` if the node is connected to already engaged nodes
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -29,23 +11,26 @@ from . sofistik_classes import CNODE
 from . sofistik_utilities import decode_nodal_boundary_condition
 
 
-class NodeData:
-    """The `NodeData` class provides methods and data structure to:
-    * access and load the keys `20/00` of the CDB file;
+class _NodeData:
+    """
+    The ``_NodeData`` class provides methods and data structure to:
+
+    * access and load the keys ``20/00`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
 
-    Node data are stored in a `pd.DataFrame` with the following columns:
-    * `ID`: the node number
-    * `INT_ID`: the node internal number
-    * `X0`: the X coordinate of the node
-    * `Y0`: the Y coordinate of the node
-    * `Z0`: the Z coordinate of the node
-    * `KFIX`: string defining the boundary conditions defined for the node
-    * `IS_USED`: `bool`, `True` if the node is connected to already engaged nodes
+    Node data are stored in a :class:`pandas.DataFrame` with the following columns:
+
+    * ``ID``: the node number
+    * ``INT_ID``: the node internal number
+    * ``X0``: the X coordinate of the node
+    * ``Y0``: the Y coordinate of the node
+    * ``Z0``: the Z coordinate of the node
+    * ``KFIX``: string defining the boundary conditions defined for the node
+    * ``IS_USED``: `bool`, `True` if the node is connected to already engaged nodes
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `NodeData` class.
+        """The initializer of the ``_NodeData`` class.
         """
         self._data = DataFrame(
             columns = ["ID", "INT_ID", "X0", "Y0", "Z0", "KFIX", "IS_USED"]
@@ -71,16 +56,16 @@ class NodeData:
         return self._data[["ID", "X0", "Y0", "Z0"]].copy(deep=True)
 
     def get_boundary_condition(self, node_number: int) -> str:
-        """Return the nodal boundary conditions for the given `node_number`.
+        """Return the nodal boundary conditions for the given ``node_number``.
 
         Parameters
         ----------
-        `node_number`: int
+        ``node_number``: int
 
         Raises
         ------
         RuntimeError
-            If the given `node_number` is not found.
+            If the given ``node_number`` is not found.
         """
         mask = self._data["ID"] == node_number
 
@@ -90,16 +75,16 @@ class NodeData:
         return self._data.KFIX[mask].item()  #type: ignore
 
     def get_coordinates(self, node_number: int) -> Any:
-        """Return the nodal coordinates for the given `node_number`.
+        """Return the nodal coordinates for the given ``node_number``.
 
         Parameters
         ----------
-        `node_number`: int
+        ``node_number``: int
 
         Raises
         ------
         RuntimeError
-            If the given `node_number` is not found.
+            If the given ``node_number`` is not found.
         """
         mask = self._data["ID"] == node_number
 
@@ -114,7 +99,7 @@ class NodeData:
         return self._data.ID.size
 
     def is_loaded(self) -> bool:
-        """Return `True` if the nodal data have been loaded from the cdb.
+        """Return ``True`` if the nodal data have been loaded from the cdb.
         """
         return self._is_loaded
 

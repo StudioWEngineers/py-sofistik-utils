@@ -1,29 +1,3 @@
-"""
-NodeResiduals
--------------
-
-The `NodeResiduals` class provides abstractions to load and access information about the
-nodal residuals for non-linear analyses, contained in keys `26/LC` of the CDB file.
-
-Data are stored in a `pandas` `DataFrame` having the following columns:
-
-    * `LOAD_CASE`: load combination number
-    * `ID`: node number
-    * `UX`: X component of the nodal residual displacement (translation)
-    * `UY`: Y component of the nodal residual displacement (translation)
-    * `UZ`: Z component of the nodal residual displacement (translation)
-    * `URX`: X component of the nodal residual displacement (rotation)
-    * `URY`: Y component of the nodal residual displacement (rotation)
-    * `URZ`: Z component of the nodal residual displacement (rotation)
-    * `URB`: twist residual rotation
-    * `PX`: X component of the nodal residual reaction (translation)
-    * `PY`: Y component of the nodal residual reaction (translation)
-    * `PZ`: Z component of the nodal residual reaction (translation)
-    * `MX`: X component of the nodal residual reaction (rotation)
-    * `MY`: Y component of the nodal residual reaction (rotation)
-    * `MZ`: Z component of the nodal residual reaction (rotation)
-    * `MB`: warping residual moment
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -36,32 +10,33 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISPI
 
 
-class NodeResiduals:
-    """The `NodeResiduals` class provides abstractions to load and access information
-        about the nodal residuals for non-linear analyses, contained in keys `26/LC` of
-        the CDB file.
+class _NodeResiduals:
+    """
+    The ``_NodeResiduals`` class provides abstractions to load and access information
+    about the nodal residuals for non-linear analyses, contained in keys ``26/LC`` of
+    the CDB file.
 
-        Data are stored in a `pandas` `DataFrame` having the following columns:
+    Data are stored in a :class:`pandas.DataFrame` having the following columns:
 
-        * `LOAD_CASE`: load combination number
-        * `ID`: node number
-        * `UX`: X component of the nodal residual displacement (translation)
-        * `UY`: Y component of the nodal residual displacement (translation)
-        * `UZ`: Z component of the nodal residual displacement (translation)
-        * `URX`: X component of the nodal residual displacement (rotation)
-        * `URY`: Y component of the nodal residual displacement (rotation)
-        * `URZ`: Z component of the nodal residual displacement (rotation)
-        * `URB`: twist residual rotation
-        * `PX`: X component of the nodal residual reaction (translation)
-        * `PY`: Y component of the nodal residual reaction (translation)
-        * `PZ`: Z component of the nodal residual reaction (translation)
-        * `MX`: X component of the nodal residual reaction (rotation)
-        * `MY`: Y component of the nodal residual reaction (rotation)
-        * `MZ`: Z component of the nodal residual reaction (rotation)
-        * `MB`: warping residual moment
+    * ``LOAD_CASE``: load combination number
+    * ``ID``: node number
+    * ``UX``: X component of the nodal residual displacement (translation)
+    * ``UY``: Y component of the nodal residual displacement (translation)
+    * ``UZ``: Z component of the nodal residual displacement (translation)
+    * ``URX``: X component of the nodal residual displacement (rotation)
+    * ``URY``: Y component of the nodal residual displacement (rotation)
+    * ``URZ``: Z component of the nodal residual displacement (rotation)
+    * ``URB``: twist residual rotation
+    * ``PX``: X component of the nodal residual reaction (translation)
+    * ``PY``: Y component of the nodal residual reaction (translation)
+    * ``PZ``: Z component of the nodal residual reaction (translation)
+    * ``MX``: X component of the nodal residual reaction (rotation)
+    * ``MY``: Y component of the nodal residual reaction (rotation)
+    * ``MZ``: Z component of the nodal residual reaction (rotation)
+    * ``MB``: warping residual moment
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `NodeResiduals` class.
+        """The initializer of the ``_NodeResiduals`` class.
         """
         self._data = DataFrame(
             columns = [
@@ -87,7 +62,7 @@ class NodeResiduals:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the residuals for the given `load case`.
+        """Clear the residuals for the given ``load case``.
         """
         if load_case not in self._loaded_lc:
             return
@@ -106,19 +81,19 @@ class NodeResiduals:
 
     def get_displacements(self, load_case: int, node_number: int) -> DataFrame:
         """Return the translational components of the displacement residuals for the given
-        `load_case`.
+        ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_nmb`: int
+        ``node_nmb``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_nmb` are not found.
+            If the given ``load_case`` or ``node_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -133,19 +108,19 @@ class NodeResiduals:
 
     def get_reaction_forces(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal translational components of the reaction force residuals for
-        the given `load_case`.
+        the given ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_nmb`: int
+        ``node_nmb``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_nmb` are not found.
+            If the given ``load_case`` or ``node_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -160,19 +135,19 @@ class NodeResiduals:
 
     def get_reaction_moments(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal rotational components of the residuals forces for the given
-        `load_case`.
+        ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_nmb`: int
+        ``node_nmb``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_nmb` are not found.
+            If the given ``load_case`` or ``node_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -187,19 +162,19 @@ class NodeResiduals:
 
     def get_rotations(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal rotational components of the residuals for the given
-        `load_case`.
+        ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_nmb`: int
+        ``node_nmb``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_nmb` are not found.
+            If the given ``load_case`` or ``node_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -213,7 +188,7 @@ class NodeResiduals:
         return self._data.loc[lc_mask & id_mask, ("URX", "URY", "URZ", "URB")].copy(deep=True)  # type: ignore
 
     def load(self, load_case: int) -> None:
-        """Load the nodal residuals for the given `load_case`.
+        """Load the nodal residuals for the given ``load_case``.
         """
         if self._dll.key_exist(26, load_case):
             node = CN_DISPI()
