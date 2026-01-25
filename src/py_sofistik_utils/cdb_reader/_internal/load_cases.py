@@ -11,25 +11,28 @@ from . sofistik_classes import CLC_CTRL
 
 
 class _LoadCases:
-    """The `_LoadCases` class provides methods and data structure to:
-    * access and load the keys `12/LC` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+    """
+    The ``_LoadCases`` class provides methods and data structure to:
+
+    * access and load the keys ``12/LC`` of the CDB file
+    * store these data in a convenient format
+    * provide access to these data
 
     Not all the information provided by SOFiSTiK are stored and therefore made available.
     In particular, the information loaded are:
-    * Type of load case (key `KIND`);
-    * Name of the load case (key `RTEX`);
-    * SOFiSTiK source program (key `NAME`);
-    * sum of the reaction forces (keys `RX`, `RY` and `RZ`);
-    * laod case factors (keys `fact`, `factX`, `factY` and `factZ`);
-    * PLC number (key `PLC`);
-    * theory (key `THEO`);
+
+    * Type of load case (key ``KIND``)
+    * Name of the load case (key ``RTEX``)
+    * SOFiSTiK source program (key ``NAME``)
+    * sum of the reaction forces (keys ``RX``, ``RY`` and ``RZ``)
+    * load case factors (keys ``fact``, ``factX``, ``factY`` and ``factZ``)
+    * PLC number (key ``PLC``)
+    * theory (key ``THEO``)
 
     For details, please refer to SOFiHELP - CDBase.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `_LoadCases` class.
+        """The initializer of the ``_LoadCases`` class.
         """
         self._dll = dll
 
@@ -73,49 +76,49 @@ class _LoadCases:
         self._loaded_lc.clear()
 
     def get_designation(self, load_case: int) -> str:
-        """Return the designation for the given `load_case`. An empty string is returned
-        if the `load_case` is not found.
+        """Return the designation for the given ``load_case``. An empty string is returned
+        if the ``load_case`` is not found.
         """
         return self._designation.get(load_case, "")
 
     def get_factors(self, load_case: int) -> NDArray[float64]:
-        """Return the factors of the given `load_case`. A zero vector is returned if the
-        `load_case` is not found.
+        """Return the factors of the given ``load_case``. A zero vector is returned if the
+        ``load_case`` is not found.
         """
         return self._factors.get(load_case, zeros(4, dtype = float64))
 
     def get_kind(self, load_case: int) -> str:
-        """Return the kind of the given `load_case`. An empty string is returned if the
-        `load_case` is not found.
+        """Return the kind of the given ``load_case``. An empty string is returned if the
+        ``load_case`` is not found.
         """
         return self._kind.get(load_case, "")
 
     def get_name(self, load_case: int) -> str:
-        """Return the name of the given `load_case`. An empty string is returned
-        if the `load_case` is not found.
+        """Return the name of the given ``load_case``. An empty string is returned
+        if the ``load_case`` is not found.
         """
         return self._name.get(load_case, "")
 
     def get_plc(self, load_case: int) -> int:
-        """Return the number of the PLC for the given `load_case`. `-1` is returned if the
-        `load_case` is not found.
+        """Return the number of the PLC for the given ``load_case``. `-1` is returned if the
+        ``load_case`` is not found.
         """
         return self._plc.get(load_case, -1)
 
     def get_reactions(self, load_case: int) -> NDArray[float64]:
-        """Return the sum of the reaction forces for the given `load_case`. A zero vector
-        is returned if the `load_case` is not found.
+        """Return the sum of the reaction forces for the given ``load_case``. A zero vector
+        is returned if the ``load_case`` is not found.
         """
         return self._reaction_sum.get(load_case, zeros(4, dtype = float64))
 
     def get_theory(self, load_case: int) -> str:
-        """Return the theory for the given `load_case`. An empty string is returned
-        if the the `load_case` is not found.
+        """Return the theory for the given ``load_case``. An empty string is returned
+        if the the ``load_case`` is not found.
         """
         return self._theory.get(load_case, "")
 
     def load(self, lc_nmb: int) -> None:
-        """Load information for given load cases (key `12/lc_nmb`).
+        """Load information for given load cases (key ``12/lc_nmb``).
         """
         if self._dll.key_exist(12, lc_nmb):
             lc = CLC_CTRL()
@@ -195,7 +198,7 @@ class _LoadCases:
             self._loaded_lc.add(lc_nmb)
 
     def load_all(self) -> None:
-        """Load information for all the load cases (keys `12/LC`).
+        """Load information for all the load cases (keys ``12/LC``).
         """
         for lc_nmb in range(1, 99999):
             self.load(lc_nmb)
