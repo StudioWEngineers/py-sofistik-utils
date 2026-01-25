@@ -28,6 +28,7 @@ Private Classes
     _NodeData
     _NodeResults
     _NodeResiduals
+    _SecondaryGroupLCData
     _SpringData
     _SpringResults
     _SysInfo

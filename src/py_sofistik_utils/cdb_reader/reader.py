@@ -23,7 +23,7 @@ from . _internal.load_cases import _LoadCases
 from . _internal.nodes import _Nodes
 from . _internal.plate_data import PlateData
 from . _internal.property import PropertyData
-from . _internal.sec_group_lc_data import SecondaryGroupLCData
+from . _internal.sec_group_lc_data import _SecondaryGroupLCData
 from . _internal.spring_data import _SpringData
 from . _internal.spring_results import _SpringResults
 from . _internal.sofistik_dll import SofDll
@@ -40,6 +40,7 @@ class SOFiSTiKCDBReader:
     beam_geo: _BeamData
     load_case: _LoadCases
     nodes: _Nodes
+    sec_grp_lc_data: _SecondaryGroupLCData
     spring_data: _SpringData
     spring_res: _SpringResults
     sys_info: _SysInfo
@@ -73,7 +74,7 @@ class SOFiSTiKCDBReader:
 
         self.grp_data = GroupData(self._dll)
         self.grp_lc_data = GroupLCData(self._dll)
-        self.sec_grp_lc_data = SecondaryGroupLCData(self._dll)
+        self.sec_grp_lc_data = _SecondaryGroupLCData(self._dll)
 
         self.nodes = _Nodes(self._dll)
 

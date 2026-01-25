@@ -4,6 +4,7 @@ from . _internal.nodes import _Nodes
 from . _internal.node_data import _NodeData
 from . _internal.node_residuals import _NodeResiduals
 from . _internal.node_results import _NodeResults
+from . _internal.sec_group_lc_data import _SecondaryGroupLCData
 from . _internal.spring_data import _SpringData
 from . _internal.spring_results import _SpringResults
 from . _internal.sys_info import _SysInfo
@@ -21,6 +22,7 @@ __all__ = [
     "_NodeData",
     "_NodeResiduals",
     "_NodeResults",
+    "_SecondaryGroupLCData",
     "_SpringData",
     "_SpringResults",
     "_SysInfo",
