@@ -1,25 +1,3 @@
-"""
-TrussData
----------
-
-The `TrussData` class provides methods and data structure to:
-    * read-only access to the cdb file (only to the part related to the beam geometry);
-    * store these information in a convenient format;
-    * access these information.
-
-Beam data are stored in a `pd.DataFrame` with the following columns:
-    * `GROUP`: the beam group number
-    * `ELEM_ID`: the beam number
-    * `STATION`: `np.array` defining the position of the output stations
-    * `ADIMENSIONAL_STATION`: `np.array` defining the position of the output stations
-unitarized by the beam length
-    * `np.array[np.uint64]` containing the start end nodes of the beam
-    * `TRANS_MATRIX`: the beam transformation matrix (3 x 3 `np.array`)
-    * `SPAR`: `np.array` with distances along a continuous beam or parameter values along
-the reference axis
-    * `PROPERTIES`: `list` containing the property number for each station
-
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -33,27 +11,29 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CTRUS
 
 
-class TrussData:
-    """The `TrussData` class provides methods and data structure to:
+class _TrussData:
+    """The ``_TrussData`` class provides methods and data structure to:
+
     * read-only access to the cdb file (only to the part related to the beam geometry);
     * store these information in a convenient format;
     * access these information.
 
-    Beam data are stored in a `pd.DataFrame` with the following columns:
-    * `GROUP`: the beam group number
-    * `ELEM_ID`: the beam number
-    * `STATION`: `np.array` defining the position of the output stations
-    * `ADIMENSIONAL_STATION`: `np.array` defining the position of the output stations
-unitarized by the beam length
-    * `CONNECTIVITY`: `np.array[np.uint64]` containing the start end nodes of the beam
-    * `TRANS_MATRIX`: the beam transformation matrix (3 x 3 `np.array`)
-    * `SPAR`: `np.array` with distances along a continuous beam or parameter values along
-the reference axis
-    * `PROPERTIES`: `list` containing the property number for each station
+    Beam data are stored in a :class:`pandas.DataFrame` with the following columns:
+
+    * ``GROUP``: the beam group number
+    * ``ELEM_ID``: the beam number
+    * ``STATION``: :class:`numpy.ndarray` defining the position of the output stations
+    * ``ADIMENSIONAL_STATION``: :class:`numpy.ndarray` defining the position of the output stations
+      unitarized by the beam length
+    * ``CONNECTIVITY``: :class:`numpy.ndarray` containing the start end nodes of the beam
+    * ``TRANS_MATRIX``: the beam transformation matrix (3 x 3 :class:`numpy.ndarray`)
+    * ``SPAR``: :class:`numpy.ndarray` with distances along a continuous beam or parameter values along
+      the reference axis
+    * ``PROPERTIES``: `list` containing the property number for each station
 
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `TrussData` class.
+        """The initializer of the `_`TrussData`` class.
         """
         self._data: DataFrame = DataFrame(
             columns = [

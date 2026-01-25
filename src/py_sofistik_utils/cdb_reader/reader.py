@@ -28,9 +28,9 @@ from . _internal.spring_data import SpringData
 from . _internal.spring_results import SpringResults
 from . _internal.sofistik_dll import SofDll
 from . _internal.sys_info import SysInfo
-from . _internal.truss_data import TrussData
-from . _internal.truss_load import TrussLoad
-from . _internal.truss_results import TrussResult
+from . _internal.truss_data import _TrussData
+from . _internal.truss_load import _TrussLoad
+from . _internal.truss_results import _TrussResult
 
 
 class SOFiSTiKCDBReader:
@@ -40,6 +40,9 @@ class SOFiSTiKCDBReader:
     beam_geo: _BeamData
     load_case: _LoadCases
     nodes: _Nodes
+    truss_data: _TrussData
+    truss_load: _TrussLoad
+    truss_results: _TrussResult
 
     def __init__(
             self,
@@ -80,9 +83,9 @@ class SOFiSTiKCDBReader:
         self.properties = PropertyData(self._dll)
         self.sys_info = SysInfo(self._dll)
 
-        self.truss_data = TrussData(self._dll)
-        self.truss_load = TrussLoad(self._dll)
-        self.truss_results = TrussResult(self._dll)
+        self.truss_data = _TrussData(self._dll)
+        self.truss_load = _TrussLoad(self._dll)
+        self.truss_results = _TrussResult(self._dll)
 
     def clear(self) -> None:
         """Clear all the loaded data and results.

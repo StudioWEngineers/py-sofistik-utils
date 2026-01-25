@@ -4,6 +4,9 @@ from . _internal.nodes import _Nodes
 from . _internal.node_data import _NodeData
 from . _internal.node_residuals import _NodeResiduals
 from . _internal.node_results import _NodeResults
+from . _internal.truss_data import _TrussData
+from . _internal.truss_load import _TrussLoad
+from . _internal.truss_results import _TrussResult
 
 from . reader import SOFiSTiKCDBReader
 
@@ -14,5 +17,8 @@ __all__ = [
     "_Nodes",
     "_NodeData",
     "_NodeResiduals",
-    "_NodeResults"
+    "_NodeResults",
+    "_TrussData",
+    "_TrussLoad",
+    "_TrussResult"
 ]
