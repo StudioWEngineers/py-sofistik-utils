@@ -37,6 +37,9 @@ class SOFiSTiKCDBReader:
     """The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only
     access to a SOFiSTiK cdb file and serialize its content.
     """
+    beam_geo: _BeamData
+    load_case: _LoadCases
+
     def __init__(
             self,
             path_to_cdb: str,
@@ -53,7 +56,7 @@ class SOFiSTiKCDBReader:
         self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
 
         self.beam_res = BeamResults(self._dll)
-        self.beam_geo: _BeamData = _BeamData(self._dll)
+        self.beam_geo = _BeamData(self._dll)
         self.beam_load = BeamLoad(self._dll)
         self.beam_stress = BeamStress(self._dll)
 
@@ -72,7 +75,7 @@ class SOFiSTiKCDBReader:
         self.spring_data = SpringData(self._dll)
         self.spring_res = SpringResults(self._dll)
 
-        self.load_case: _LoadCases = _LoadCases(self._dll)
+        self.load_case = _LoadCases(self._dll)
         self.properties = PropertyData(self._dll)
         self.sys_info = SysInfo(self._dll)
 
