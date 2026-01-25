@@ -27,7 +27,7 @@ from . _internal.sec_group_lc_data import SecondaryGroupLCData
 from . _internal.spring_data import SpringData
 from . _internal.spring_results import SpringResults
 from . _internal.sofistik_dll import SofDll
-from . _internal.sys_info import SysInfo
+from . _internal.sys_info import _SysInfo
 from . _internal.truss_data import _TrussData
 from . _internal.truss_load import _TrussLoad
 from . _internal.truss_results import _TrussResult
@@ -40,6 +40,7 @@ class SOFiSTiKCDBReader:
     beam_geo: _BeamData
     load_case: _LoadCases
     nodes: _Nodes
+    sys_info: _SysInfo
     truss_data: _TrussData
     truss_load: _TrussLoad
     truss_results: _TrussResult
@@ -81,7 +82,7 @@ class SOFiSTiKCDBReader:
 
         self.load_case = _LoadCases(self._dll)
         self.properties = PropertyData(self._dll)
-        self.sys_info = SysInfo(self._dll)
+        self.sys_info = _SysInfo(self._dll)
 
         self.truss_data = _TrussData(self._dll)
         self.truss_load = _TrussLoad(self._dll)

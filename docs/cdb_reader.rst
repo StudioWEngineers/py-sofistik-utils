@@ -28,6 +28,7 @@ Private Classes
     _NodeData
     _NodeResults
     _NodeResiduals
+    _SysInfo
     _TrussData
     _TrussLoad
     _TrussResult
