@@ -3,7 +3,7 @@
 CDB Reader API Reference
 ========================
 
-This is the table of contents for the `CDB Reader` module.
+This is the table of contents for the ``cdb_reader`` module.
 Click any class to go to its detailed documentation page.
 
 Public Classes
