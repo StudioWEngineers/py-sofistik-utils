@@ -23,6 +23,9 @@ Private Classes
     :template: class-template.rst
 
     _BeamData
+    _BeamLoad
+    _BeamResults
+    _BeamStress
     _LoadCases
     _Nodes
     _NodeData

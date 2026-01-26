@@ -1,12 +1,3 @@
-"""
-BeamLoad
----------
-
-The `BeamLoad` class provides methods and data structure to:
-    * access and load the keys `161/LC` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -20,14 +11,15 @@ from . sofistik_classes import CBEAM_DL
 from . sofistik_dll import SofDll
 
 
-class BeamLoad:
-    """The `BeamLoad` class provides methods and data structure to:
-    * access and load the keys `161/LC` of the CDB file;
+class _BeamLoad:
+    """The `_BeamLoad` class provides methods and data structure to:
+
+    * access and load the keys ``161/LC`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `BeamLoad` class.
+        """The initializer of the `_BeamLoad` class.
         """
         self._data: DataFrame = DataFrame(
             columns = [
@@ -46,7 +38,7 @@ class BeamLoad:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load_case` number.
+        """Clear the results for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -66,15 +58,15 @@ class BeamLoad:
             load_case: int,
             load_type: str
         ) -> Any:
-        """Return the cable connectivity for the given `element_number`.
+        """Return the cable connectivity for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The cable element number
-        `load_case`: int
+        ``load_case``: int
             The load case number
-        `load_type`: str
+        ``load_type``: str
             The load type
 
         Raises
@@ -94,13 +86,13 @@ class BeamLoad:
         return self._data[e_mask & lc_mask & lt_mask].copy(deep=True)
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Load cable element loads for the given the `load_cases`.
+        """Load cable element loads for the given the ``load_cases``.
 
-        If a load case is not found, a warning is raised only if `echo_level` is `> 0`.
+        If a load case is not found, a warning is raised only if ``echo_level`` is ``> 0``.
 
         Parameters
         ----------
-        `load_cases`: int | list[int], load case numbers
+        ``load_cases``: int | list[int], load case numbers
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]

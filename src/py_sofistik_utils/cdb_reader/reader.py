@@ -11,9 +11,9 @@ SOFiSTiK cdb file and serialize its content.
 
 # local library specific imports
 from . _internal.beam_data import _BeamData
-from . _internal.beam_load import BeamLoad
-from . _internal.beam_results import BeamResults
-from . _internal.beam_stresses import BeamStress
+from . _internal.beam_load import _BeamLoad
+from . _internal.beam_results import _BeamResults
+from . _internal.beam_stresses import _BeamStress
 from . _internal.cable_data import CableData
 from . _internal.cable_load import CableLoad
 from . _internal.cable_results import CableResults
@@ -38,6 +38,9 @@ class SOFiSTiKCDBReader:
     access to a SOFiSTiK cdb file and serialize its content.
     """
     beam_geo: _BeamData
+    beam_load: _BeamLoad
+    beam_res: _BeamResults
+    beam_stress: _BeamStress
     load_case: _LoadCases
     nodes: _Nodes
     sec_grp_lc_data: _SecondaryGroupLCData
@@ -63,10 +66,10 @@ class SOFiSTiKCDBReader:
 
         self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
 
-        self.beam_res = BeamResults(self._dll)
+        self.beam_res = _BeamResults(self._dll)
         self.beam_geo = _BeamData(self._dll)
-        self.beam_load = BeamLoad(self._dll)
-        self.beam_stress = BeamStress(self._dll)
+        self.beam_load = _BeamLoad(self._dll)
+        self.beam_stress = _BeamStress(self._dll)
 
         self.cable_data = CableData(self._dll)
         self.cable_load = CableLoad(self._dll)

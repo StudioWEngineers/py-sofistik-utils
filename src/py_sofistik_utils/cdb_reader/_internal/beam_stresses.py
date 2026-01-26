@@ -1,9 +1,3 @@
-"""
-BeamStresses
-------------
-
-
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 
@@ -17,11 +11,11 @@ from . sofistik_classes import CBEAM_STR
 from . sofistik_utilities import long_to_str
 
 
-class BeamStress:
+class _BeamStress:
     """
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `BeamStress` class.
+        """The initializer of the ``_BeamStress`` class.
         """
         self._data: DataFrame = DataFrame(
             columns = [
@@ -39,7 +33,7 @@ class BeamStress:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load_case` number.
+        """Clear the results for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -62,7 +56,7 @@ class BeamStress:
         return self._data.copy(deep = True)
 
     def load(self, load_case: int) -> None:
-        """Load the results for the given `load_case` number.
+        """Load the results for the given ``load_case`` number.
 
         Parameters
         ----------
@@ -71,7 +65,7 @@ class BeamStress:
         Raises
         ------
         RuntimeError
-            If the given `load_case` is not found.
+            If the given ``load_case`` is not found.
         """
         if self._dll.key_exist(105, load_case):
             beam_stress = CBEAM_STR()
