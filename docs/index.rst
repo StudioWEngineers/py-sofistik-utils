@@ -18,7 +18,7 @@ software.
 
     .. rubric:: Dependencies
 
-*py3dm* depends on:
+*py-sofistik-utils* depends on:
 
 - `pandas <https://pandas.pydata.org/>`__
 
