@@ -14,7 +14,8 @@ extensions = [
     "sphinx.ext.autodoc",           # core autodoc
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",       # links to Python, numpy, pandas
-    "sphinx_copybutton"
+    "sphinx_copybutton",
+    "sphinx.ext.napoleon"
 ]
 
 # Hide full module names in docs
