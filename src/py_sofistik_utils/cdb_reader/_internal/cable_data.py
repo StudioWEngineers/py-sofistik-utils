@@ -1,12 +1,3 @@
-"""
-CableData
----------
-
-The `CableData` class provides methods and data structure to:
-    * access and load the keys `160/00` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -20,14 +11,16 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL
 
 
-class CableData:
-    """The `CableData` class provides methods and data structure to:
-    * access and load the keys `160/00` of the CDB file;
+class _CableData:
+    """
+    This class provides methods and data structure to:
+
+    * access and load the keys ``160/00`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `CableData` class.
+        """The initializer of the ``_CableData`` class.
         """
         self._data: DataFrame = DataFrame(
             columns = [
@@ -51,17 +44,17 @@ class CableData:
         self._loaded_lc.clear()
 
     def get_element_connectivity(self, element_number: int) -> list[int]:
-        """Return the cable connectivity for the given `element_number`.
+        """Return the cable connectivity for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         raise NotImplementedError
         for group_data in self._connectivity.values():
@@ -71,17 +64,17 @@ class CableData:
         raise RuntimeError(f"Element number {element_number} not found!")
 
     def get_element_length(self, element_number: int) -> float:
-        """Return the cable initial length for the given `element_number`.
+        """Return the cable initial length for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         raise NotImplementedError
         for group_data in self._initial_length.values():
@@ -91,17 +84,17 @@ class CableData:
         raise RuntimeError(f"Element number {element_number} not found!")
 
     def get_element_property(self, element_number: int) -> int:
-        """Return the cable property number for the given `element_number`.
+        """Return the cable property number for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         raise NotImplementedError
         for group_data in self._property_id.values():
@@ -111,17 +104,17 @@ class CableData:
         raise RuntimeError(f"Element number {element_number} not found!")
 
     def get_element_transformation_vector(self, element_number: int) -> DataFrame:
-        """Return the cable transformation vector for the given `element_number`.
+        """Return the cable transformation vector for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         raise NotImplementedError
         for group_data in self._transformation_vector.values():
@@ -131,17 +124,17 @@ class CableData:
         raise RuntimeError(f"Element number {element_number} not found!")
 
     def get_group_connectivity(self, group_number: int) -> dict[int, list[int]]:
-        """Return the cable connectivity for all the cables in the given `group_number`.
+        """Return the cable connectivity for all the cables in the given ``group_number``.
 
         Parameters
         ----------
-        `group_number`: int
+        ``group_number``: int
             The cable group number
 
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         raise NotImplementedError
         if group_number in self._connectivity:
@@ -154,7 +147,7 @@ class CableData:
 
         Parameters
         ----------
-        `group_divisor`: int, optional default to 10000
+        ``group_divisor``: int, optional default to 10000
 
         Raises
         ------

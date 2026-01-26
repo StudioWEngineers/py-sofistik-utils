@@ -1,12 +1,3 @@
-"""
-CableResult
------------
-
-The `CableResult` class provides methods and data structure to:
-    * access and load the keys `162/LC` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these results.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 
@@ -19,14 +10,16 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL_RES
 
 
-class CableResults:
-    """The `CableResults` class provides methods and data structure to:
-    * access and load the keys `162/LC` of the CDB file;
+class _CableResults:
+    """
+    This class provides methods and data structure to:
+
+    * access and load the keys ``162/LC`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `CableResults` class.
+        """The initializer of the ``_CableResults`` class.
         """
         self._dll = dll
 
@@ -42,7 +35,7 @@ class CableResults:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load_case` number.
+        """Clear the results for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -64,20 +57,20 @@ class CableResults:
             load_case: int,
             grp_number: int
         ) -> "Series[float]":
-        """Return the cable average axial force for the given `load_case` and
-        `grp_number`.
+        """Return the cable average axial force for the given ``load_case`` and
+        ``grp_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `grp_number`: int
+        ``grp_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `grp_number` are not found.
+            If the given ``load_case`` or ``grp_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -93,19 +86,19 @@ class CableResults:
 
     def get_group_axial_displacement(
             self, load_case: int, grp_number: int) -> "Series[float]":
-        """Return the cable axial displacement for the given `load_case` and `grp_number`.
+        """Return the cable axial displacement for the given ``load_case`` and ``grp_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `grp_number`: int
+        ``grp_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `grp_number` are not found.
+            If the given ``load_case`` or ``grp_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -120,19 +113,19 @@ class CableResults:
         return self._data.AXIAL_DISPLACEMENT[lc_mask & grp_mask].copy(deep = True)
 
     def get_group_axial_force(self, load_case: int, grp_number: int) -> "Series[float]":
-        """Return the cable axial force for the given `load_case` and `grp_number`.
+        """Return the cable axial force for the given ``load_case`` and ``grp_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `grp_number`: int
+        ``grp_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `grp_number` are not found.
+            If the given ``load_case`` or ``grp_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -151,20 +144,20 @@ class CableResults:
             load_case: int,
             grp_number: int
         ) -> "Series[float]":
-        """Return the cable effective stiffness for the given `load_case` and
-        `grp_number`.
+        """Return the cable effective stiffness for the given ``load_case`` and
+        ``grp_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `grp_number`: int
+        ``grp_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `grp_number` are not found.
+            If the given ``load_case`` or ``grp_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -180,19 +173,19 @@ class CableResults:
 
     def get_group_relaxed_length(
             self, load_case: int, grp_number: int) -> "Series[float]":
-        """Return the cable relaxed length for the given `load_case` and `grp_number`.
+        """Return the cable relaxed length for the given ``load_case`` and ``grp_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `grp_number`: int
+        ``grp_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `grp_number` are not found.
+            If the given ``load_case`` or ``grp_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -207,19 +200,19 @@ class CableResults:
         return self._data.RELAXED_LENGTH[lc_mask & grp_mask].copy(deep = True)
 
     def get_group_total_strain(self, load_case: int, grp_number: int) -> "Series[float]":
-        """Return the cable total strain for the given `load_case` and `grp_number`.
+        """Return the cable total strain for the given ``load_case`` and ``grp_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `grp_number`: int
+        ``grp_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `grp_number` are not found.
+            If the given ``load_case`` or ``grp_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -238,19 +231,19 @@ class CableResults:
                                         element_number: int
         ) -> float:
         """Return a shallow copy of the cable average axial force for the given
-        `load_case` and `element_number`.
+        ``load_case`` and ``element_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `element_number` are not found.
+            If the given ``load_case`` or ``element_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -266,20 +259,20 @@ class CableResults:
 
     def get_element_axial_displacement(
             self, load_case: int, element_number: int) -> float:
-        """Return a shallow copy of the cable axial displacement for the given `load_case`
-        and `element_number`.
+        """Return a shallow copy of the cable axial displacement for the given ``load_case``
+        and ``element_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `element_number` are not found.
+            If the given ``load_case`` or ``element_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -294,20 +287,20 @@ class CableResults:
         return float(self._data.AXIAL_DISPLACEMENT[lc_mask & elem_mask].item())
 
     def get_element_axial_force(self, load_case: int, element_number: int) -> float:
-        """Return a shallow copy of the cable axial force for the given `load_case` and
-        `element_number`.
+        """Return a shallow copy of the cable axial force for the given ``load_case`` and
+        ``element_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `element_number` are not found.
+            If the given ``load_case`` or ``element_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -326,19 +319,19 @@ class CableResults:
                                         element_number: int
         ) -> float:
         """Return a shallow copy of the cable effective stiffness for the given
-        `load_case` and `element_number`.
+        ``load_case`` and ``element_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `element_number` are not found.
+            If the given ``load_case`` or ``element_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -353,20 +346,20 @@ class CableResults:
         return float(self._data.EFFECTIVE_STIFFNESS[lc_mask & elem_mask].item())
 
     def get_element_relaxed_length(self, load_case: int, element_number: int) -> float:
-        """Return a shallow copy of the cable relaxed length for the given `load_case` and
-        `element_number`.
+        """Return a shallow copy of the cable relaxed length for the given ``load_case`` and
+        ``element_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `element_number` are not found.
+            If the given ``load_case`` or ``element_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -381,20 +374,20 @@ class CableResults:
         return float(self._data.RELAXED_LENGTH[lc_mask & elem_mask].item())
 
     def get_element_total_strain(self, load_case: int, element_number: int) -> float:
-        """Return a shallow copy of the cable total strain for the given `load_case` and
-        `element_number`.
+        """Return a shallow copy of the cable total strain for the given ``load_case`` and
+        ``element_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `element_number`: int
+        ``element_number``: int
             The cable element number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `element_number` are not found.
+            If the given ``load_case`` or ``element_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -409,16 +402,16 @@ class CableResults:
         return float(self._data.TOTAL_STRAIN[lc_mask & elem_mask].item())
 
     def load(self, load_case: int) -> None:
-        """Load the cable results for the given `load_case` number.
+        """Load the cable results for the given ``load_case`` number.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` is not found.
+            If the given ``load_case`` is not found.
         """
         if self._dll.key_exist(162, load_case):
             cable_res = CCABL_RES()

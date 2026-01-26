@@ -25,6 +25,9 @@ Private Classes
     _BeamData
     _BeamLoad
     _BeamResults
+    _CableData
+    _CableLoad
+    _CableResults
     _BeamStress
     _LoadCases
     _Nodes

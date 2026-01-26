@@ -2,6 +2,9 @@ from . _internal.beam_data import _BeamData
 from . _internal.beam_load import _BeamLoad
 from . _internal.beam_results import _BeamResults
 from . _internal.beam_stresses import _BeamStress
+from . _internal.cable_data import _CableData
+from . _internal.cable_load import _CableLoad
+from . _internal.cable_results import _CableResults
 from . _internal.load_cases import _LoadCases
 from . _internal.nodes import _Nodes
 from . _internal.node_data import _NodeData
@@ -23,6 +26,9 @@ __all__ = [
     "_BeamLoad",
     "_BeamResults",
     "_BeamStress",
+    "_CableData",
+    "_CableLoad",
+    "_CableResults",
     "_LoadCases",
     "_Nodes",
     "_NodeData",
