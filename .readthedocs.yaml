@@ -10,6 +10,7 @@ python:
     - method: pip
       path: .
     - requirements: docs/requirements.txt
+    - pip install -e src/py-sofistik-utils/
 
 sphinx:
   configuration: docs/conf.py
