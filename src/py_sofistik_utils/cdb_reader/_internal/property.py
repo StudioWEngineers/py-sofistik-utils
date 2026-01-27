@@ -1,23 +1,3 @@
-"""
-PropertyData
-------------
-
-The `PropertyData` class provides abstractions to load and access information about the
-cross-sectional values, contained in keys `9/PROP:0` (total section) of the CDB file.
-Refer to SOFiHELP - CDBase for further information on this key.
-
-Data are stored in a `pandas` `DataFrame` having the following columns:
-    * `ID`: property number
-    * `A`: cross-sectional gross area
-    * `AV_Y`: shear area Y
-    * `AV_Z`: shear area Z
-    * `J`: torsional moment of inertia
-    * `I_YY`: moment of inertia YY
-    * `I_ZZ`: moment of inertia ZZ
-    * `E`: elastic modulus
-    * `G`: shear modulus
-    * `SW`: nominal weight (of the material)
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -30,27 +10,29 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CSECT, CSECT_ADD
 
 
-class PropertyData:
-    """The `PropertyData` class provides abstractions to load and access information about
-    the cross-sectional values, contained in keys `9/PROP:0` (total section) of the CDB
+class _PropertyData:
+    """
+    This class provides abstractions to load and access information about
+    the cross-sectional values, contained in keys ``9/PROP:0`` (total section) of the CDB
     file. Refer to SOFiHELP - CDBase for further information on this key.
 
-    Data are stored in a `pandas` `DataFrame` having the following columns:
-        * `ID`: property number
-        * `A`: cross-sectional gross area
-        * `AV_Y`: shear area Y
-        * `AV_Z`: shear area Z
-        * `J`: torsional moment of inertia
-        * `I_YY`: moment of inertia YY
-        * `I_ZZ`: moment of inertia ZZ
-        * `W_EL_YY`: elastic section modulus YY
-        * `W_EL_ZZ`: elastic section modulus ZZ
-        * `E`: elastic modulus
-        * `G`: shear modulus
-        * `SW`: nominal weight (of the material)
+    Data are stored in a :class:`pandas.DataFrame` having the following columns:
+
+    * ``ID``: property number
+    * ``A``: cross-sectional gross area
+    * ``AV_Y``: shear area Y
+    * ``AV_Z``: shear area Z
+    * ``J``: torsional moment of inertia
+    * ``I_YY``: moment of inertia YY
+    * ``I_ZZ``: moment of inertia ZZ
+    * ``W_EL_YY``: elastic section modulus YY
+    * ``W_EL_ZZ``: elastic section modulus ZZ
+    * ``E``: elastic modulus
+    * ``G``: shear modulus
+    * ``SW``: nominal weight (of the material)
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `PropertyData` class.
+        """The initializer of the ``_PropertyData`` class.
         """
         self._data = DataFrame(
             columns = [
@@ -71,7 +53,7 @@ class PropertyData:
         self._loaded_prop: set[int] = set()
 
     def clear(self, property_number: int) -> None:
-        """Clear values for the given `property_number`.
+        """Clear values for the given ``property_number``.
         """
         if property_number not in self._loaded_prop:
             return
@@ -86,17 +68,17 @@ class PropertyData:
         self._loaded_prop.clear()
 
     def get_area(self, property_number: int) -> float:
-        """Return the cross-sectional gross area for the given `property_number`.
+        """Return the cross-sectional gross area for the given ``property_number``.
 
         Parameters
         ----------
-        `property_number`: int
+        ``property_number``: int
             The property number
 
         Raises
         ------
         LookupError
-            If the given `property_number` is not found.
+            If the given ``property_number`` is not found.
         """
         if property_number not in self._loaded_prop:
             raise LookupError(f"Property number {property_number} not found!")
@@ -105,17 +87,17 @@ class PropertyData:
         return self._data.loc[p_mask, ("A")].item()  #type: ignore
 
     def get_elastic_section_modulus_yy(self, property_number: int) -> float:
-        """Return the elastic section modulus YY for the given `property_number`.
+        """Return the elastic section modulus YY for the given ``property_number``.
 
         Parameters
         ----------
-        `property_number`: int
+        ``property_number``: int
             The property number
 
         Raises
         ------
         LookupError
-            If the given `property_number` is not found.
+            If the given ``property_number`` is not found.
         """
         if property_number not in self._loaded_prop:
             raise LookupError(f"Property number {property_number} not found!")
@@ -124,17 +106,17 @@ class PropertyData:
         return self._data.loc[p_mask, ("W_EL_YY")].item()  #type: ignore
 
     def get_elastic_section_modulus_zz(self, property_number: int) -> float:
-        """Return the elastic section modulus ZZ for the given `property_number`.
+        """Return the elastic section modulus ZZ for the given ``property_number``.
 
         Parameters
         ----------
-        `property_number`: int
+        ``property_number``: int
             The property number
 
         Raises
         ------
         LookupError
-            If the given `property_number` is not found.
+            If the given ``property_number`` is not found.
         """
         if property_number not in self._loaded_prop:
             raise LookupError(f"Property number {property_number} not found!")
@@ -143,17 +125,17 @@ class PropertyData:
         return self._data.loc[p_mask, ("W_EL_ZZ")].item()  #type: ignore
 
     def get_second_moment_of_area_yy(self, property_number: int) -> float:
-        """Return the cross-sectional moment of area YY for the given `property_number`.
+        """Return the cross-sectional moment of area YY for the given ``property_number``.
 
         Parameters
         ----------
-        `property_number`: int
+        ``property_number``: int
             The property number
 
         Raises
         ------
         LookupError
-            If the given `property_number` is not found.
+            If the given ``property_number`` is not found.
         """
         if property_number not in self._loaded_prop:
             raise LookupError(f"Property number {property_number} not found!")
@@ -162,17 +144,17 @@ class PropertyData:
         return self._data.loc[p_mask, ("I_YY")].item()  #type: ignore
 
     def get_second_moment_of_area_zz(self, property_number: int) -> float:
-        """Return the cross-sectional moment of area ZZ for the given `property_number`.
+        """Return the cross-sectional moment of area ZZ for the given ``property_number``.
 
         Parameters
         ----------
-        `property_number`: int
+        ``property_number``: int
             The property number
 
         Raises
         ------
         LookupError
-            If the given `property_number` is not found.
+            If the given ``property_number`` is not found.
         """
         if property_number not in self._loaded_prop:
             raise LookupError(f"Property number {property_number} not found!")
@@ -181,7 +163,7 @@ class PropertyData:
         return self._data.loc[p_mask, ("I_ZZ")].item()  #type: ignore
 
     def get_values(self, property_number: int) -> DataFrame:
-        """Return all the sectional values for the given `property_number`.
+        """Return all the sectional values for the given ``property_number``.
         """
         if property_number not in self._loaded_prop:
             raise LookupError(f"Property number {property_number} not found!")
@@ -190,7 +172,7 @@ class PropertyData:
         return self._data.loc[p_mask].copy(deep=True)
 
     def load(self, property_number: int) -> None:
-        """Load sectional values for the given `property_number`.
+        """Load sectional values for the given ``property_number``.
         """
         if self._dll.key_exist(9, property_number):
             prop = CSECT()

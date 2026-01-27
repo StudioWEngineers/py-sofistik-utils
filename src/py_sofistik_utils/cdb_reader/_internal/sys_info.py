@@ -1,12 +1,3 @@
-"""
-SysInfo
--------
-
-The `SysInfo` class provides methods and data structure to:
-    * access the key 10/0 of the cdb file;
-    * store these information in a convenient format;
-    * provide API to access these information.
-"""
 # standard library imports
 from ctypes import byref, create_string_buffer, c_int, sizeof
 
@@ -17,14 +8,15 @@ from . sofistik_classes import CSYST
 from . sofistik_dll import SofDll
 
 
-class SysInfo:
-    """The `SysInfo` class provides methods and data structure to:
-    * access the key 10/0 of the cdb file;
+class _SysInfo:
+    """The ``_SysInfo`` class provides methods and data structure to:
+
+    * access the key ``10/0`` of the cdb file;
     * store these information in a convenient format;
     * provide API to access these information.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `SysInfo` class.
+        """The initializer of the ``_SysInfo`` class.
         """
         self._dll = dll
         self._info: dict[str, str | int] = {}
@@ -35,7 +27,7 @@ class SysInfo:
         self._info.clear()
 
     def gravity_direction(self) -> str:
-        """Return the gravity direction. `load` method is supposed to be called
+        """Return the gravity direction. ``load`` method is supposed to be called
         beforehand.
 
         Raises
@@ -53,7 +45,7 @@ class SysInfo:
             raise KeyError("System informations have not been loaded!") from exc
 
     def group_divisor(self) -> int:
-        """Return the group divisor number. `load` method is supposed to be called
+        """Return the group divisor number. ``load`` method is supposed to be called
         beforehand.
 
         Raises
@@ -128,7 +120,7 @@ class SysInfo:
                 raise RuntimeError("Unknown error while checking existance of key 10/0")
 
     def max_node_id(self) -> int:
-        """Return the maximum node ID. `load` method is supposed to be called beforehand.
+        """Return the maximum node ID. ``load`` method is supposed to be called beforehand.
 
         Raises
         ------
@@ -145,7 +137,7 @@ class SysInfo:
             raise KeyError("System informations have not been loaded!") from exc
 
     def number_of_nodes(self) -> int:
-        """Return the number of nodes. `load` method is supposed to be called beforehand.
+        """Return the number of nodes. ``load`` method is supposed to be called beforehand.
 
         Raises
         ------
@@ -162,7 +154,7 @@ class SysInfo:
             raise KeyError("System informations have not been loaded!") from exc
 
     def project_name(self) -> str:
-        """Return the project name. `load` method is supposed to be called beforehand.
+        """Return the project name. ``load`` method is supposed to be called beforehand.
 
         Raises
         ------

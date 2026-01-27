@@ -1,7 +1,7 @@
 py-sofistik-utils documentation
 ===============================
 
-This is the py3dm 0.0.2-dev1 documentation.
+This is the py-sofistik-utils documentation.
 
 *py-sofistik-utils* is a set of external utilities for the SOFiSTiK finite element analysis
 software.
@@ -18,7 +18,7 @@ software.
 
     .. rubric:: Dependencies
 
-*py3dm* depends on:
+*py-sofistik-utils* depends on:
 
 - `pandas <https://pandas.pydata.org/>`__
 

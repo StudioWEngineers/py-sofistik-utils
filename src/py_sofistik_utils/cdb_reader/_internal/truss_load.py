@@ -1,12 +1,3 @@
-"""
-TrussLoad
----------
-
-The `TrussLoad` class provides methods and data structure to:
-    * access and load the keys `161/LC` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -15,19 +6,19 @@ from typing import Any
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_classes import CTRUS_LOA
 from . sofistik_dll import SofDll
 
 
-class TrussLoad:
-    """The `TrussLoad` class provides methods and data structure to:
-    * access and load the keys `161/LC` of the CDB file;
+class _TrussLoad:
+    """The ``_TrussLoad`` class provides methods and data structure to:
+    * access and load the keys ``161/LC`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `TrussLoad` class.
+        """The initializer of the ``_TrussLoad`` class.
         """
         self._data: DataFrame = DataFrame(
             columns = [
@@ -44,7 +35,7 @@ class TrussLoad:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load_case` number.
+        """Clear the results for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -64,15 +55,15 @@ class TrussLoad:
             load_case: int,
             load_type: str
         ) -> Any:
-        """Return the cable connectivity for the given `element_number`.
+        """Return the cable connectivity for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The cable element number
-        `load_case`: int
+        ``load_case``: int
             The load case number
-        `load_type`: str
+        ``load_type``: str
             The load type
 
         Raises
@@ -92,13 +83,13 @@ class TrussLoad:
         return self._data[e_mask & lc_mask & lt_mask].copy(deep=True)
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Load cable element loads for the given the `load_cases`.
+        """Load cable element loads for the given the ``load_cases``.
 
-        If a load case is not found, a warning is raised only if `echo_level` is `> 0`.
+        If a load case is not found, a warning is raised only if ``echo_level`` is ``> 0``.
 
         Parameters
         ----------
-        `load_cases`: int | list[int], load case numbers
+        ``load_cases``: int | list[int], load case numbers
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
@@ -121,7 +112,7 @@ class TrussLoad:
                 continue
 
         # assigning groups
-        group_data = GroupData(self._dll)
+        group_data = _GroupData(self._dll)
         group_data.load()
 
         for grp, cable_range in group_data.iterator_truss():

@@ -1,12 +1,3 @@
-"""
-SpringData
-----------
-
-The `SpringData` class provides methods and data structure to:
-    * access and load the key `170/00` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 
@@ -17,14 +8,15 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI
 
 
-class SpringData:
-    """The `SpringData` class provides methods and data structure to:
-    * access and load the key `170/00` of the CDB file;
+class _SpringData:
+    """The ``_SpringData`` class provides methods and data structure to:
+
+    * access and load the key ``170/00`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `SpringData` class.
+        """The initializer of the ``_SpringData`` class.
         """
         self._dll = dll
 
@@ -80,17 +72,17 @@ class SpringData:
                 count += 1
 
     def get_element_connectivity(self, spring_nmb: int) -> list[int]:
-        """Return the connectivity for the given `spring_nmb`.
+        """Return the connectivity for the given ``spring_nmb``.
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The sprig element number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         for group_data in self._connectivity.values():
             if spring_nmb in group_data:
@@ -99,17 +91,17 @@ class SpringData:
         raise RuntimeError(f"Element number {spring_nmb} not found!")
 
     def get_element_axial_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring axial stiffness for the given `spring_nmb`.
+        """Return the spring axial stiffness for the given ``spring_nmb``.
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The sprig element number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         for group_data in self._axial_stiffness.values():
             if spring_nmb in group_data:
@@ -118,17 +110,17 @@ class SpringData:
         raise RuntimeError(f"Element number {spring_nmb} not found!")
 
     def get_element_lateral_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring lateral stiffness for the given `spring_nmb`.
+        """Return the spring lateral stiffness for the given ``spring_nmb``.
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The sprig element number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         for group_data in self._lateral_stiffness.values():
             if spring_nmb in group_data:
@@ -137,17 +129,17 @@ class SpringData:
         raise RuntimeError(f"Element number {spring_nmb} not found!")
 
     def get_element_rotational_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring rotational stiffness for the given `spring_nmb`.
+        """Return the spring rotational stiffness for the given ``spring_nmb``.
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The sprig element number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         for group_data in self._rotational_stiffness.values():
             if spring_nmb in group_data:
@@ -160,13 +152,13 @@ class SpringData:
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The spring number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         return self.get_element_axial_stiffness(spring_nmb) != 0.0
 
@@ -175,13 +167,13 @@ class SpringData:
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The spring number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         return self.get_element_lateral_stiffness(spring_nmb) != 0.0
 
@@ -190,12 +182,12 @@ class SpringData:
 
         Parameters
         ----------
-        `spring_nmb`: int
+        ``spring_nmb``: int
             The spring number
 
         Raises
         ------
         RuntimeError
-            If the given `spring_nmb` is not found.
+            If the given ``spring_nmb`` is not found.
         """
         return self.get_element_rotational_stiffness(spring_nmb) != 0.0

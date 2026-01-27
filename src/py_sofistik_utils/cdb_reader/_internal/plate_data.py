@@ -1,12 +1,3 @@
-"""
-PlateData
----------
-
-The `PlateData` class provides methods and data structure to:
-    * read-only access to the cdb file (only to key 200/00);
-    * store these information in a convenient format;
-    * access these information.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 
@@ -14,29 +5,34 @@ from ctypes import byref, c_int, sizeof
 from pandas import DataFrame
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CQUAD
 
 
-class PlateData:
-    """The `PlateData` class provides methods and data structure to:
-    * read-only access to the cdb file (only to key 200/00);
+class _PlateData:
+    """
+    This class provides methods and data structure to:
+
+    * read-only access to the cdb file (only to key ``200/00``);
     * store these information in a convenient format;
     * access these information.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `PlateData` class.
+        """The initializer of the ``_PlateData`` class.
         """
-        self._data: DataFrame = DataFrame(columns = ["GROUP",
-                                                     "ELEM_ID",
-                                                     "N1",
-                                                     "N2",
-                                                     "N3",
-                                                     "N4",
-                                                     "MNO",
-                                                     "NRA"
-                                                     ])
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "GROUP",
+                "ELEM_ID",
+                "N1",
+                "N2",
+                "N3",
+                "N4",
+                "MNO",
+                "NRA"
+            ]
+        )
         self._dll = dll
         self._is_loaded = False
 
@@ -102,7 +98,7 @@ class PlateData:
             self._is_loaded = True
 
             # assigning groups
-            group_data = GroupData(self._dll)
+            group_data = _GroupData(self._dll)
             group_data.load()
 
             for grp, quad_range in group_data.iterator_quad():
@@ -115,18 +111,18 @@ class PlateData:
         return self._data.iloc[:, 1:6].copy(deep=True)
 
     def get_element_connectivity(self, plate_nmb: int) -> DataFrame:
-        """Return the plate connectivity for the given `plate_nmb`.
+        """Return the plate connectivity for the given ``plate_nmb``.
         The first value represents the element ID.
 
         Parameters
         ----------
-        `plate_nmb`: int
+        ``plate_nmb``: int
             The plate number
 
         Raises
         ------
         RuntimeError
-            If the given `plate_nmb` is not found.
+            If the given ``plate_nmb`` is not found.
         """
         mask = self._data["ELEM_ID"] == plate_nmb
 
@@ -136,18 +132,18 @@ class PlateData:
         return self._data.iloc[:, 1:6][mask].copy(deep=True)
 
     def get_group_connectivity(self, group_number: int|list[int]) -> DataFrame:
-        """Return the plate connectivity for the given `grp_nmb`.
+        """Return the plate connectivity for the given ``grp_nmb``.
         The first column represents the element IDs.
 
         Parameters
         ----------
-        `grp_nmb`: int | list[int]
+        ``grp_nmb``: int | list[int]
             The plate group number
 
         Raises
         ------
         RuntimeError
-            If the given `grp_nmb` is not found. In case a `list` of groups is passed, the
+            If the given ``grp_nmb`` is not found. In case a `list` of groups is passed, the
             error is raised of none of the groups is found.
         """
         if isinstance(group_number, int):

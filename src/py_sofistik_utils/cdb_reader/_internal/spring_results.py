@@ -1,12 +1,3 @@
-"""np
-SpringResults
--------------
-
-The `SpringResults` class provides methods and data structure to:
-    * access and load the keys `170/LC` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 
@@ -19,14 +10,15 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI_RES
 
 
-class SpringResults:
-    """The `SpringResults` class provides methods and data structure to:
-    * access and load the keys `170/LC` of the CDB file;
+class _SpringResults:
+    """The ``_SpringResults`` class provides methods and data structure to:
+
+    * access and load the keys ``170/LC`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `SpringResults` class.
+        """The initializer of the ``SpringResults`` class.
         """
         self._dll = dll
 
@@ -61,7 +53,7 @@ class SpringResults:
         self._loaded_lc.clear()
 
     def load(self, load_case: int, grp_divisor: int = 10000) -> None:
-        """Load the results for the given `load_case`.
+        """Load the results for the given ``load_case``.
         """
         if self._dll.key_exist(170, load_case):
             spring = CSPRI_RES()
@@ -131,19 +123,19 @@ class SpringResults:
             load_case: int,
             spring_nmb: int
         ) -> NDArray[float64]:
-        """Return the spring displacements for the given `load_case`.
+        """Return the spring displacements for the given ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `spring_nmb`: int
+        ``spring_nmb``: int
             Spring number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `spring_nmb` are not found.
+            If the given ``load_case`` or ``spring_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -156,19 +148,19 @@ class SpringResults:
         raise RuntimeError(err_msg)
 
     def get_element_rotation( self, load_case: int, spring_nmb: int) -> float:
-        """Return the spring rotation for the given `load_case`.
+        """Return the spring rotation for the given ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `spring_nmb`: int
+        ``spring_nmb``: int
             Spring number
 
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `spring_nmb` are not found.
+            If the given ``load_case`` or ``spring_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")

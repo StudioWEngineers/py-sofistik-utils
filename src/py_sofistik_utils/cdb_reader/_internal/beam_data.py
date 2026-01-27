@@ -8,48 +8,54 @@ from numpy.typing import NDArray
 from pandas import DataFrame, Series
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM, CBEAM_SCT
-from .sofistik_utilities import decode_beam_end_release
+from . sofistik_utilities import decode_beam_end_release
 
 
 class _BeamData:
-    """The `BeamData` class provides methods and data structure to:
-        * read-only access to the cdb file (only to the part related to the beam geometry);
-        * store these information in a convenient format;
-        * access these information.
+    """
+    The ``BeamData`` class provides methods and data structure to:
 
-    Beam data are stored in a `pd.DataFrame` with the following columns:
-        * `GROUP`: the beam group number
-        * `ELEM_ID`: the beam number
-        * `STATION`: `np.array` defining the position of the output stations
-        * `ADIMENSIONAL_STATION`: `np.array` defining the position of the output station unitarized by the beam length
-        * `CONNECTIVITY`: `np.array[np.uint64]` containing the start end nodes of the beam
-        * `TRANS_MATRIX`: the beam transformation matrix (3 x 3 `np.array`)
-        * `SPAR`: `np.array` with distances along a continuous beam or parameter values along the reference axis
-        * `PROPERTIES`: `list` containing the property number for each station
+    * read-only access to the cdb file (only to the part related to the beam geometry);
+    * store these information in a convenient format;
+    * access these information.
 
+    Beam data are stored in a :class:`pandas.DataFrame` with the following columns:
+
+    * ``GROUP``: the beam group number
+    * ``ELEM_ID``: the beam number
+    * ``STATION``: :class:`numpy.ndarray` defining the position of the output stations
+    * ``ADIMENSIONAL_STATION``: :class:`numpy.ndarray` defining the position of the output
+      station unitarized by the beam length
+    * ``CONNECTIVITY``: :class:`numpy.ndarray` containing the start end nodes of the beam
+    * ``TRANS_MATRIX``: the beam transformation matrix (3 x 3 :class:`numpy.ndarray`)
+    * ``SPAR``: :class:`numpy.ndarray` with distances along a continuous beam or parameter
+      values along the reference axis
+    * ``PROPERTIES``: :class:`list` containing the property number for each station
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `BeamData` class.
+        """The initializer of the ``BeamData`` class.
         """
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "GROUP",
+                "ELEM_ID",
+                "STATION",
+                "ADIMENSIONAL_STATION",
+                "LENGTH",
+                "N1",
+                "N2",
+                "TRANS_MATRIX",
+                "SPAR",
+                "PROP_END_1",
+                "PROP_END_2",
+                "RELEASES_END_1",
+                "RELEASES_END_2"
+            ]
+        )
         self._dll = dll
-
-        self._data: DataFrame = DataFrame(columns = ["GROUP",
-                                                     "ELEM_ID",
-                                                     "STATION",
-                                                     "ADIMENSIONAL_STATION",
-                                                     "LENGTH",
-                                                     "N1",
-                                                     "N2",
-                                                     "TRANS_MATRIX",
-                                                     "SPAR",
-                                                     "PROP_END_1",
-                                                     "PROP_END_2",
-                                                     "RELEASES_END_1",
-                                                     "RELEASES_END_2"
-                                                     ])
 
     def clear(self) -> None:
         """Clear all the loaded data.
@@ -57,17 +63,17 @@ class _BeamData:
         self._data = self._data[0:0]
 
     def get_element_connectivity(self, element_number: int) -> NDArray[uint64]:
-        """Return a shallow copy of the beam connectivity for the given `element_number`.
+        """Return a shallow copy of the beam connectivity for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The beam element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         mask = self._data["ELEM_ID"] == element_number
 
@@ -77,17 +83,17 @@ class _BeamData:
         return self._data.CONNECTIVITY[mask].copy(deep = True).item()  # type: ignore
 
     def get_element_length(self, element_number: int) -> float:
-        """Return a shallow copy of the beam length for the given `element_number`.
+        """Return a shallow copy of the beam length for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The beam element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         mask = self._data["ELEM_ID"] == element_number
 
@@ -97,17 +103,17 @@ class _BeamData:
         return self._data.LENGTH[mask].copy(deep = True).item()  # type: ignore
 
     def get_element_properties(self, element_number: int) -> list[int]:
-        """Return a shallow copy of the beam properties for the given `element_number`.
+        """Return a shallow copy of the beam properties for the given ``element_number``.
 
         Parameters
         ----------
-        `element_number`: int
+        ``element_number``: int
             The beam element number
 
         Raises
         ------
         RuntimeError
-            If the given `element_number` is not found.
+            If the given ``element_number`` is not found.
         """
         mask = self._data["ELEM_ID"] == element_number
 
@@ -117,17 +123,17 @@ class _BeamData:
         return self._data.PROPERTIES[mask].to_list()[0]  # type: ignore
 
     def get_group_connectivity(self, group_number: int) -> "Series[type[object]]":
-        """Return the beam connectivities for the given `grp_number`.
+        """Return the beam connectivities for the given ``group_number``.
 
         Parameters
         ----------
-        `group_number`: int
+        ``group_number``: int
             The group number
 
         Raises
         ------
         RuntimeError
-            If the given `grp_number` is not found.
+            If the given ``group_number`` is not found.
         """
         grp_mask = self._data["GROUP"] == group_number
 
@@ -224,7 +230,7 @@ class _BeamData:
             self._data = DataFrame(conv_data)
 
             # assigning groups
-            group_data = GroupData(self._dll)
+            group_data = _GroupData(self._dll)
             group_data.load()
 
             for grp, beam_range in group_data.iterator_beam():

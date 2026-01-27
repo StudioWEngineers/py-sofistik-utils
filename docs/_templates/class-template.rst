@@ -1,7 +1,9 @@
-{{ name }}
-{{ underline }}
+{{ name | escape | underline}}
 
-.. autoclass:: {{ fullname }}
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: {{ module }}
+
+.. autoclass:: {{ objname }}
+   :members:
+   :show-inheritance:
+   :inherited-members:
+   :no-index-entry:

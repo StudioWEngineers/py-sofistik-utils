@@ -1,26 +1,3 @@
-"""
-BeamResults
------------
-
-The `BeamResults` class provides methods and data structure to:
-    * read-only access to the cdb file (only to the part related to the beam results);
-    * store these results in a convenient format;
-    * access these results.
-
-Beam results are stored in a `pd.DataFrame` with the following columns:
-    * `LOAD_CASE`: the load case number
-    * `GROUP`: the beam group number
-    * `ELEM_ID`: the beam number
-    * `STATION`: position of the output station along the beam
-    * `N`: axial force
-    * `VY`: shear force Y
-    * `VZ`: shear force Z
-    * `MT`: torsional moment
-    * `MY`: bending moment around Y
-    * `MZ`: bending moment around Z
-    * `MB`: warping moment
-    * `MT2`: second torsional moment
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 
@@ -28,33 +5,35 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_lc_data import GroupLCData
+from . group_lc_data import _GroupLCData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_FOR
 
 
-class BeamResults:
-    """The `BeamResults` class provides methods and data structure to:
+class _BeamResults:
+    """The ``_BeamResults`` class provides methods and data structure to:
+
     * read-only access to the cdb file (only to the part related to the beam results);
     * store these results in a convenient format;
     * access these results
 
-    Beam results are stored in a `pd.DataFrame` with the following columns:
-    * `LOAD_CASE`: the load case number
-    * `GROUP`: the beam group number
-    * `ELEM_ID`: the beam number
-    * `STATION`: position of the output station along the beam
-    * `N`: axial force
-    * `VY`: shear force Y
-    * `VZ`: shear force Z
-    * `MT`: torsional moment
-    * `MY`: bending moment around Y
-    * `MZ`: bending moment around Z
-    * `MB`: warping moment
-    * `MT2`: second torsional moment
+    Beam results are stored in a :class:`pandas.DataFrame` with the following columns:
+
+    * ```load_case```: the load case number
+    * ``GROUP``: the beam group number
+    * ``ELEM_ID``: the beam number
+    * ``STATION``: position of the output station along the beam
+    * ``N``: axial force
+    * ``VY``: shear force Y
+    * ``VZ``: shear force Z
+    * ``MT``: torsional moment
+    * ``MY``: bending moment around Y
+    * ``MZ``: bending moment around Z
+    * ``MB``: warping moment
+    * ``MT2``: second torsional moment
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `BeamResults` class.
+        """The initializer of the ``_BeamResults`` class.
         """
         self._data: DataFrame = DataFrame(columns = ["LOAD_CASE",
                                                      "GROUP",
@@ -72,7 +51,7 @@ class BeamResults:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load_case` number.
+        """Clear the results for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -95,7 +74,7 @@ class BeamResults:
         return self._data.copy(deep = True)
 
     def load(self, load_case: int) -> None:
-        """Load the results for the given `load_case` number.
+        """Load the results for the given ``load_case`` number.
 
         Parameters
         ----------
@@ -104,7 +83,7 @@ class BeamResults:
         Raises
         ------
         RuntimeError
-            If the given `load_case` is not found.
+            If the given ``load_case`` is not found.
         """
         if self._dll.key_exist(102, load_case):
             beam = CBEAM_FOR()
@@ -149,7 +128,7 @@ class BeamResults:
             data = DataFrame(temp_container)
 
             # assigning groups
-            group_lc_data = GroupLCData(self._dll)
+            group_lc_data = _GroupLCData(self._dll)
             group_lc_data.load(load_case)
 
             for grp, beam_range in group_lc_data.iterator_beam(load_case):

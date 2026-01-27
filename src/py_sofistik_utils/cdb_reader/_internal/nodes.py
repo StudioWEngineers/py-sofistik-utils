@@ -1,43 +1,40 @@
-"""
-Nodes
------
-
-The `Nodes` class is a wrapper that manages informations about nodes through member
-variables of classes `NodeData`, `NodeResiduals` and `NodeResults`. It provides easy
-abstractions for commonly used data manipulations, e.g, calculating nodal coordinates
-in deflected configuration.
-"""
 # standard library imports
 
 # third party library imports
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . node_data import NodeData
-from . node_residuals import NodeResiduals
-from . node_results import NodeResults
+from . node_data import _NodeData
+from . node_residuals import _NodeResiduals
+from . node_results import _NodeResults
 from . sofistik_dll import SofDll
 
 
-class Nodes:
-    """The `Nodes` class is a wrapper that manages informations about nodes through
-    member variables of classes `NodeData`, `NodeResiduals` and `NodeResults`. It provides
-    easy abstractions for commonly used data manipulations, e.g, calculating nodal
-    coordinates in deflected configuration.
+class _Nodes:
     """
+    The ``Nodes`` class is a wrapper that manages informations about nodes through
+    member variables of classes ``NodeData``, ``NodeResiduals`` and ``NodeResults``.
+    It provides easy abstractions for commonly used data manipulations, e.g, calculating
+    nodal coordinates in deflected configuration.
+    """
+
+    data: _NodeData
+    residuals: _NodeResiduals
+    results: _NodeResults
+
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `Nodes` class.
+        """The initializer of the ``Nodes`` class.
         """
-        self.data = NodeData(dll)
-        self.residuals = NodeResiduals(dll)
-        self.results = NodeResults(dll)
+        self.data = _NodeData(dll)
+        self.residuals = _NodeResiduals(dll)
+        self.results = _NodeResults(dll)
 
         self._calculated_lc: set[int] = set()
         self._data = DataFrame(columns = ["LOAD_CASE", "ID", "X", "Y", "Z"])
 
     def calculate_deflected_configuration(self, load_case: int) -> None:
         """Calculate the nodal coordinates in deflected configuration for the given
-        `load_case`.
+        ``load_case``.
         """
         if not self.data.is_loaded():
             self.data.load()
@@ -66,7 +63,7 @@ class Nodes:
             self._data = concat([self._data, coord], ignore_index=True)
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load case`.
+        """Clear the results for the given ``load case``.
         """
         if not self.is_deflected_configuration_calculated(load_case):
             return
@@ -84,7 +81,7 @@ class Nodes:
         self._calculated_lc.clear()
 
     def get_deflected_configuration(self, load_case: int) -> DataFrame:
-        """Return the deformed configuration for the given `load_case`.
+        """Return the deformed configuration for the given ``load_case``.
         """
         if not self.is_deflected_configuration_calculated(load_case):
             raise LookupError(f"Load case {load_case} has not been calculated!")
@@ -93,7 +90,7 @@ class Nodes:
         return self._data.loc[lc_mask, ("ID", "X", "Y", "Z")].copy(deep=True)
 
     def is_deflected_configuration_calculated(self, load_case: int) -> bool:
-        """Return `True` if the deflected configuration has been calculated for the given
-        `load_case`.
+        """Return ``True`` if the deflected configuration has been calculated for the
+        given ``load_case``.
         """
         return load_case in self._calculated_lc

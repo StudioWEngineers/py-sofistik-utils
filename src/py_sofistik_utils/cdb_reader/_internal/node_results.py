@@ -1,29 +1,3 @@
-"""
-NodeResults
------------
-
-The `NodeResults` class provides abstractions to load and access information about the
-nodal results, contained in keys `24/LC` of the CDB file.
-
-Data are stored in a `pandas` `DataFrame` having the following columns:
-
-    * `LOAD_CASE`: load combination number
-    * `ID`: node number
-    * `UX`: X component of the nodal displacement (translation)
-    * `UY`: Y component of the nodal displacement (translation)
-    * `UZ`: Z component of the nodal displacement (translation)
-    * `URX`: X component of the nodal displacement (rotation)
-    * `URY`: Y component of the nodal displacement (rotation)
-    * `URZ`: Z component of the nodal displacement (rotation)
-    * `URB`: twist rotation
-    * `PX`: X component of the nodal reaction (translation)
-    * `PY`: Y component of the nodal reaction (translation)
-    * `PZ`: Z component of the nodal reaction (translation)
-    * `MX`: X component of the nodal reaction (rotation)
-    * `MY`: Y component of the nodal reaction (rotation)
-    * `MZ`: Z component of the nodal reaction (rotation)
-    * `MB`: warping moment
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any
@@ -36,31 +10,32 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISP
 
 
-class NodeResults:
-    """The `NodeResults` class provides abstractions to load and access information
-        about the nodal results, contained in keys `24/LC` of the CDB file.
+class _NodeResults:
+    """
+    The ``NodeResults`` class provides abstractions to load and access information
+    about the nodal results, contained in keys ``24/LC`` of the CDB file.
 
-        Data are stored in a `pandas` `DataFrame` having the following columns:
+    Data are stored in a :class:`pandas.DataFrame` having the following columns:
 
-        * `LOAD_CASE`: load combination number
-        * `ID`: node number
-        * `UX`: X component of the nodal displacement (translation)
-        * `UY`: Y component of the nodal displacement (translation)
-        * `UZ`: Z component of the nodal displacement (translation)
-        * `URX`: X component of the nodal displacement (rotation)
-        * `URY`: Y component of the nodal displacement (rotation)
-        * `URZ`: Z component of the nodal displacement (rotation)
-        * `URB`: twist rotation
-        * `PX`: X component of the nodal reaction (translation)
-        * `PY`: Y component of the nodal reaction (translation)
-        * `PZ`: Z component of the nodal reaction (translation)
-        * `MX`: X component of the nodal reaction (rotation)
-        * `MY`: Y component of the nodal reaction (rotation)
-        * `MZ`: Z component of the nodal reaction (rotation)
-        * `MB`: warping moment
+        * ``LOAD_CASE``: load combination number
+        * ``ID``: node number
+        * ``UX``: X component of the nodal displacement (translation)
+        * ``UY``: Y component of the nodal displacement (translation)
+        * ``UZ``: Z component of the nodal displacement (translation)
+        * ``URX``: X component of the nodal displacement (rotation)
+        * ``URY``: Y component of the nodal displacement (rotation)
+        * ``URZ``: Z component of the nodal displacement (rotation)
+        * ``URB``: twist rotation
+        * ``PX``: X component of the nodal reaction (translation)
+        * ``PY``: Y component of the nodal reaction (translation)
+        * ``PZ``: Z component of the nodal reaction (translation)
+        * ``MX``: X component of the nodal reaction (rotation)
+        * ``MY``: Y component of the nodal reaction (rotation)
+        * ``MZ``: Z component of the nodal reaction (rotation)
+        * ``MB``: warping moment
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `NodeResults` class.
+        """The initializer of the ``NodeResults`` class.
         """
         self._data: DataFrame = DataFrame(
             columns = [
@@ -86,7 +61,7 @@ class NodeResults:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load case`.
+        """Clear the results for the given ``load case``.
         """
         if load_case not in self._loaded_lc:
             return
@@ -105,17 +80,17 @@ class NodeResults:
 
     def get_all_displacements(self, load_case: int) -> DataFrame:
         """Return all of the nodal translational components of the displacements for the
-        given `load_case`.
+        given ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
 
         Raises
         ------
         LookupError
-            If the given `load_case` is not found.
+            If the given ``load_case`` is not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -125,19 +100,19 @@ class NodeResults:
 
     def get_displacements(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal translational components of the displacements for the given
-        `load_case` and `node_number`.
+        ``load_case`` and ``node_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_number`: int
+        ``node_number``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_nmb` are not found.
+            If the given ``load_case`` or ``node_nmb`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -153,19 +128,19 @@ class NodeResults:
 
     def get_reaction_forces(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal translational components of the reaction forces for the given
-        `load_case` and `node_number`.
+        ``load_case`` and ``node_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_number`: int
+        ``node_number``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_number` are not found.
+            If the given ``load_case`` or ``node_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -181,19 +156,19 @@ class NodeResults:
 
     def get_reaction_moments(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal rotational components of the reaction forces for the given
-        `load_case` and `node_number`.
+        ``load_case`` and ``node_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_number`: int
+        ``node_number``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_number` are not found.
+            If the given ``load_case`` or ``node_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -209,19 +184,19 @@ class NodeResults:
 
     def get_rotations(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal rotational components of the displacements for the given
-        `load_case` and `node_number`.
+        ``load_case`` and ``node_number``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
-        `node_number`: int
+        ``node_number``: int
             Node number
 
         Raises
         ------
         LookupError
-            If the given `load_case` or `node_number` are not found.
+            If the given ``load_case`` or ``node_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -236,17 +211,17 @@ class NodeResults:
         return self._data.loc[lc_mask & id_mask, ("URX", "URY", "URZ", "URB")].copy(deep=True)  # type: ignore
 
     def get_values(self, load_case: int) -> DataFrame:
-        """Return the results for the given `load_case`.
+        """Return the results for the given ``load_case``.
 
         Parameters
         ----------
-        `load_case`: int
+        ``load_case``: int
             Load case number
 
         Raises
         ------
         LookupError
-            If the given `load_case` is not found.
+            If the given ``load_case`` is not found.
         """
         if load_case not in self._loaded_lc:
             raise LookupError(f"Load case {load_case} not found!")
@@ -255,12 +230,12 @@ class NodeResults:
         return self._data.loc[lc_mask].copy(deep=True)
 
     def is_loaded(self, load_case: int) -> bool:
-        """Return `True` if the results have been loaded for the given `load_case`.
+        """Return `True` if the results have been loaded for the given ``load_case``.
         """
         return load_case in self._loaded_lc
 
     def load(self, load_case: int) -> None:
-        """Load the nodal results for the given `load_case`.
+        """Load the nodal results for the given ``load_case``.
         """
         if self._dll.key_exist(24, load_case):
             node = CN_DISP()
