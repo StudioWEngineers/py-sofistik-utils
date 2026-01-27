@@ -11,7 +11,8 @@ from . sofistik_classes import CBEAM_FOR
 
 
 class _BeamResults:
-    """The ``_BeamResults`` class provides methods and data structure to:
+    """
+    This class provides methods and data structure to:
 
     * read-only access to the cdb file (only to the part related to the beam results);
     * store these results in a convenient format;

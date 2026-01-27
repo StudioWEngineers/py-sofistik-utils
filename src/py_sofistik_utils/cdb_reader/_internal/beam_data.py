@@ -16,7 +16,7 @@ from . sofistik_utilities import decode_beam_end_release
 
 class _BeamData:
     """
-    The ``BeamData`` class provides methods and data structure to:
+    This class provides methods and data structure to:
 
     * read-only access to the cdb file (only to the part related to the beam geometry);
     * store these information in a convenient format;

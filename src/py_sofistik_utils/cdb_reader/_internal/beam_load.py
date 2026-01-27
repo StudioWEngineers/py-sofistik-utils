@@ -12,7 +12,8 @@ from . sofistik_dll import SofDll
 
 
 class _BeamLoad:
-    """The `_BeamLoad` class provides methods and data structure to:
+    """
+    This class provides methods and data structure to:
 
     * access and load the keys ``161/LC`` of the CDB file;
     * store these data in a convenient format;
