@@ -21,8 +21,8 @@ from . _internal.group_data import _GroupData
 from . _internal.group_lc_data import _GroupLCData
 from . _internal.load_cases import _LoadCases
 from . _internal.nodes import _Nodes
-from . _internal.plate_data import PlateData
-from . _internal.property import PropertyData
+from . _internal.plate_data import _PlateData
+from . _internal.property import _PropertyData
 from . _internal.sec_group_lc_data import _SecondaryGroupLCData
 from . _internal.spring_data import _SpringData
 from . _internal.spring_results import _SpringResults
@@ -48,6 +48,8 @@ class SOFiSTiKCDBReader:
     grp_lc_data: _GroupLCData
     load_case: _LoadCases
     nodes: _Nodes
+    plate_data: _PlateData
+    properties: _PropertyData
     sec_grp_lc_data: _SecondaryGroupLCData
     spring_data: _SpringData
     spring_res: _SpringResults
@@ -86,13 +88,13 @@ class SOFiSTiKCDBReader:
 
         self.nodes = _Nodes(self._dll)
 
-        self.plate_data = PlateData(self._dll)
+        self.plate_data = _PlateData(self._dll)
 
         self.spring_data = _SpringData(self._dll)
         self.spring_res = _SpringResults(self._dll)
 
         self.load_case = _LoadCases(self._dll)
-        self.properties = PropertyData(self._dll)
+        self.properties = _PropertyData(self._dll)
         self.sys_info = _SysInfo(self._dll)
 
         self.truss_data = _TrussData(self._dll)

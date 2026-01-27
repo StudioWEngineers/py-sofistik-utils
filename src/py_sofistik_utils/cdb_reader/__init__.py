@@ -12,6 +12,8 @@ from . _internal.nodes import _Nodes
 from . _internal.node_data import _NodeData
 from . _internal.node_residuals import _NodeResiduals
 from . _internal.node_results import _NodeResults
+from . _internal.plate_data import _PlateData
+from . _internal.property import _PropertyData
 from . _internal.sec_group_lc_data import _SecondaryGroupLCData
 from . _internal.spring_data import _SpringData
 from . _internal.spring_results import _SpringResults
@@ -38,6 +40,8 @@ __all__ = [
     "_NodeData",
     "_NodeResiduals",
     "_NodeResults",
+    "_PlateData",
+    "_PropertyData",
     "_SecondaryGroupLCData",
     "_SpringData",
     "_SpringResults",
