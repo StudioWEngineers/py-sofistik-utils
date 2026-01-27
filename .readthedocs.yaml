@@ -4,8 +4,6 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
-  apt_packages:
-    - librsvg2-bin
 
 python:
   install:
