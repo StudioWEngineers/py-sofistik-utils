@@ -38,22 +38,24 @@ class _BeamData:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``BeamData`` class.
         """
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "GROUP",
+                "ELEM_ID",
+                "STATION",
+                "ADIMENSIONAL_STATION",
+                "LENGTH",
+                "N1",
+                "N2",
+                "TRANS_MATRIX",
+                "SPAR",
+                "PROP_END_1",
+                "PROP_END_2",
+                "RELEASES_END_1",
+                "RELEASES_END_2"
+            ]
+        )
         self._dll = dll
-
-        self._data: DataFrame = DataFrame(columns = ["GROUP",
-                                                     "ELEM_ID",
-                                                     "STATION",
-                                                     "ADIMENSIONAL_STATION",
-                                                     "LENGTH",
-                                                     "N1",
-                                                     "N2",
-                                                     "TRANS_MATRIX",
-                                                     "SPAR",
-                                                     "PROP_END_1",
-                                                     "PROP_END_2",
-                                                     "RELEASES_END_1",
-                                                     "RELEASES_END_2"
-                                                     ])
 
     def clear(self) -> None:
         """Clear all the loaded data.
