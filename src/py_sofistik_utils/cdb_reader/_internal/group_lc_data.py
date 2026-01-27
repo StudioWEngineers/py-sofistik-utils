@@ -85,10 +85,10 @@ class _GroupLCData:
     def get_beam_id_range(self, load_case: int, group_number: int) -> range:
         """For the given ``load_case``, return a `range` starting from the minimum beam
         element ID to the maximum ID + 1, so that a check like
-        ``max_id in get_beam_id_range(lc, grp_nmb)`` return ``True``.
+        ``max_id in get_beam_id_range(lc, grp_nmb)`` return `True`.
 
         If no beam elements are present in the given ``load_case`` and ``group_number``
-        return `range(0)`.
+        return ``range(0)``.
 
         Parameters
         ----------
@@ -123,10 +123,10 @@ class _GroupLCData:
     def get_cable_id_range(self, load_case: int, group_number: int) -> range:
         """For the given ``load_case``, return a `range` starting from the minimum cable
         element ID to the maximum ID + 1, so that a check like
-        `max_id in get_cable_id_range(lc, grp_nmb)` return `True`.
+        ``max_id in get_cable_id_range(lc, grp_nmb)`` return `True`.
 
         If no cable elements are present in the given ``load_case`` and ``group_number``
-        return `range(0)`.
+        return ``range(0)``.
 
         Parameters
         ----------
@@ -161,10 +161,10 @@ class _GroupLCData:
     def get_quad_id_range(self, load_case: int, group_number: int) -> range:
         """For the given ``load_case``, return a `range` starting from the minimum quad
         element ID to the maximum ID + 1, so that a check like
-        `max_id in get_quad_id_range(lc, grp_nmb)` return `True`.
+        ``max_id in get_quad_id_range(lc, grp_nmb)`` return `True`.
 
         If no quad elements are present in the given ``load_case`` and ``group_number``
-        return `range(0)`.
+        return ``range(0)``.
 
         Parameters
         ----------
@@ -199,10 +199,10 @@ class _GroupLCData:
     def get_spring_id_range(self, load_case: int, group_number: int) -> range:
         """For the given ``load_case``, return a `range` starting from the minimum spring
         element ID to the maximum ID + 1, so that a check like
-        `max_id in get_spring_id_range(lc, grp_nmb)` return `True`.
+        ``max_id in get_spring_id_range(lc, grp_nmb)`` return `True`.
 
         If no spring elements are present in the given ``load_case`` and ``group_number``
-        return `range(0)`.
+        return ``range(0)``.
 
         Parameters
         ----------
@@ -237,10 +237,10 @@ class _GroupLCData:
     def get_truss_id_range(self, load_case: int, group_number: int) -> range:
         """For the given ``load_case``, return a `range` starting from the minimum truss
         element ID to the maximum ID + 1, so that a check like
-        `max_id in get_truss_id_range(lc, grp_nmb)` return `True`.
+        ``max_id in get_truss_id_range(lc, grp_nmb)`` return `True`.
 
         If no truss elements are present in the given ``load_case`` and ``group_number``
-        return `range(0)`.
+        return ``range(0)``.
 
         Parameters
         ----------
