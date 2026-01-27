@@ -5,7 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame, Series
 
 # local library specific imports
-from . group_lc_data import GroupLCData
+from . group_lc_data import _GroupLCData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL_RES
 
@@ -453,7 +453,7 @@ class _CableResults:
             data = DataFrame(temp_container)
 
             # assigning groups
-            group_lc_data = GroupLCData(self._dll)
+            group_lc_data = _GroupLCData(self._dll)
             group_lc_data.load(load_case)
 
             for grp, cable_range in group_lc_data.iterator_cable(load_case):

@@ -14,7 +14,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import DataFrame
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CQUAD
 
@@ -102,7 +102,7 @@ class PlateData:
             self._is_loaded = True
 
             # assigning groups
-            group_data = GroupData(self._dll)
+            group_data = _GroupData(self._dll)
             group_data.load()
 
             for grp, quad_range in group_data.iterator_quad():

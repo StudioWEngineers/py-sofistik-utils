@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from pandas import DataFrame, Series
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM, CBEAM_SCT
 from . sofistik_utilities import decode_beam_end_release
@@ -230,7 +230,7 @@ class _BeamData:
             self._data = DataFrame(conv_data)
 
             # assigning groups
-            group_data = GroupData(self._dll)
+            group_data = _GroupData(self._dll)
             group_data.load()
 
             for grp, beam_range in group_data.iterator_beam():

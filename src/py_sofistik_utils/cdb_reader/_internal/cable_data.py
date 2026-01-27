@@ -6,7 +6,7 @@ from typing import Any
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL
 
@@ -191,7 +191,7 @@ class _CableData:
                 count += 1
 
             # assigning groups
-            group_data = GroupData(self._dll)
+            group_data = _GroupData(self._dll)
             group_data.load()
 
             data = DataFrame(data)

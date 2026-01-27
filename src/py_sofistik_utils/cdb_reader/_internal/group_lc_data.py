@@ -1,12 +1,3 @@
-"""
-GroupLCData
------------
-
-The `GroupLCData` class provides methods and data structure to:
-    * access and load the key `011/LC` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any, Generator
@@ -19,38 +10,44 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CGRP_LC
 
 
-class GroupLCData:
-    """The `GroupLCData` class provides methods and data structure to:
-    * access and load the key `011/LC` of the CDB file;
+class _GroupLCData:
+    """
+    This class provides methods and data structure to:
+
+    * access and load the key ``011/LC`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `GroupLCData` class.
+        """The initializer of the ``_GroupLCData`` class.
         """
-        self._data: DataFrame = DataFrame(columns = ["LOAD_CASE",
-                                                     "GROUP",
-                                                     "BEAM_MIN_ID",
-                                                     "BEAM_MAX_ID",
-                                                     "NUMBER_OF_BEAMS",
-                                                     "TRUSS_MIN_ID",
-                                                     "TRUSS_MAX_ID",
-                                                     "NUMBER_OF_TRUSSES",
-                                                     "CABLE_MIN_ID",
-                                                     "CABLE_MAX_ID",
-                                                     "NUMBER_OF_CABLES",
-                                                     "SPRING_MIN_ID",
-                                                     "SPRING_MAX_ID",
-                                                     "NUMBER_OF_SPRINGS",
-                                                     "QUAD_MIN_ID",
-                                                     "QUAD_MAX_ID",
-                                                     "NUMBER_OF_QUADS",
-                                                     "IS_ACTIVE"])
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "LOAD_CASE",
+                "GROUP",
+                "BEAM_MIN_ID",
+                "BEAM_MAX_ID",
+                "NUMBER_OF_BEAMS",
+                "TRUSS_MIN_ID",
+                "TRUSS_MAX_ID",
+                "NUMBER_OF_TRUSSES",
+                "CABLE_MIN_ID",
+                "CABLE_MAX_ID",
+                "NUMBER_OF_CABLES",
+                "SPRING_MIN_ID",
+                "SPRING_MAX_ID",
+                "NUMBER_OF_SPRINGS",
+                "QUAD_MIN_ID",
+                "QUAD_MAX_ID",
+                "NUMBER_OF_QUADS",
+                "IS_ACTIVE"
+            ]
+        )
         self._dll = dll
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given `load_case` number.
+        """Clear the results for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -65,7 +62,7 @@ class GroupLCData:
         self._loaded_lc.clear()
 
     def get_active_groups(self, load_case: int) -> list[int]:
-        """For the given `load_case`, return the `list` of active groups.
+        """For the given ``load_case``, return the `list` of active groups.
 
         Parameters
         ----------
@@ -75,7 +72,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` is not found.
+            If the given ``load_case`` is not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -86,11 +83,11 @@ class GroupLCData:
         return self._data.GROUP[lc_mask & active_mask].to_list()
 
     def get_beam_id_range(self, load_case: int, group_number: int) -> range:
-        """For the given `load_case`, return a `range` starting from the minimum beam
+        """For the given ``load_case``, return a `range` starting from the minimum beam
         element ID to the maximum ID + 1, so that a check like
-        `max_id in get_beam_id_range(lc, grp_nmb)` return `True`.
+        ``max_id in get_beam_id_range(lc, grp_nmb)`` return ``True``.
 
-        If no beam elements are present in the given `load_case` and `group_number`
+        If no beam elements are present in the given ``load_case`` and ``group_number``
         return `range(0)`.
 
         Parameters
@@ -103,7 +100,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `group_number` are not found.
+            If the given ``load_case`` or ``group_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -124,11 +121,11 @@ class GroupLCData:
         return range(min_id, max_id + 1, 1)
 
     def get_cable_id_range(self, load_case: int, group_number: int) -> range:
-        """For the given `load_case`, return a `range` starting from the minimum cable
+        """For the given ``load_case``, return a `range` starting from the minimum cable
         element ID to the maximum ID + 1, so that a check like
         `max_id in get_cable_id_range(lc, grp_nmb)` return `True`.
 
-        If no cable elements are present in the given `load_case` and `group_number`
+        If no cable elements are present in the given ``load_case`` and ``group_number``
         return `range(0)`.
 
         Parameters
@@ -141,7 +138,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `group_number` are not found.
+            If the given ``load_case`` or ``group_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -162,11 +159,11 @@ class GroupLCData:
         return range(min_id, max_id + 1, 1)
 
     def get_quad_id_range(self, load_case: int, group_number: int) -> range:
-        """For the given `load_case`, return a `range` starting from the minimum quad
+        """For the given ``load_case``, return a `range` starting from the minimum quad
         element ID to the maximum ID + 1, so that a check like
         `max_id in get_quad_id_range(lc, grp_nmb)` return `True`.
 
-        If no quad elements are present in the given `load_case` and `group_number`
+        If no quad elements are present in the given ``load_case`` and ``group_number``
         return `range(0)`.
 
         Parameters
@@ -179,7 +176,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `group_number` are not found.
+            If the given ``load_case`` or ``group_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -200,11 +197,11 @@ class GroupLCData:
         return range(min_id, max_id + 1, 1)
 
     def get_spring_id_range(self, load_case: int, group_number: int) -> range:
-        """For the given `load_case`, return a `range` starting from the minimum spring
+        """For the given ``load_case``, return a `range` starting from the minimum spring
         element ID to the maximum ID + 1, so that a check like
         `max_id in get_spring_id_range(lc, grp_nmb)` return `True`.
 
-        If no spring elements are present in the given `load_case` and `group_number`
+        If no spring elements are present in the given ``load_case`` and ``group_number``
         return `range(0)`.
 
         Parameters
@@ -217,7 +214,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `group_number` are not found.
+            If the given ``load_case`` or ``group_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -238,11 +235,11 @@ class GroupLCData:
         return range(min_id, max_id + 1, 1)
 
     def get_truss_id_range(self, load_case: int, group_number: int) -> range:
-        """For the given `load_case`, return a `range` starting from the minimum truss
+        """For the given ``load_case``, return a `range` starting from the minimum truss
         element ID to the maximum ID + 1, so that a check like
         `max_id in get_truss_id_range(lc, grp_nmb)` return `True`.
 
-        If no truss elements are present in the given `load_case` and `group_number`
+        If no truss elements are present in the given ``load_case`` and ``group_number``
         return `range(0)`.
 
         Parameters
@@ -255,7 +252,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `group_number` are not found.
+            If the given ``load_case`` or ``group_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -276,7 +273,7 @@ class GroupLCData:
         return range(min_id, max_id + 1, 1)
 
     def group_is_active(self, load_case: int, group_number: int) -> bool:
-        """Return `True` if the given `group_number` is active in the given `load_case`.
+        """Return `True` if the given ``group_number`` is active in the given ``load_case``.
         `False` otherwise.
 
         Parameters
@@ -289,7 +286,7 @@ class GroupLCData:
         Raises
         ------
         RuntimeError
-            If the given `load_case` or `group_number` are not found.
+            If the given ``load_case`` or ``group_number`` are not found.
         """
         if load_case not in self._loaded_lc:
             raise RuntimeError(f"Load case {load_case} not found!")
@@ -305,41 +302,41 @@ class GroupLCData:
 
     def iterator_beam(self, load_case: int) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the beam ID range for the given
-        `load_case`.
+        ``load_case``.
         """
         for grp in self.get_active_groups(load_case):
             yield (grp, self.get_beam_id_range(load_case, grp))
 
     def iterator_cable(self, load_case: int) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the cable ID range for the given
-        `load_case`.
+        ``load_case``.
         """
         for grp in self.get_active_groups(load_case):
             yield (grp, self.get_cable_id_range(load_case, grp))
 
     def iterator_quad(self, load_case: int) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the quad ID range for the given
-        `load_case`.
+        ``load_case``.
         """
         for grp in self.get_active_groups(load_case):
             yield (grp, self.get_quad_id_range(load_case, grp))
 
     def iterator_spring(self, load_case: int) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the spring ID range for the given
-        `load_case`.
+        ``load_case``.
         """
         for grp in self.get_active_groups(load_case):
             yield (grp, self.get_spring_id_range(load_case, grp))
 
     def iterator_truss(self, load_case: int) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the truss ID range for the given
-        `load_case`.
+        ``load_case``.
         """
         for grp in self.get_active_groups(load_case):
             yield (grp, self.get_truss_id_range(load_case, grp))
 
     def load(self, load_case: int) -> None:
-        """Load the group data for the given `load_case`.
+        """Load the group data for the given ``load_case``.
         """
         if self._dll.key_exist(11, load_case):
             g_data = CGRP_LC()

@@ -29,6 +29,8 @@ Private Classes
     _CableLoad
     _CableResults
     _BeamStress
+    _GroupData
+    _GroupLCData
     _LoadCases
     _Nodes
     _NodeData

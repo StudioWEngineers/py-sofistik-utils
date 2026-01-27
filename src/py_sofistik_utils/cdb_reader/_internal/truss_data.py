@@ -6,7 +6,7 @@ from typing import Any
 from pandas import DataFrame
 
 # local library specific imports
-from . group_data import GroupData
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CTRUS
 
@@ -98,7 +98,7 @@ class _TrussData:
             self._data = DataFrame(temp_data)
 
             # assigning groups
-            group_data = GroupData(self._dll)
+            group_data = _GroupData(self._dll)
             group_data.load()
 
             for grp, truss_range in group_data.iterator_truss():

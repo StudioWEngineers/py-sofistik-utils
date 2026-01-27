@@ -1,12 +1,3 @@
-"""
-GroupData
----------
-
-The `GroupData` class provides methods and data structure to:
-    * access and load the key `011/00` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
-"""
 # standard library imports
 from ctypes import byref, c_int, sizeof
 from typing import Any, Generator
@@ -20,33 +11,39 @@ from . sofistik_classes import CGRP
 from . sofistik_utilities import long_to_str
 
 
-class GroupData:
-    """The `GroupData` class provides methods and data structure to:
-    * access and load the key `011/00` of the CDB file;
+class _GroupData:
+    """
+    This class provides methods and data structure to:
+
+    * access and load the key ``011/00`` of the CDB file;
     * store these data in a convenient format;
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `GroupData` class.
+        """The initializer of the ``_GroupData`` class.
         """
         self._dll = dll
-        self._data: DataFrame = DataFrame(columns = ["GROUP",
-                                                     "GROUP_NAME",
-                                                     "BEAM_MIN_ID",
-                                                     "BEAM_MAX_ID",
-                                                     "NUMBER_OF_BEAMS",
-                                                     "TRUSS_MIN_ID",
-                                                     "TRUSS_MAX_ID",
-                                                     "NUMBER_OF_TRUSSES",
-                                                     "CABLE_MIN_ID",
-                                                     "CABLE_MAX_ID",
-                                                     "NUMBER_OF_CABLES",
-                                                     "SPRING_MIN_ID",
-                                                     "SPRING_MAX_ID",
-                                                     "NUMBER_OF_SPRINGS",
-                                                     "QUAD_MIN_ID",
-                                                     "QUAD_MAX_ID",
-                                                     "NUMBER_OF_QUADS"])
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "GROUP",
+                "GROUP_NAME",
+                "BEAM_MIN_ID",
+                "BEAM_MAX_ID",
+                "NUMBER_OF_BEAMS",
+                "TRUSS_MIN_ID",
+                "TRUSS_MAX_ID",
+                "NUMBER_OF_TRUSSES",
+                "CABLE_MIN_ID",
+                "CABLE_MAX_ID",
+                "NUMBER_OF_CABLES",
+                "SPRING_MIN_ID",
+                "SPRING_MAX_ID",
+                "NUMBER_OF_SPRINGS",
+                "QUAD_MIN_ID",
+                "QUAD_MAX_ID",
+                "NUMBER_OF_QUADS"
+            ]
+        )
 
     def clear(self) -> None:
         """Clear all group data.
@@ -55,9 +52,9 @@ class GroupData:
 
     def get_beam_id_range(self, group_number: int) -> range:
         """Return a `range` starting from the minimum beam element ID to the maximum ID +
-        1, so that a check like `max_id in get_beam_id_range(grp_nmb)` return `True`.
+        1, so that a check like ``max_id in get_beam_id_range(grp_nmb)`` return `True`.
 
-        If no beam elements are present in the given `group_number` return `range(0)`.
+        If no beam elements are present in the given ``group_number`` return ``range(0)``.
 
         Parameters
         ----------
@@ -67,7 +64,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         mask = self._data["GROUP"] == group_number
 
@@ -84,9 +81,9 @@ class GroupData:
 
     def get_cable_id_range(self, group_number: int) -> range:
         """Return a `range` starting from the minimum cable element ID to the maximum ID +
-        1, so that a check like `max_id in get_cable_id_range(grp_nmb)` return `True`.
+        1, so that a check like ``max_id in get_cable_id_range(grp_nmb)`` return `True`.
 
-        If no cable elements are present in the given `group_number` return `range(0)`.
+        If no cable elements are present in the given ``group_number`` return ``range(0)``.
 
         Parameters
         ----------
@@ -96,7 +93,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         mask = self._data["GROUP"] == group_number
 
@@ -130,7 +127,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         mask = self._data["GROUP"] == group_number
 
@@ -150,7 +147,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_name` is not found.
+            If the given ``group_name`` is not found.
         """
         mask = self._data["GROUP_NAME"] == group_name.upper()
 
@@ -161,9 +158,9 @@ class GroupData:
 
     def get_quad_id_range(self, group_number: int) -> range:
         """Return a `range` starting from the minimum quad element ID to the maximum ID
-        + 1, so that a check like `max_id in get_quad_id_range(grp_nmb)` return `True`.
+        + 1, so that a check like ``max_id in get_quad_id_range(grp_nmb)`` return `True`.
 
-        If no quad elements are present in the given `group_number` return `range(0)`.
+        If no quad elements are present in the given ``group_number`` return ``range(0)``.
 
         Parameters
         ----------
@@ -173,7 +170,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         mask = self._data["GROUP"] == group_number
 
@@ -190,9 +187,9 @@ class GroupData:
 
     def get_spring_id_range(self, group_number: int) -> range:
         """Return a `range` starting from the minimum spring element ID to the maximum ID
-        + 1, so that a check like `max_id in get_spring_id_range(grp_nmb)` return `True`.
+        + 1, so that a check like ``max_id in get_spring_id_range(grp_nmb)`` return `True`.
 
-        If no spring elements are present in the given `group_number` return `range(0)`
+        If no spring elements are present in the given ``group_number`` return ``range(0)``
         .
 
         Parameters
@@ -203,7 +200,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         mask = self._data["GROUP"] == group_number
 
@@ -220,9 +217,9 @@ class GroupData:
 
     def get_truss_id_range(self, group_number: int) -> range:
         """Return a `range` starting from the minimum truss element ID to the maximum ID
-        + 1, so that a check like `max_id in get_truss_id_range(grp_nmb)` return `True`.
+        + 1, so that a check like ``max_id in get_truss_id_range(grp_nmb)`` return `True`.
 
-        If no truss elements are present in the given `group_number` return `range(0)`.
+        If no truss elements are present in the given ``group_number`` return ``range(0)``.
 
         Parameters
         ----------
@@ -232,7 +229,7 @@ class GroupData:
         Raises
         ------
         RuntimeError
-            If the given `group_number` is not found.
+            If the given ``group_number`` is not found.
         """
         mask = self._data["GROUP"] == group_number
 
