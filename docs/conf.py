@@ -6,8 +6,14 @@ for p in sys.path:
 try:
     import py_sofistik_utils
     print("py_sofistik_utils OK", py_sofistik_utils)
+except Exception as e:
+    print("IMPORT FAILED:", e)
+print("#############################")
+print("#############################")
+print("#############################")
+try:
     import py_sofistik_utils.cdb_reader
-    print("cdb_reader OK")
+    print("cdb_reader OK", py_sofistik_utils.cdb_reader)
 except Exception as e:
     print("IMPORT FAILED:", e)
 
