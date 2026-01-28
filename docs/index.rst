@@ -1,27 +1,42 @@
-py-sofistik-utils documentation
-===============================
+Introduction
+============
 
-This is the py-sofistik-utils documentation.
+``py-sofistik-utils`` is an open-source Windows-only Python package that provides utilities
+for interfacing with the SOFiSTiK finite element analysis (FEA) software.
 
-*py-sofistik-utils* is a set of external utilities for the SOFiSTiK finite element analysis software.
+In particular, it provides classes and data structures to:
 
-Documentation formats
----------------------
+* read SOFiSTiK CDB files in read-only mode.
+* read, write and manipulate DAT (Teddy) files.
 
-You are reading the HTML version of the documentation. An alternative
-`PDF version <https://py3dm.readthedocs.io/_/downloads/en/latest/pdf/>`__ is also available.
+.. important::
+    **SOFiSTiK is a registered trademark of SOFiSTiK AG.**
 
-Dependencies
+    ``py-sofistik-utils`` is **NOT** affiliated with, endorsed by, or vetted by SOFiSTiK AG.
+    It interfaces with proprietary SOFiSTiK DLLs that are **NOT** distributed with this
+    repository or the PyPI wheels and must be supplied by the user.
+
+Installation
 ------------
 
-*py-sofistik-utils* depends on:
+You can install ``py-sofistik-utils`` and its dependencies via `pip <https://pip.pypa.io/>`_ from
+`PyPI <https://pypi.org/>`_:
 
-- `pandas <https://pandas.pydata.org/>`__
+.. code:: shell
+
+   pip install py-sofistik-utils
+
+Its Python dependencies are:
+
+- `Python <https://www.python.org/>`_ 3.12+.
+- `pandas <https://pandas.pydata.org/>`_ 3.0+.
+
+See XXX for more information.
 
 How to cite this project?
 -------------------------
 
-Please use the following BibTeX template to cite *py-sofistik-utils*:
+Please use the following BibTeX template to cite ``py-sofistik-utils``:
 
 .. code-block:: bibtex
 
@@ -32,11 +47,21 @@ Please use the following BibTeX template to cite *py-sofistik-utils*:
         url = {https://github.com/StudioWEngineers/py-sofistik-utils}
     }
 
+Disclaimer
+----------
+
+``py-sofistik-utils`` is an open-source set of tools that benefits from the collaboration
+of many contributors. While efforts have been made to ensure the implementation is correct,
+it remains the user's responsibility to verify and accept the results.
+
+Please refer to the `license <https://github.com/StudioWEngineers/py-sofistik-utils/blob/main/LICENSE>`_
+for the terms and conditions of use.
+
 Table of contents
 -----------------
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 1
 
     changelog
     cdb_reader
