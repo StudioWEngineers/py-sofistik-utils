@@ -1,3 +1,16 @@
+import sys
+print("=== SYS.PATH ===")
+for p in sys.path:
+    print(p)
+
+try:
+    import py_sofistik_utils
+    print("py_sofistik_utils OK", py_sofistik_utils)
+    import py_sofistik_utils.cdb_reader
+    print("cdb_reader OK")
+except Exception as e:
+    print("IMPORT FAILED:", e)
+
 # -- Project information --
 project = "py-sofistik-utils"
 author = "StudioWEngineers"
