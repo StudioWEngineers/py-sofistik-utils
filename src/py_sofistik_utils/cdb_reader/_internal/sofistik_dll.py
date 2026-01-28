@@ -12,6 +12,7 @@ from ctypes import cdll, CDLL
 from os import add_dll_directory
 from os.path import isfile
 from pathlib import Path
+from sys import platform
 from typing import Callable
 
 # third party library imports
@@ -63,10 +64,11 @@ class SofDll():
             return False
         print("\n")
         try:
-            with add_dll_directory(self._path):
-                print(1)
-                print("Library loaded successfully!")
-                self._dll = cdll.LoadLibrary(self._version)
+            if platform == "win32":
+                with add_dll_directory(self._path):
+                    print(1)
+                    print("Library loaded successfully!")
+                    self._dll = cdll.LoadLibrary(self._version)
 
         except: # OSError as e:
             print(f"Failed to load library: {1}")
