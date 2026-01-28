@@ -23,7 +23,7 @@ class _BeamStress:
                 "GROUP",
                 "ELEM_ID",
                 "STATION",
-                "SIG_C",
+                "SIG_Cs",
                 "SIG_T",
                 "TAU",
                 "SIG_VM",
