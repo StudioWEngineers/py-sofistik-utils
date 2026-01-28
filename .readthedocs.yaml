@@ -8,7 +8,4 @@ build:
   commands:
     - pip install -e .
     - pip install -r docs/requirements.txt
-
-sphinx:
-  configuration: docs/conf.py
-  builder: html
+    - sphinx-build -b html docs docs/_build/html
