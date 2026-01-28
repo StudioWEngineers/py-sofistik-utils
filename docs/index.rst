@@ -3,28 +3,23 @@ py-sofistik-utils documentation
 
 This is the py-sofistik-utils documentation.
 
-*py-sofistik-utils* is a set of external utilities for the SOFiSTiK finite element analysis
-software.
+*py-sofistik-utils* is a set of external utilities for the SOFiSTiK finite element analysis software.
 
-.. only:: not latex
+Documentation formats
+---------------------
 
-    Documentation formats
-    ---------------------
+You are reading the HTML version of the documentation. An alternative
+`PDF version <https://py3dm.readthedocs.io/_/downloads/en/latest/pdf/>`__ is also available.
 
-    You are reading the HTML version of the documentation. An alternative
-    `PDF version <https://py3dm.readthedocs.io/_/downloads/en/latest/pdf/>`__ is also available.
-
-.. only:: latex
-
-    .. rubric:: Dependencies
+Dependencies
+------------
 
 *py-sofistik-utils* depends on:
 
 - `pandas <https://pandas.pydata.org/>`__
 
-.. only:: latex
-
-    .. rubric:: How to cite this project?
+How to cite this project?
+-------------------------
 
 Please use the following BibTeX template to cite *py-sofistik-utils*:
 
