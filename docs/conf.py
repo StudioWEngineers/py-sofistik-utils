@@ -24,7 +24,6 @@ templates_path = ["_templates"]
 
 primary_domain = "py"
 highlight_language = "python"
-autodoc_mock_imports = ["os"]
 
 add_module_names = False
 autosummary_generate = True
