@@ -9,7 +9,6 @@ Writing to a cdb is currently not supported.
 """
 # standard library imports
 from ctypes import cdll, CDLL
-from os import add_dll_directory
 from os.path import isfile
 from pathlib import Path
 from typing import Callable
@@ -63,10 +62,9 @@ class SofDll():
             return False
         print("\n")
         try:
-            with add_dll_directory(self._path):
-                print(1)
-                print("Library loaded successfully!")
-                self._dll = cdll.LoadLibrary(self._version)
+            Path(self._path + self._version).resolve()
+            self._dll = cdll.LoadLibrary(self._version)
+            print("Library loaded successfully!")
 
         except: # OSError as e:
             print(f"Failed to load library: {1}")
