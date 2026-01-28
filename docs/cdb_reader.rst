@@ -1,4 +1,4 @@
-.. currentmodule:: py_sofistik_utils.cdb_reader
+.. currentmodule:: py_sofistik_utils.cdb_reader.reader
 
 CDB Reader API Reference
 ========================
