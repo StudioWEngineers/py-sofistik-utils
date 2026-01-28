@@ -31,6 +31,7 @@ primary_domain = "py"
 highlight_language = "python"
 
 add_module_names = False
+autosummary_generate = True
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
