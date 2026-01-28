@@ -9,7 +9,8 @@ from . sofistik_dll import SofDll
 
 
 class _SysInfo:
-    """The ``_SysInfo`` class provides methods and data structure to:
+    """
+    This class provides methods and data structure to:
 
     * access the key ``10/0`` of the cdb file;
     * store these information in a convenient format;
