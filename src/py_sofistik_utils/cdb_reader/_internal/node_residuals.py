@@ -12,7 +12,7 @@ from . sofistik_classes import CN_DISPI
 
 class _NodeResiduals:
     """
-    The ``_NodeResiduals`` class provides abstractions to load and access information
+    This class provides abstractions to load and access information
     about the nodal residuals for non-linear analyses, contained in keys ``26/LC`` of
     the CDB file.
 
