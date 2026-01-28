@@ -5,12 +5,9 @@ build:
   tools:
     python: "3.12"
 
-python:
-  install:
-    - method: pip
-      path: .
-    - requirements: docs/requirements.txt
-    - pip install -e src/py-sofistik-utils/
+  commands:
+    - pip install -e .
+    - pip install -r docs/requirements.txt
 
 sphinx:
   configuration: docs/conf.py
