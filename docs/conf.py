@@ -47,6 +47,10 @@ highlight_language = "python"
 add_module_names = False
 autosummary_generate = True
 
+autodoc_mock_imports = [
+    "os",  # os is built-in, but add_dll_directory is Windows-only
+]
+
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
