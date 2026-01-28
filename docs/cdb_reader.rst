@@ -10,7 +10,7 @@ Public Classes
 --------------
 
 .. autosummary::
-    :toctree:
+    :toctree: _build/_cdb_autosummary
     :template: class-template.rst
 
     SOFiSTiKCDBReader
@@ -19,7 +19,7 @@ Private Classes
 ---------------
 
 .. autosummary::
-    :toctree:
+    :toctree: _build/_cdb_autosummary
     :template: class-template.rst
 
     _BeamData
