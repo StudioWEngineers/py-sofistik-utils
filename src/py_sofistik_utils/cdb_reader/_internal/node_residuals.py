@@ -104,7 +104,7 @@ class _NodeResiduals:
         if (id_mask & lc_mask).eq(False).all():
             raise LookupError(f"Node {node_number} not found in load case {load_case}!")
 
-        return self._data.loc[lc_mask & id_mask, ("UX", "UY", "UZ")].copy(deep=True)  # type: ignore
+        return self._data.loc[lc_mask & id_mask, ("UX", "UY", "UZ")].copy(deep=True)
 
     def get_reaction_forces(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal translational components of the reaction force residuals for
@@ -131,7 +131,7 @@ class _NodeResiduals:
         if (id_mask & lc_mask).eq(False).all():
             raise LookupError(f"Node {node_number} not found in load case {load_case}!")
 
-        return self._data.loc[lc_mask & id_mask, ("PX", "PY", "PZ")].copy(deep=True)  # type: ignore
+        return self._data.loc[lc_mask & id_mask, ("PX", "PY", "PZ")].copy(deep=True)
 
     def get_reaction_moments(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal rotational components of the residuals forces for the given
@@ -158,7 +158,7 @@ class _NodeResiduals:
         if (id_mask & lc_mask).eq(False).all():
             raise LookupError(f"Node {node_number} not found in load case {load_case}!")
 
-        return self._data.loc[lc_mask & id_mask, ("MX", "MY", "MZ", "MB")].copy(deep=True)  # type: ignore
+        return self._data.loc[lc_mask & id_mask, ("MX", "MY", "MZ", "MB")].copy(deep=True)
 
     def get_rotations(self, load_case: int, node_number: int) -> DataFrame:
         """Return the nodal rotational components of the residuals for the given
@@ -185,7 +185,7 @@ class _NodeResiduals:
         if (id_mask & lc_mask).eq(False).all():
             raise LookupError(f"Node {node_number} not found in load case {load_case}!")
 
-        return self._data.loc[lc_mask & id_mask, ("URX", "URY", "URZ", "URB")].copy(deep=True)  # type: ignore
+        return self._data.loc[lc_mask & id_mask, ("URX", "URY", "URZ", "URB")].copy(deep=True)
 
     def load(self, load_case: int) -> None:
         """Load the nodal residuals for the given ``load_case``.
