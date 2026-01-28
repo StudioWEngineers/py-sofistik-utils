@@ -2,9 +2,9 @@
 [![Continuous Integration](https://img.shields.io/github/actions/workflow/status/StudioWEngineers/py-sofistik-utils/build_and_publish.yml?label=build)](https://github.com/StudioWEngineers/py-sofistik-utils/actions/workflows/build_and_publish.yml)
 [![](https://img.shields.io/pypi/v/py-sofistik-utils.svg?color=brightgreen)](https://pypi.org/pypi/py-sofistik-utils/)
 ![](https://img.shields.io/pypi/l/py-sofistik-utils.svg?color=brightgreen)
-[![](https://img.shields.io/badge/Changelog-Link-brightgreen)](XXX)
+[![](https://img.shields.io/badge/Changelog-Link-brightgreen)](https://py-sofistik-utils.readthedocs.io/en/latest/)
 
-Python utilities for the *SOFiSTiK* finite element analysis software.
+The Studio W Python utilities for the *SOFiSTiK* finite element analysis software.
 
 > [!IMPORTANT]  
 > **SOFiSTiK is a registered trademark of SOFiSTiK AG.**
@@ -18,7 +18,7 @@ Python utilities for the *SOFiSTiK* finite element analysis software.
 
 ## Documentation
 
-Reference documentation is available in [HTML](XXX) and [PDF](XXX) formats.
+Reference documentation is available in [HTML](https://py-sofistik-utils.readthedocs.io/en/latest/) format.
 
 ## License and attribution
 
