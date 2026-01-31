@@ -44,5 +44,6 @@ jobs:
         run: echo "${{ github.workspace }}\\sofistik_dlls\\2025" >> $env:GITHUB_PATH
 
       - name: Run tests
-        run: py -m unittest discover --verbose
-
+        run: |
+          cd tests
+          py -m unittest discover --verbose
