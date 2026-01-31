@@ -127,7 +127,7 @@ class _CableLoad:
         return_value = c_int(0)
 
         data: list[dict[str, Any]] = []
-        count = 0
+        first_call = True
         while return_value.value < 2:
             return_value.value = self._dll.get(
                 1,
@@ -135,11 +135,11 @@ class _CableLoad:
                 load_case,
                 byref(cabl),
                 byref(record_length),
-                0 if count == 0 else 1
+                0 if first_call else 1
             )
 
             record_length = c_int(sizeof(cabl))
-            count += 1
+            first_call = False
 
             if return_value.value >= 2:
                 break
