@@ -28,8 +28,9 @@ def print_tree(directory, prefix=""):
         print(f"{prefix}{'└── ' if is_last else '├── '}{item.name}")
 
         if item.is_dir():
-            extension = "    " if is_last else "│   "
-            print_tree(item, prefix + extension)
+            pass
+            #extension = "    " if is_last else "│   "
+            #print_tree(item, prefix + extension)
 
 class SofDll():
     """The `_SofDll` class load the SOFiSTiK dll `sof_cdb_w-202X.dll` and store as member
