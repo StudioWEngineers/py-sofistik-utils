@@ -18,18 +18,6 @@ from typing import Callable
 # local library specific imports
 from . sofistik_utilities import decode_cdb_status
 
-def print_tree(directory, prefix=""):
-    """Print directory tree structure"""
-    path = Path(directory)
-    contents = list(path.iterdir())
-
-    for i, item in enumerate(contents):
-        is_last = i == len(contents) - 1
-        print(f"{prefix}{'└── ' if is_last else '├── '}{item.name}")
-
-        if item.is_dir():
-            extension = "    " if is_last else "│   "
-            print_tree(item, prefix + extension)
 
 class SofDll():
     """The `_SofDll` class load the SOFiSTiK dll `sof_cdb_w-202X.dll` and store as member
@@ -73,9 +61,8 @@ class SofDll():
             return False
 
         if not self._check_files(self._path, [self._version]):
-            print_tree(self._path)
-                raise RuntimeError()
-                return False
+            raise RuntimeError()
+            return False
         print("\n")
         try:
             Path(self._path + self._version).resolve()
