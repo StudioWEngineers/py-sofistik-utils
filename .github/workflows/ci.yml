@@ -42,7 +42,7 @@ jobs:
         run: echo "SOFISTIK_DLL_PATH=${{ github.workspace }}\\sofistik_dlls\\2025" >> $env:GITHUB_ENV
 
       - name: Add DLL folder to PATH
-        run: echo "${{ github.workspace }}\\sofistik_dlls" >> $env:GITHUB_PATH
+        run: echo "${{ github.workspace }}\\sofistik_dlls\\2025" >> $env:GITHUB_PATH
 
       - name: Run tests
         run: py -m unittest discover --verobse
