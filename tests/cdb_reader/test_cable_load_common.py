@@ -190,4 +190,4 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self._cdb.initialize()
         for lc in self._load_cases:
             self._cdb.cable_load.load(lc)
-        self._cdb.close()
+        #self._cdb.close()
