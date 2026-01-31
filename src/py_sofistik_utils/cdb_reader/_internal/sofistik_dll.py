@@ -118,7 +118,7 @@ class SofDll():
         mode: int, optional and default to 93
             Read only access with mode = 93.
         """
-        if not isfile(file_full_name):
+        if not os.path.isfile(file_full_name):
             raise RuntimeError(f"\"{file_full_name}\" is NOT an existing regular file!")
 
         self._dll.sof_cdb_init(file_full_name.encode("UTF-8"), mode)
