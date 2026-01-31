@@ -49,6 +49,9 @@ class SofDll():
         loads the main SOFiSTiK dll.
         Returns `True` on success.
         """
+        print("*********\n")
+        print(self._path)
+        print("*********\n")
         if not self._check_folder(self._path):
             raise RuntimeError()
             return False
