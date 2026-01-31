@@ -46,7 +46,7 @@ jobs:
 
       - name: List DLL folder contents
         run: |
-          python -c "from pathlib import Path; [print(f) for f in Path('${{ github.workspace }}\\sofistik_dlls\\2022').rglob('*')]"
+          python -c "from pathlib import Path; [print(f) for f in Path(r'${{ github.workspace }}\sofistik_dlls\2022').rglob('*')]"
 
       - name: Run tests
         run: |
