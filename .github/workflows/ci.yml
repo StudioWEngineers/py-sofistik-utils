@@ -32,7 +32,7 @@ jobs:
 
       - name: Download SOFiSTiK DLLs
         env:
-            GH_TOKEN: ${{ secrets.SOFISTIK_DLL_TOKEN }}
+          GH_TOKEN: ${{ secrets.SOFiSTiK-DLLs-TOKEN }}
         run: |
           mkdir sofistik_dlls
           gh repo clone https://github.com/StudioWEngineers/SOFiSTiK-DLLs.git sofistik_dlls
