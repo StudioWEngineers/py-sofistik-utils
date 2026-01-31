@@ -135,14 +135,14 @@ class _CableLoad:
         for grp, cable_range in group_data.iterator_cable():
             self._data.loc[self._data.ELEM_ID.isin(cable_range), "GROUP"] = grp
 
-    def _load(self, load_case: int) -> list[dict[str, Any]]:
+    def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
         """
         """
         cabl = CCABL_LOA()
         record_length = c_int(sizeof(cabl))
         return_value = c_int(0)
 
-        data: list[dict[str, Any]] = []
+        data: list[dict[str, float | int | str]] = []
         first_call = True
         while return_value.value < 2:
             return_value.value = self._dll.get(
