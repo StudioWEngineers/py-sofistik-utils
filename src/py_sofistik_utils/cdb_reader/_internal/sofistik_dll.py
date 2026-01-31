@@ -49,6 +49,9 @@ class SofDll():
         loads the main SOFiSTiK dll.
         Returns `True` on success.
         """
+        print("*********\n")
+        print(self._path)
+        print("*********\n")
         if not self._check_folder(self._path):
             raise RuntimeError()
             return False
@@ -58,8 +61,9 @@ class SofDll():
             return False
 
         if not self._check_files(self._path, [self._version]):
-            raise RuntimeError()
-            return False
+            print("\n" + self._path + "\n")
+            #raise RuntimeError()
+            #return False
         print("\n")
         try:
             Path(self._path + self._version).resolve()
