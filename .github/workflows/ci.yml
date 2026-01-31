@@ -39,10 +39,10 @@ jobs:
           gh repo clone StudioWEngineers/SOFiSTiK-DLLs sofistik_dlls
 
       - name: Set DLL path
-        run: echo "SOFISTIK_DLL_PATH=${{ github.workspace }}/sofistik_dlls/2022/" >> $env:GITHUB_ENV
+        run: echo "SOFISTIK_DLL_PATH=${{ github.workspace }}\sofistik_dlls\2022\" >> $env:GITHUB_ENV
 
       - name: Add DLL folder to PATH
-        run: echo "${{ github.workspace }}/sofistik_dlls/2022/" >> $env:GITHUB_PATH
+        run: echo "${{ github.workspace }}\sofistik_dlls\2022\" >> $env:GITHUB_PATH
 
       - name: Run tests
         run: |
