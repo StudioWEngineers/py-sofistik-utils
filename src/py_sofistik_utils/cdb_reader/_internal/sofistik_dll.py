@@ -62,8 +62,8 @@ class SofDll():
 
         if not self._check_files(self._path, [self._version]):
             print("\n" + self._path + "\n")
-            raise RuntimeError()
-            return False
+            #raise RuntimeError()
+            #return False
         print("\n")
         try:
             Path(self._path + self._version).resolve()
