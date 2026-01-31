@@ -35,7 +35,6 @@ jobs:
           GH_TOKEN: ${{ secrets.SOFISTIK_DLL_TOKEN }}
         shell: bash
         run: |
-          echo "Token length: ${#GH_TOKEN}"
           gh repo clone StudioWEngineers/SOFiSTiK-DLLs sofistik_dlls
 
       - name: Set DLL path
@@ -45,5 +44,5 @@ jobs:
         run: echo "${{ github.workspace }}\\sofistik_dlls\\2025" >> $env:GITHUB_PATH
 
       - name: Run tests
-        run: py -m unittest discover --verobse
+        run: py -m unittest discover --verbose
 
