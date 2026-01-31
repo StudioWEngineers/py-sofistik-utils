@@ -10,6 +10,9 @@ from . test_cable_load_common import SOFiSTiKCDBReaderCableLoadTestSuite as CLTS
 
 
 DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
+print("*********\n")
+print(DLL_PATH)
+print("*********\n")
 
 
 class SOFiSTiKCDBReaderCableLoadTestSuite2022(CLTS):
