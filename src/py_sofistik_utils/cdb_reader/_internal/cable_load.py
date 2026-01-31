@@ -19,6 +19,22 @@ class _CableLoad:
     * store these data in a convenient format;
     * provide access to these data.
     """
+
+    LOAD_TYPE_MAP = {
+        10: "PG",
+        11: "PXX",
+        12: "PYY",
+        13: "PZZ",
+        30: "EX",
+        31: "WX",
+        61: "DT",
+        70: "VX",
+        80: "VX",
+        111: "PXP",
+        212: "PYP",
+        313: "PZP"
+    }
+
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``_CableLoad`` class.
         """
@@ -140,37 +156,15 @@ class _CableLoad:
 
             record_length = c_int(sizeof(cabl))
             first_call = False
-
             if return_value.value >= 2:
                 break
 
-            match cabl.m_typ:
-                case 10:
-                    type_ = "PG"
-                case 11:
-                    type_ = "PXX"
-                case 12:
-                    type_ = "PYY"
-                case 13:
-                    type_ = "PZZ"
-                case 30:
-                    type_ = "EX"
-                case 31:
-                    type_ = "WX"
-                case 61:
-                    type_ = "DT"
-                case 70:
-                    type_ = "VX"
-                case 80:
-                    type_ = "VX"
-                case 111:
-                    type_ = "PXP"
-                case 212:
-                    type_ = "PYP"
-                case 313:
-                    type_ = "PZP"
-                case _:
-                    raise RuntimeError(f"Unknown type: {cabl.m_typ}!")
+            try:
+                type_ = _CableLoad.LOAD_TYPE_MAP[cabl.m_typ]
+            except KeyError:
+                raise RuntimeError(
+                    f"UNKNOWN CABLE LOAD TYPE {cabl.m_typ} FOR ELEMENT {cabl.m_nr}!"
+                )
 
             data.append(
                 {
