@@ -19,9 +19,6 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self._columns = ["LOAD_CASE", "GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
         self._load_cases = [_ for _ in range(1, 12, 1)] + [100]
 
-    def tearDown(self) -> None:
-        self._cdb.close()
-
     def get_element_load(self) -> None:
         """Test for the `get_element_load` method.
         """
@@ -193,3 +190,4 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self._cdb.initialize()
         for lc in self._load_cases:
             self._cdb.cable_load.load(lc)
+        self._cdb.close()
