@@ -6,7 +6,7 @@ from pandas import DataFrame, Index
 from pandas.testing import assert_frame_equal
 
 # local library specific imports
-from . py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
+from .. py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 
 
 class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):

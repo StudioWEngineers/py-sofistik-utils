@@ -5,7 +5,7 @@ from os.path import dirname
 # third party library imports
 
 # local library specific imports
-from . py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
+from .. py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 from . test_cable_load_common import SOFiSTiKCDBReaderCableLoadTestSuite as CLTS
 
 
