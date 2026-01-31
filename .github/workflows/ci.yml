@@ -45,7 +45,5 @@ jobs:
 
       - name: Run tests
         run: |
-          cd
           cd tests
-          cd
           py -m unittest discover --verbose
