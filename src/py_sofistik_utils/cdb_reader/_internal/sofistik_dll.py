@@ -69,6 +69,9 @@ class SofDll():
             with os.add_dll_directory(self._path):
                 print("Library loaded successfully!")
                 self._dll = cdll.LoadLibrary(self._version)
+                if self._dll.sof_cdb_status(1) > 0:
+                    print("self._dll.sof_cdb_status(1) > 0")
+
         except: # OSError as e:
             print(f"Failed to load library: {1}")
 
