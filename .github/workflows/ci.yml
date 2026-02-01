@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - v*
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest']
+        python: ['3.12', '3.13', '3.14', '3.15.0-alpha.5']
+        sofistik: ['2022', '2023', '2024']
+
+    name: "Python ${{ matrix.python }} / ${{ matrix.os }} / SOFiSTiK ${{ matrix.sofistik }}"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+
+      - name: Download SOFiSTiK DLLs
+        env:
+          GH_TOKEN: ${{ secrets.SOFISTIK_DLL_TOKEN }}
+        shell: bash
+        run: |
+          gh repo clone StudioWEngineers/SOFiSTiK-DLLs sofistik_dlls
+
+      - name: Set SOFiSTiK DLL path
+        shell: pwsh
+        run: |
+          $dllPath = "${{ github.workspace }}\sofistik_dlls\${{ matrix.sofistik }}"
+          echo "SOFISTIK_DLL_PATH=$dllPath" >> $env:GITHUB_ENV
+          echo "SOFISTIK_VERSION=${{ matrix.sofistik }}" >> $env:GITHUB_ENV
+          echo $dllPath >> $env:GITHUB_PATH
+
+      - name: Run tests (SOFiSTiK ${{ matrix.sofistik }})
+        run: |
+          python -m unittest discover -s tests -p "test_*.py" --verbose
