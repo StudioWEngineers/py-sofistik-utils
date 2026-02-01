@@ -209,5 +209,4 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         """Open the CDB file and load the cable load data set for each load case.
         """
         self._cdb.initialize()
-        for lc in self._load_cases:
-            self._cdb.cable_load.load(lc)
+        self._cdb.cable_load.load(self._load_cases)
