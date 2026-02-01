@@ -8,9 +8,8 @@ variables some of the function provided by SOFiSTiK to read and write cdb files.
 Writing to a cdb is currently not supported.
 """
 # standard library imports
-from ctypes import cdll, CDLL
-from os import add_dll_directory
-from os.path import isfile
+from ctypes import CDLL, cdll
+import os
 from pathlib import Path
 from typing import Callable
 
@@ -63,8 +62,7 @@ class SofDll():
             return False
         print("\n")
         try:
-            with add_dll_directory(self._path):
-                print(1)
+            with os.add_dll_directory(self._path):
                 print("Library loaded successfully!")
                 self._dll = cdll.LoadLibrary(self._version)
 
@@ -118,7 +116,7 @@ class SofDll():
         mode: int, optional and default to 93
             Read only access with mode = 93.
         """
-        if not isfile(file_full_name):
+        if not os.path.isfile(file_full_name):
             raise RuntimeError(f"\"{file_full_name}\" is NOT an existing regular file!")
 
         self._dll.sof_cdb_init(file_full_name.encode("UTF-8"), mode)
