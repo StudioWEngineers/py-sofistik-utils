@@ -12,17 +12,24 @@ from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 
 
 DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
+SOFISTIK_VERSION = environ.get("SOFISTIK_VERSION")
 
 
 class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     """Tests for the `SOFiSTiKCDBReader`, `CableLoad` module.
     """
     def setUp(self) -> None:
+        if not DLL_PATH:
+            self.fail("SOFISTIK_DLL_PATH environment variable is not set")
+
+        if not SOFISTIK_VERSION:
+            self.fail("SOFISTIK_VERSION environment variable is not set")
+
         self._cdb = SOFiSTiKCDBReader(
             dirname(__file__) + "\\_cdb\\" ,
             "CABLE_LOAD",
             DLL_PATH,
-            2022
+            int(SOFISTIK_VERSION)
         )
 
         self._columns = ["LOAD_CASE", "GROUP", "ELEM_ID", "TYPE", "PA", "PE"]

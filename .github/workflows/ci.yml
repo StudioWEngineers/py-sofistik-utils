@@ -46,6 +46,7 @@ jobs:
         run: |
           $dllPath = "${{ github.workspace }}\sofistik_dlls\${{ matrix.sofistik }}"
           echo "SOFISTIK_DLL_PATH=$dllPath" >> $env:GITHUB_ENV
+          echo "SOFISTIK_VERSION=${{ matrix.sofistik }}" >> $env:GITHUB_ENV
           echo $dllPath >> $env:GITHUB_PATH
 
       - name: Run tests (SOFiSTiK ${{ matrix.sofistik }})
