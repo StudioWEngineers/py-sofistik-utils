@@ -44,10 +44,6 @@ jobs:
       - name: Add DLL folder to PATH
         run: echo "${{ github.workspace }}\sofistik_dlls\2022\" >> $env:GITHUB_PATH
 
-      - name: List DLL folder contents
-        run: |
-          python -c "from pathlib import Path; [print(f) for f in Path(r'${{ github.workspace }}\sofistik_dlls\2022').rglob('*')]"
-
       - name: Run tests
         run: |
           python -m unittest discover -s tests -p "test_*.py" --verbose
