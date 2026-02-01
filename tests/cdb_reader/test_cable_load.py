@@ -1,4 +1,6 @@
 # standard library imports
+from os import environ
+from os.path import dirname
 from unittest import TestCase
 
 # third party library imports
@@ -9,17 +11,24 @@ from pandas.testing import assert_frame_equal
 from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 
 
+DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
+
+
 class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     """Tests for the `SOFiSTiKCDBReader`, `CableLoad` module.
     """
     def setUp(self) -> None:
-        # create dummy reader to be overridden by the child class
-        self._cdb = SOFiSTiKCDBReader("", "", "", 2022)
+        self._cdb = SOFiSTiKCDBReader(
+            dirname(__file__) + "\\_cdb\\" ,
+            "CABLE_LOAD",
+            DLL_PATH,
+            2022
+        )
 
         self._columns = ["LOAD_CASE", "GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
         self._load_cases = [_ for _ in range(1, 12, 1)] + [100]
 
-    def get_element_load(self) -> None:
+    def test_get_element_load(self) -> None:
         """Test for the `get_element_load` method.
         """
         with self.subTest(msg="LC-1"):
@@ -165,16 +174,16 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
                 expected_dataframe
             )
 
-    def get_element_load_after_clear(self) -> None:
+    def test_get_element_load_after_clear(self) -> None:
         """Test for the `get_element_load` method after a `clear` call.
         """
         for lc in self._load_cases:
             self._cdb.cable_load.clear(lc)
             self._cdb.cable_load.load(lc)
 
-        self.get_element_load()
+        self.test_get_element_load()
 
-    def get_element_load_after_clear_all(self) -> None:
+    def test_get_element_load_after_clear_all(self) -> None:
         """Test for the `get_element_load` method after a `clear_all` call.
         """
         self._cdb.cable_load.clear_all()
@@ -182,7 +191,7 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         for lc in self._load_cases:
             self._cdb.cable_load.load(lc)
 
-        self.get_element_load()
+        self.test_get_element_load()
 
     def _load_data(self) -> None:
         """Open the CDB file and load the cable load data set for each load case.
@@ -190,4 +199,3 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self._cdb.initialize()
         for lc in self._load_cases:
             self._cdb.cable_load.load(lc)
-        #self._cdb.close()
