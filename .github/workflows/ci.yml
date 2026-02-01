@@ -16,10 +16,7 @@ jobs:
         python: ['3.12']
         sofistik: ['2022', '2023', '2024']
 
-    name: >
-      Python ${{ matrix.python }} |
-      SOFiSTiK ${{ matrix.sofistik }} |
-      ${{ matrix.os }}
+    name: "Python ${{ matrix.python }} / ${{ matrix.os }} / SOFiSTiK ${{ matrix.sofistik }}"
 
     runs-on: ${{ matrix.os }}
 
