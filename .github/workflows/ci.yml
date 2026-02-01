@@ -10,11 +10,17 @@ on:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: ['windows-latest']
         python: ['3.12']
+        sofistik: ['2022', '2023', '2024']
 
-    name: "Python ${{ matrix.python }} on ${{ matrix.os }}"
+    name: >
+      Python ${{ matrix.python }} |
+      SOFiSTiK ${{ matrix.sofistik }} |
+      ${{ matrix.os }}
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -38,12 +44,13 @@ jobs:
         run: |
           gh repo clone StudioWEngineers/SOFiSTiK-DLLs sofistik_dlls
 
-      - name: Set DLL path
-        run: echo "SOFISTIK_DLL_PATH=${{ github.workspace }}\sofistik_dlls\2022\" >> $env:GITHUB_ENV
+      - name: Set SOFiSTiK DLL path
+        shell: pwsh
+        run: |
+          $dllPath = "${{ github.workspace }}\sofistik_dlls\${{ matrix.sofistik }}"
+          echo "SOFISTIK_DLL_PATH=$dllPath" >> $env:GITHUB_ENV
+          echo $dllPath >> $env:GITHUB_PATH
 
-      - name: Add DLL folder to PATH
-        run: echo "${{ github.workspace }}\sofistik_dlls\2022\" >> $env:GITHUB_PATH
-
-      - name: Run tests
+      - name: Run tests (SOFiSTiK ${{ matrix.sofistik }})
         run: |
           python -m unittest discover -s tests -p "test_*.py" --verbose
