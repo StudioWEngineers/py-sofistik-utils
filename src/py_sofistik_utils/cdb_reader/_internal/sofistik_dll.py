@@ -37,7 +37,7 @@ class SofDll():
     def close(self) -> None:
         """Close the CDB database.
         """
-        self._dll.sof_cdb_close(1)
+        self._dll.sof_cdb_close(0)
 
         if self._dll.sof_cdb_status(1) == 0:
             print("CDB file has been successfully closed.")
