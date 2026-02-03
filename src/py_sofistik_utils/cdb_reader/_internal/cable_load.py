@@ -111,29 +111,37 @@ class _CableLoad:
         if isinstance(load_cases, int):
             load_cases = [load_cases]
 
+        temp_list: list[dict[str, float | int | str]] = []
         for load_case in load_cases:
             if self._dll.key_exist(161, load_case):
                 self.clear(load_case)
-
-                # load data
-                data = DataFrame(self._load(load_case))
-
-                # merge data
-                if self._data.empty:
-                    self._data = data
-                else:
-                    self._data = concat([self._data, data], ignore_index=True)
-                self._loaded_lc.add(load_case)
-
-            else:
-                continue
+                temp_list.extend(self._load(load_case))
 
         # assigning groups
         group_data = _GroupData(self._dll)
         group_data.load()
 
-        for grp, cable_range in group_data.iterator_cable():
-            self._data.loc[self._data.ELEM_ID.isin(cable_range), "GROUP"] = grp
+        temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
+        elem_ids = temp_df["ELEM_ID"]
+
+        for grp, grp_range in group_data.iterator_cable():
+            if grp_range.stop == 0:
+                continue
+
+            left = elem_ids.searchsorted(grp_range.start, side="left")
+            right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+            temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+        # set indices for fast lookup
+        temp_df = temp_df.set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+
+        # merge data
+        if self._data.empty:
+            self._data = temp_df
+        else:
+            self._data = concat([self._data, temp_df], ignore_index=True)
+
+        self._loaded_lc.update(load_cases)
 
     def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
         """
