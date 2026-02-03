@@ -112,6 +112,7 @@ class _CableLoad:
         if isinstance(load_cases, int):
             load_cases = [load_cases]
 
+        # load data
         temp_list: list[dict[str, float | int | str]] = []
         for load_case in load_cases:
             if self._dll.key_exist(161, load_case):
@@ -145,7 +146,7 @@ class _CableLoad:
         self._loaded_lc.update(load_cases)
 
     def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
-        """
+        """Retrieve key ``161/load_case`` using SOFiSTiK dll.
         """
         cabl = CCABL_LOA()
         record_length = c_int(sizeof(cabl))
@@ -172,7 +173,7 @@ class _CableLoad:
                 type_ = _CableLoad.LOAD_TYPE_MAP[cabl.m_typ]
             except KeyError:
                 raise RuntimeError(
-                    f"UNKNOWN CABLE LOAD TYPE {cabl.m_typ} FOR ELEMENT {cabl.m_nr}!"
+                    f"Unknown cable load type {cabl.m_typ} for element {cabl.m_nr}!"
                 )
 
             data.append(
