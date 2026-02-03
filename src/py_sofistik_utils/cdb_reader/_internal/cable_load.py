@@ -77,11 +77,11 @@ class _CableLoad:
 
         Parameters
         ----------
-        ``element_number``: int
+        element_number: int
             The cable element number
-        ``load_case``: int
+        load_case: int
             The load case number
-        ``load_type``: str
+        load_type: str
             The load type
 
         Raises
@@ -100,13 +100,14 @@ class _CableLoad:
         return self._data[e_mask & lc_mask & lt_mask].copy(deep=True)
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Load cable element loads for the given the ``load_cases``.
+        """Retrieve cable loads for the given the ``load_cases``.
 
-        If a load case is not found, a warning is raised only if ``echo_level`` is ``> 0``.
+        If a load case is not found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
-        ``load_cases``: int | list[int], load case numbers
+        load_cases: int | list[int]
+            load case numbers
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
