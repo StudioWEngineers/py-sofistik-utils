@@ -43,7 +43,7 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     def test_get_element_load(self) -> None:
         """Test for the `get_element_load` method.
         """
-        self.assertEqual(self._cdb.cable_load.get_element_load(5002, 7, "PZP", "PA"), -7.0)
+        self.assertEqual(self._cdb.cable_load.get(5002, 7, "PZP", "PA"), -7.0)
 
     def test_get_element_load_after_clear(self) -> None:
         """Test for the `get_element_load` method after a `clear` call.

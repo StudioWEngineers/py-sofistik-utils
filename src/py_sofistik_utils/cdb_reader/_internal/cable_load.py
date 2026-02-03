@@ -67,7 +67,7 @@ class _CableLoad:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def get_element_load(
+    def get(
             self,
             element_id: int,
             load_case: int,
