@@ -1,9 +1,9 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
+from pandas._typing import Scalar
 
 # local library specific imports
 from . group_data import _GroupData
@@ -69,35 +69,37 @@ class _CableLoad:
 
     def get_element_load(
             self,
-            element_number: int,
+            element_id: int,
             load_case: int,
-            load_type: str
-        ) -> Any:
-        """Return the cable connectivity for the given ``element_number``.
+            load_type: str,
+            point: str = "PA"
+        ) -> Scalar:
+        """Retrieve the requested cable load.
 
         Parameters
         ----------
-        element_number: int
+        element_id: int
             The cable element number
         load_case: int
             The load case number
         load_type: str
             The load type
+        point: str, default "PA"
+            Location on the cable where the load is applied; either the start ("PA") or
+            the end ("PE")
 
         Raises
         ------
         LookupError
             If the requested data is not found.
         """
-        e_mask = self._data["ELEM_ID"] == element_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-        lt_mask = self._data["TYPE"] == load_type
-
-        if (e_mask & lc_mask & lt_mask).eq(False).all():
-            err_msg = f"LC {load_case}, LT {load_type}, EL_ID {element_number} not found!"
-            raise LookupError(err_msg)
-
-        return self._data[e_mask & lc_mask & lt_mask].copy(deep=True)
+        try:
+            return self._data.at[(element_id, load_case, load_type), point]
+        except KeyError as e:
+            raise LookupError(
+                f"Load entry not found for element id {element_id}, "
+                f"load case {load_case}, load type {load_type} and point {point}!"
+            ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
         """Retrieve cable loads for the given the ``load_cases``.
