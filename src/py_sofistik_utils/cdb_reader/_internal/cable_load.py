@@ -177,10 +177,10 @@ class _CableLoad:
 
             try:
                 type_ = _CableLoad.LOAD_TYPE_MAP[cabl.m_typ]
-            except KeyError:
+            except KeyError as e:
                 raise RuntimeError(
                     f"Unknown cable load type {cabl.m_typ} for element {cabl.m_nr}!"
-                )
+                ) from e
 
             data.append(
                 {
