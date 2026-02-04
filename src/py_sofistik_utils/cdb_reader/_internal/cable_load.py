@@ -146,6 +146,11 @@ class _CableLoad:
             self._data = concat([self._data, temp_df])
         self._loaded_lc.update(load_cases)
 
+    def set_echo_level(self, echo_level: int) -> None:
+        """Set the echo level.
+        """
+        self._echo_level = echo_level
+
     def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
         """Retrieve key ``161/load_case`` using SOFiSTiK dll.
         """
@@ -189,8 +194,3 @@ class _CableLoad:
             )
 
         return data
-
-    def set_echo_level(self, echo_level: int) -> None:
-        """Set the echo level.
-        """
-        self._echo_level = echo_level
