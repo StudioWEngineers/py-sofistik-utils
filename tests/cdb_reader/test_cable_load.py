@@ -49,8 +49,13 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         """Test for the `get` method after a `clear` call.
         """
         self._cdb.cable_load.clear(7)
+        with self.subTest(msg="Check clear method"):
+            with self.assertRaises(LookupError):
+                self.test_get()
+
         self._cdb.cable_load.load(7)
-        self.test_get()
+        with self.subTest(msg="Check indexes management"):
+            self.test_get()
 
     def test_get_after_clear_all(self) -> None:
         """Test for the `get` method after a `clear_all` call.
