@@ -143,8 +143,7 @@ class _CableLoad:
         if self._data.empty:
             self._data = temp_df
         else:
-            self._data = concat([self._data, temp_df], ignore_index=True)
-
+            self._data = concat([self._data, temp_df])
         self._loaded_lc.update(load_cases)
 
     def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
