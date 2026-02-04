@@ -1,7 +1,7 @@
 # standard library imports
 from os import environ
 from os.path import dirname
-from unittest import TestCase, skip
+from unittest import TestCase
 
 # third party library imports
 from pandas import DataFrame, Index
@@ -40,29 +40,25 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     def tearDown(self) -> None:
         self._cdb.close()
 
-    def test_get_element_load(self) -> None:
-        """Test for the `get_element_load` method.
+    def test_get(self) -> None:
+        """Test for the `get` method.
         """
         self.assertEqual(self._cdb.cable_load.get(5002, 7, "PZP", "PA"), -7.0)
 
-    def test_get_element_load_after_clear(self) -> None:
-        """Test for the `get_element_load` method after a `clear` call.
+    def test_get_after_clear(self) -> None:
+        """Test for the `get` method after a `clear` call.
         """
-        for lc in self._load_cases:
-            self._cdb.cable_load.clear(lc)
-            self._cdb.cable_load.load(lc)
+        self._cdb.cable_load.clear(7)
+        self._cdb.cable_load.load(7)
+        self.test_get()
 
-        self.test_get_element_load()
-
-    def test_get_element_load_after_clear_all(self) -> None:
-        """Test for the `get_element_load` method after a `clear_all` call.
+    def test_get_after_clear_all(self) -> None:
+        """Test for the `get` method after a `clear_all` call.
         """
         self._cdb.cable_load.clear_all()
+        self._cdb.cable_load.load(self._load_cases)
 
-        for lc in self._load_cases:
-            self._cdb.cable_load.load(lc)
-
-        self.test_get_element_load()
+        self.test_get()
 
     def _load_data(self) -> None:
         """Open the CDB file and load the cable load data set for each load case.
