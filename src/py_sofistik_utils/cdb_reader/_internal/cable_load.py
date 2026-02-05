@@ -35,8 +35,6 @@ class _CableLoad:
     }
 
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_CableLoad`` class.
-        """
         self._data: DataFrame = DataFrame(
             columns = [
                 "LOAD_CASE",
