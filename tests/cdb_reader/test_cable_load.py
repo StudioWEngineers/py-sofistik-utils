@@ -1,6 +1,5 @@
 # standard library imports
 from os import environ
-from os.path import dirname
 from unittest import TestCase
 
 # third party library imports
@@ -11,6 +10,7 @@ from pandas.testing import assert_frame_equal
 from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 
 
+CDB_PATH = environ.get("SOFISTIK_CDB_PATH")
 DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
 SOFISTIK_VERSION = environ.get("SOFISTIK_VERSION")
 
@@ -43,6 +43,9 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     ]
 
     def setUp(self) -> None:
+        if not CDB_PATH:
+            self.fail("SOFISTIK_CDB_PATH environment variable is not set")
+
         if not DLL_PATH:
             self.fail("SOFISTIK_DLL_PATH environment variable is not set")
 
@@ -56,7 +59,7 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self.load_cases = list(range(1, 12, 1))
 
         self.cdb = SOFiSTiKCDBReader(
-            dirname(__file__) + "\\_cdb\\" ,
+            CDB_PATH,
             "CABLE_LOAD",
             DLL_PATH,
             int(SOFISTIK_VERSION)
