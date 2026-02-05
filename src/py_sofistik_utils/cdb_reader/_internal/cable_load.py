@@ -20,7 +20,7 @@ class _CableLoad:
     * provide access to these data.
     """
 
-    LOAD_TYPE_MAP = {
+    _LOAD_TYPE_MAP = {
         10: "PG",
         11: "PXX",
         12: "PYY",
@@ -176,7 +176,7 @@ class _CableLoad:
                 break
 
             try:
-                type_ = _CableLoad.LOAD_TYPE_MAP[cabl.m_typ]
+                type_ = _CableLoad._LOAD_TYPE_MAP[cabl.m_typ]
             except KeyError as e:
                 raise RuntimeError(
                     f"Unknown cable load type {cabl.m_typ} for element {cabl.m_nr}!"
