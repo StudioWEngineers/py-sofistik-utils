@@ -102,7 +102,7 @@ class _CableLoad:
             ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Retrieve cable loads for the given the ``load_cases``.
+        """Retrieve cable loads for the given ``load_cases``.
 
         If a load case is not found, a warning is raised only if ``echo_level > 0``.
 
