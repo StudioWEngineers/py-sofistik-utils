@@ -49,22 +49,23 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         if not SOFISTIK_VERSION:
             self.fail("SOFISTIK_VERSION environment variable is not set")
 
-        self._cdb = SOFiSTiKCDBReader(
+        self.expected_data = DataFrame(
+              SOFiSTiKCDBReaderCableLoadTestSuite._EXPECTED_DATA,
+              columns=["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
+            ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+        self.load_cases = list(range(1, 12, 1))
+
+        self.cdb = SOFiSTiKCDBReader(
             dirname(__file__) + "\\_cdb\\" ,
             "CABLE_LOAD",
             DLL_PATH,
             int(SOFISTIK_VERSION)
         )
-
-        self.expected_data = DataFrame(
-              SOFiSTiKCDBReaderCableLoadTestSuite._EXPECTED_DATA,
-              columns=["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
-            ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
-        self._load_cases = list(range(1, 12, 1))
-        self._load_data()
+        self.cdb.initialize()
+        self.cdb.cable_load.load(self.load_cases)
 
     def tearDown(self) -> None:
-        self._cdb.close()
+        self.cdb.close()
 
     def test_data(self) -> None:
         """Test for the `data` method.
@@ -74,35 +75,29 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         # (e.g. -0.008 is represented as -0.00800000037997961). The chosen tolerance
         # rtol=1e-7 is stricter than pandas default and reflects the maximum relative
         # error observed in practice, ensuring stable and reproducible comparisons.
-        assert_frame_equal(self.expected_data, self._cdb.cable_load.data(), rtol=1E-7)
+        assert_frame_equal(self.expected_data, self.cdb.cable_load.data(), rtol=1E-7)
 
     def test_get(self) -> None:
         """Test for the `get` method.
         """
-        self.assertEqual(self._cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+        self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
         """
-        self._cdb.cable_load.clear(7)
+        self.cdb.cable_load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
                 self.test_get()
 
-        self._cdb.cable_load.load(7)
+        self.cdb.cable_load.load(7)
         with self.subTest(msg="Check indexes management"):
             self.test_get()
 
     def test_get_after_clear_all(self) -> None:
         """Test for the `get` method after a `clear_all` call.
         """
-        self._cdb.cable_load.clear_all()
-        self._cdb.cable_load.load(self._load_cases)
+        self.cdb.cable_load.clear_all()
+        self.cdb.cable_load.load(self.load_cases)
 
         self.test_get()
-
-    def _load_data(self) -> None:
-        """Open the CDB file and load the cable load data set for each load case.
-        """
-        self._cdb.initialize()
-        self._cdb.cable_load.load(self._load_cases)
