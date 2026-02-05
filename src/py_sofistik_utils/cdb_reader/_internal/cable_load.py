@@ -64,6 +64,19 @@ class _CableLoad:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the `DataFrame`containing the loaded data.
+
+        Parameters
+        ----------
+        deep: bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            ``pandas.DataFrame.copy`` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
     def get(
             self,
             element_id: int,
