@@ -4,7 +4,7 @@ from os.path import dirname
 from unittest import TestCase
 
 # third party library imports
-from pandas import DataFrame, Index
+from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 
 # local library specific imports
@@ -56,18 +56,30 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
             int(SOFISTIK_VERSION)
         )
 
-        self._columns = ["LOAD_CASE", "GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
-        self._load_cases = [_ for _ in range(1, 12, 1)] + [100]
-
+        self.expected_data = DataFrame(
+              SOFiSTiKCDBReaderCableLoadTestSuite._EXPECTED_DATA,
+              columns=["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
+            ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+        self._load_cases = list(range(1, 12, 1))
         self._load_data()
 
     def tearDown(self) -> None:
         self._cdb.close()
 
+    def test_data(self) -> None:
+        """Test for the `data` method.
+        """
+        # NOTE:
+        # Float values loaded from the CDB contain inherent numerical noise
+        # (e.g. -0.008 is represented as -0.00800000037997961). The chosen tolerance
+        # rtol=1e-7 is stricter than pandas default and reflects the maximum relative
+        # error observed in practice, ensuring stable and reproducible comparisons.
+        assert_frame_equal(self.expected_data, self._cdb.cable_load.data(), rtol=1E-7)
+
     def test_get(self) -> None:
         """Test for the `get` method.
         """
-        self.assertEqual(self._cdb.cable_load.get(5002, 7, "PZP", "PA"), -7.0)
+        self.assertEqual(self._cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
