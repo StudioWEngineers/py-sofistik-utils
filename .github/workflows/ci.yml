@@ -51,7 +51,7 @@ jobs:
       - name: Set SOFiSTiK DLL path
         shell: pwsh
         run: |
-          $cdbPath = "${{ github.workspace }}\sofistik_cdbs\cdb_files"
+          $cdbPath = "${{ github.workspace }}\sofistik_cdbs\cdb_files\"
           $dllPath = "${{ github.workspace }}\sofistik_dlls\${{ matrix.sofistik }}"
           echo "SOFISTIK_CDB_PATH=$cdbPath" >> $env:GITHUB_ENV
           echo "SOFISTIK_DLL_PATH=$dllPath" >> $env:GITHUB_ENV
