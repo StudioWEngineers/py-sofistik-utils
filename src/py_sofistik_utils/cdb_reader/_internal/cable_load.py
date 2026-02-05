@@ -3,7 +3,6 @@ from ctypes import byref, c_int, sizeof
 
 # third party library imports
 from pandas import concat, DataFrame
-from pandas._typing import Scalar
 
 # local library specific imports
 from . group_data import _GroupData
@@ -73,7 +72,7 @@ class _CableLoad:
             load_case: int,
             load_type: str,
             point: str = "PA"
-        ) -> Scalar:
+        ) -> float:
         """Retrieve the requested cable load.
 
         Parameters
@@ -94,7 +93,7 @@ class _CableLoad:
             If the requested data is not found.
         """
         try:
-            return self._data.at[(element_id, load_case, load_type), point]
+            return self._data.at[(element_id, load_case, load_type), point]  # type: ignore
         except KeyError as e:
             raise LookupError(
                 f"Load entry not found for element id {element_id}, "
