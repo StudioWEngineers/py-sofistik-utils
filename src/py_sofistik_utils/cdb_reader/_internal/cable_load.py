@@ -73,7 +73,9 @@ class _CableLoad:
         if load_case not in self._loaded_lc:
             return
 
-        self._data = self._data.drop(load_case, level="LOAD_CASE")
+        self._data = self._data[
+            self._data.index.get_level_values("LOAD_CASE") != load_case
+        ]
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
