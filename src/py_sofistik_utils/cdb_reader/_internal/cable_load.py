@@ -11,12 +11,30 @@ from . sofistik_dll import SofDll
 
 
 class _CableLoad:
-    """
-    This class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the keys ``161/LC`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``161/LC`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``LOAD_CASE`` load case number
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``TYPE`` load type
+        * ``PA``: load value at cable start point
+        * ``PE``: load value at cable end point
+
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``, ``LOAD_CASE`` and
+        ``TYPE`` (in this specific order) to enable fast lookups via the `get` method. The
+        index columns are not dropped from the ``DataFrame``.
+
+        .. important::
+
+            Wind and snow loads are not implemented and will raise a runtime error if they
+            are present in the requested load case.
     """
 
     _LOAD_TYPE_MAP = {
@@ -50,7 +68,7 @@ class _CableLoad:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given ``load_case`` number.
+        """Clear the loaded data for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
@@ -59,21 +77,21 @@ class _CableLoad:
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
-        """Clear all group data.
+        """Clear the loaded data for all the load cases.
         """
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the `DataFrame`containing the loaded data.
+        """Return the :class:`pandas.DataFrame` containing the loaded keys ``161/LC``.
 
         Parameters
         ----------
-        deep: bool, default True
+        deep : bool, default True
             When ``deep=True``, a new object will be created with a copy of the calling
             object's data and indices. Modifications to the data or indices of the
             copy will not be reflected in the original object (refer to
-            ``pandas.DataFrame.copy`` documentation for details).
+            :meth:`pandas.DataFrame.copy` documentation for details).
         """
         return self._data.copy(deep=deep)
 
@@ -88,13 +106,13 @@ class _CableLoad:
 
         Parameters
         ----------
-        element_id: int
+        element_id : int
             The cable element number
-        load_case: int
+        load_case : int
             The load case number
-        load_type: str
+        load_type : str
             The load type
-        point: str, default "PA"
+        point : str, default "PA"
             Location on the cable where the load is applied; either the start ("PA") or
             the end ("PE")
 
@@ -112,14 +130,18 @@ class _CableLoad:
             ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Retrieve cable loads for the given ``load_cases``.
-
-        If a load case is not found, a warning is raised only if ``echo_level > 0``.
+        """Retrieve cable load data for the given ``load_cases``. If a load case is not
+        found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
-        load_cases: int | list[int]
+        load_cases : int | list[int]
             load case numbers
+
+        Notes
+        -----
+        Wind and snow loads are not implemented and will raise a runtime error if they are
+        present in the requested load case.
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
@@ -158,6 +180,11 @@ class _CableLoad:
 
     def set_echo_level(self, echo_level: int) -> None:
         """Set the echo level.
+
+        Parameters
+        ----------
+        echo_level : int
+            the new echo level
         """
         self._echo_level = echo_level
 
