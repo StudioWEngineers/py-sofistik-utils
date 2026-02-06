@@ -1,16 +1,16 @@
 # standard library imports
 from os import environ
-from os.path import dirname
 from unittest import TestCase
 
 # third party library imports
-from pandas import DataFrame, Index
+from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 
 # local library specific imports
 from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 
 
+CDB_PATH = environ.get("SOFISTIK_CDB_PATH")
 DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
 SOFISTIK_VERSION = environ.get("SOFISTIK_VERSION")
 
@@ -18,195 +18,89 @@ SOFISTIK_VERSION = environ.get("SOFISTIK_VERSION")
 class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     """Tests for the `SOFiSTiKCDBReader`, `CableLoad` module.
     """
+    _EXPECTED_DATA = [
+        (1,  500, 5001, "PG",  +1.0,   -1.0),
+        (2,  500, 5001, "PXX", +2.0,   +2.0),
+        (6,  500, 5001, "PYP", -6.0,   -6.0),
+        (8,  500, 5001, "EX",  -0.008, -0.008),
+        (11, 500, 5001, "VX",  +11.0,  +11.0),
+        (2,  500, 5009, "PXX", +2.0,   +2.0),
+        (6,  500, 5009, "PYP", -6.0,   -6.0),
+        (7,  500, 5009, "PZP", -7.0,   -7.0),
+        (11, 500, 5009, "VX",  +11.0,  +11.0),
+        (3,  501, 5011, "PYY", -3.0,   -3.0),
+        (4,  501, 5011, "PZZ", -4.0,   -4.0),
+        (5,  501, 5011, "PXP", +5.0,   +5.0),
+        (9,  501, 5011, "WX",  +0.009, +0.009),
+        (10, 501, 5011, "DT",  -10.0,  -10.0),
+        (11, 501, 5011, "VX",  +11.0,  +11.0),
+        (3,  501, 5014, "PYY", -3.0,   -3.0),
+        (5,  501, 5014, "PXP", +5.0,   +5.0),
+        (8,  501, 5014, "EX",  -0.008, -0.008),
+        (9,  501, 5014, "WX",  +0.009, +0.009),
+        (10, 501, 5014, "DT",  -10.0,  -10.0),
+        (11, 501, 5014, "VX",  +11.0,  +11.0)
+    ]
+
     def setUp(self) -> None:
+        if not CDB_PATH:
+            self.fail("SOFISTIK_CDB_PATH environment variable is not set")
+
         if not DLL_PATH:
             self.fail("SOFISTIK_DLL_PATH environment variable is not set")
 
         if not SOFISTIK_VERSION:
             self.fail("SOFISTIK_VERSION environment variable is not set")
 
-        self._cdb = SOFiSTiKCDBReader(
-            dirname(__file__) + "\\_cdb\\" ,
+        self.expected_data = DataFrame(
+              SOFiSTiKCDBReaderCableLoadTestSuite._EXPECTED_DATA,
+              columns=["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
+            ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+        self.load_cases = list(range(1, 12, 1))
+
+        self.cdb = SOFiSTiKCDBReader(
+            CDB_PATH,
             "CABLE_LOAD",
             DLL_PATH,
             int(SOFISTIK_VERSION)
         )
-
-        self._columns = ["LOAD_CASE", "GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
-        self._load_cases = [_ for _ in range(1, 12, 1)] + [100]
-
-        self._load_data()
+        self.cdb.initialize()
+        self.cdb.cable_load.load(self.load_cases)
 
     def tearDown(self) -> None:
-        self._cdb.close()
+        self.cdb.close()
 
-    def test_get_element_load(self) -> None:
-        """Test for the `get_element_load` method.
+    def test_data(self) -> None:
+        """Test for the `data` method.
         """
-        with self.subTest(msg="LC-1"):
-            expected_dataframe = DataFrame(
-                [[1, 500, 5001, "PG", 1.0, -1.0]],
-                columns=self._columns
-            )
+        # NOTE:
+        # Float values loaded from the CDB contain inherent numerical noise
+        # (e.g. -0.008 is represented as -0.00800000037997961). The chosen tolerance
+        # rtol=1e-7 is stricter than pandas default and reflects the maximum relative
+        # error observed in practice, ensuring stable and reproducible comparisons.
+        assert_frame_equal(self.expected_data, self.cdb.cable_load.data(), rtol=1E-7)
 
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5001, 1, "PG"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-2"):
-            expected_dataframe = DataFrame(
-                [[2, 500, 5001, "PXX", 2.0, 2.0]],
-                index=Index([1]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5001, 2, "PXX"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-3"):
-            expected_dataframe = DataFrame(
-                [[3, 501, 5013, "PYY", -3.0, -3.0]],
-                index=Index([7]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5013, 3, "PYY"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-4"):
-            expected_dataframe = DataFrame(
-                [[4, 501, 5012, "PZZ", -4.0, -4.0]],
-                index=Index([9]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5012, 4, "PZZ"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-5"):
-            expected_dataframe = DataFrame(
-                [[5, 501, 5011, "PXP", 5.0, 5.0]],
-                index=Index([10]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5011, 5, "PXP"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-6"):
-            expected_dataframe = DataFrame(
-                [[6, 500, 5002, "PYP", -6.0, -6.0]],
-                index=Index([15]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5002, 6, "PYP"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-7"):
-            expected_dataframe = DataFrame(
-                [[7, 500, 5002, "PZP", -7.0, -7.0]],
-                index=Index([18]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5002, 7, "PZP"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-8"):
-            expected_dataframe = DataFrame(
-                [[8, 501, 5013, "EX", -0.008, -0.008]],
-                index=Index([20]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5013, 8, "EX"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-9"):
-            expected_dataframe = DataFrame(
-                [[9, 501, 5012, "WX", 0.009, 0.009]],
-                index=Index([22]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5012, 9, "WX"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-10"):
-            expected_dataframe = DataFrame(
-                [[10, 501, 5014, "DT", -10.0, -10.0]],
-                index=Index([28]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5014, 10, "DT"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-11"):
-            expected_dataframe = DataFrame(
-                [[11, 500, 5002, "VX", 11.0, 11.0]],
-                index=Index([30]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5002, 11, "VX"),
-                expected_dataframe
-            )
-
-        with self.subTest(msg="LC-100"):
-            expected_dataframe = DataFrame(
-                [[100, 500, 5001, "PYP", -6.0, -6.0]],
-                index=Index([40]),
-                columns=self._columns
-            )
-
-            assert_frame_equal(
-                self._cdb.cable_load.get_element_load(5001, 100, "PYP"),
-                expected_dataframe
-            )
-
-    def test_get_element_load_after_clear(self) -> None:
-        """Test for the `get_element_load` method after a `clear` call.
+    def test_get(self) -> None:
+        """Test for the `get` method.
         """
-        for lc in self._load_cases:
-            self._cdb.cable_load.clear(lc)
-            self._cdb.cable_load.load(lc)
+        self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
 
-        self.test_get_element_load()
-
-    def test_get_element_load_after_clear_all(self) -> None:
-        """Test for the `get_element_load` method after a `clear_all` call.
+    def test_get_after_clear(self) -> None:
+        """Test for the `get` method after a `clear` call.
         """
-        self._cdb.cable_load.clear_all()
+        self.cdb.cable_load.clear(7)
+        with self.subTest(msg="Check clear method"):
+            with self.assertRaises(LookupError):
+                self.test_get()
 
-        for lc in self._load_cases:
-            self._cdb.cable_load.load(lc)
+        self.cdb.cable_load.load(7)
+        with self.subTest(msg="Check indexes management"):
+            self.test_get()
 
-        self.test_get_element_load()
-
-    def _load_data(self) -> None:
-        """Open the CDB file and load the cable load data set for each load case.
+    def test_get_after_clear_all(self) -> None:
+        """Test for the `get` method after a `clear_all` call.
         """
-        self._cdb.initialize()
-        self._cdb.cable_load.load(self._load_cases)
+        self.cdb.cable_load.clear_all()
+        self.cdb.cable_load.load(self.load_cases)
+
+        self.test_get()

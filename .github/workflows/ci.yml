@@ -41,12 +41,22 @@ jobs:
         run: |
           gh repo clone StudioWEngineers/SOFiSTiK-DLLs sofistik_dlls
 
+      - name: Download SOFiSTiK CDBs
+        env:
+          GH_TOKEN: ${{ secrets.SOFISTIK_CDB_TOKEN }}
+        shell: bash
+        run: |
+          gh repo clone StudioWEngineers/SOFiSTiK-CDBs sofistik_cdbs
+
       - name: Set SOFiSTiK DLL path
         shell: pwsh
         run: |
+          $cdbPath = "${{ github.workspace }}\sofistik_cdbs\cdb_files\"
           $dllPath = "${{ github.workspace }}\sofistik_dlls\${{ matrix.sofistik }}"
+          echo "SOFISTIK_CDB_PATH=$cdbPath" >> $env:GITHUB_ENV
           echo "SOFISTIK_DLL_PATH=$dllPath" >> $env:GITHUB_ENV
           echo "SOFISTIK_VERSION=${{ matrix.sofistik }}" >> $env:GITHUB_ENV
+          echo $cdbPath >> $env:GITHUB_PATH
           echo $dllPath >> $env:GITHUB_PATH
 
       - name: Run tests (SOFiSTiK ${{ matrix.sofistik }})

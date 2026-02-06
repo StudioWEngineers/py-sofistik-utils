@@ -1,6 +1,5 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
@@ -12,16 +11,48 @@ from . sofistik_dll import SofDll
 
 
 class _CableLoad:
-    """
-    This class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the keys ``161/LC`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``161/LC`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``LOAD_CASE`` load case number
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``TYPE`` load type
+        * ``PA``: load value at cable start point
+        * ``PE``: load value at cable end point
+
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``, ``LOAD_CASE`` and
+        ``TYPE`` (in this specific order) to enable fast lookups via the `get` method. The
+        index columns are not dropped from the ``DataFrame``.
+
+        .. important::
+
+            Wind and snow loads are not implemented and will raise a runtime error if they
+            are present in the requested load case.
     """
+
+    _LOAD_TYPE_MAP = {
+        10: "PG",
+        11: "PXX",
+        12: "PYY",
+        13: "PZZ",
+        30: "EX",
+        31: "WX",
+        61: "DT",
+        70: "VX",
+        80: "VX",
+        111: "PXP",
+        212: "PYP",
+        313: "PZP"
+    }
+
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_CableLoad`` class.
-        """
         self._data: DataFrame = DataFrame(
             columns = [
                 "LOAD_CASE",
@@ -37,97 +68,137 @@ class _CableLoad:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given ``load_case`` number.
+        """Clear the loaded data for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
 
-        self._data = self._data.loc[~(self._data["LOAD_CASE"] == load_case), :]
+        self._data = self._data[
+            self._data.index.get_level_values("LOAD_CASE") != load_case
+        ]
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
-        """Clear all group data.
+        """Clear the loaded data for all the load cases.
         """
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def get_element_load(
-            self,
-            element_number: int,
-            load_case: int,
-            load_type: str
-        ) -> Any:
-        """Return the cable connectivity for the given ``element_number``.
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys ``161/LC``.
 
         Parameters
         ----------
-        ``element_number``: int
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
+    def get(
+            self,
+            element_id: int,
+            load_case: int,
+            load_type: str,
+            point: str = "PA"
+        ) -> float:
+        """Retrieve the requested cable load.
+
+        Parameters
+        ----------
+        element_id : int
             The cable element number
-        ``load_case``: int
+        load_case : int
             The load case number
-        ``load_type``: str
+        load_type : str
             The load type
+        point : str, default "PA"
+            Location on the cable where the load is applied; either the start ("PA") or
+            the end ("PE")
 
         Raises
         ------
         LookupError
             If the requested data is not found.
         """
-        e_mask = self._data["ELEM_ID"] == element_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-        lt_mask = self._data["TYPE"] == load_type
-
-        if (e_mask & lc_mask & lt_mask).eq(False).all():
-            err_msg = f"LC {load_case}, LT {load_type}, EL_ID {element_number} not found!"
-            raise LookupError(err_msg)
-
-        return self._data[e_mask & lc_mask & lt_mask].copy(deep=True)
+        try:
+            return self._data.at[(element_id, load_case, load_type), point]  # type: ignore
+        except KeyError as e:
+            raise LookupError(
+                f"Load entry not found for element id {element_id}, "
+                f"load case {load_case}, load type {load_type} and point {point}!"
+            ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Load cable element loads for the given the ``load_cases``.
-
-        If a load case is not found, a warning is raised only if ``echo_level`` is ``> 0``.
+        """Retrieve cable load data for the given ``load_cases``. If a load case is not
+        found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
-        ``load_cases``: int | list[int], load case numbers
+        load_cases : int | list[int]
+            load case numbers
+
+        Notes
+        -----
+        Wind and snow loads are not implemented and will raise a runtime error if they are
+        present in the requested load case.
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
 
+        # load data
+        temp_list: list[dict[str, float | int | str]] = []
         for load_case in load_cases:
             if self._dll.key_exist(161, load_case):
                 self.clear(load_case)
-
-                # load data
-                data = DataFrame(self._load(load_case))
-
-                # merge data
-                if self._data.empty:
-                    self._data = data
-                else:
-                    self._data = concat([self._data, data], ignore_index=True)
-                self._loaded_lc.add(load_case)
-
-            else:
-                continue
+                temp_list.extend(self._load(load_case))
 
         # assigning groups
         group_data = _GroupData(self._dll)
         group_data.load()
 
-        for grp, cable_range in group_data.iterator_cable():
-            self._data.loc[self._data.ELEM_ID.isin(cable_range), "GROUP"] = grp
+        temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
+        elem_ids = temp_df["ELEM_ID"]
 
-    def _load(self, load_case: int) -> list[dict[str, Any]]:
+        for grp, grp_range in group_data.iterator_cable():
+            if grp_range.stop == 0:
+                continue
+
+            left = elem_ids.searchsorted(grp_range.start, side="left")
+            right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+            temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+        # set indices for fast lookup
+        temp_df = temp_df.set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+
+        # merge data
+        if self._data.empty:
+            self._data = temp_df
+        else:
+            self._data = concat([self._data, temp_df])
+        self._loaded_lc.update(load_cases)
+
+    def set_echo_level(self, echo_level: int) -> None:
+        """Set the echo level.
+
+        Parameters
+        ----------
+        echo_level : int
+            the new echo level
         """
+        self._echo_level = echo_level
+
+    def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
+        """Retrieve key ``161/load_case`` using SOFiSTiK dll.
         """
         cabl = CCABL_LOA()
         record_length = c_int(sizeof(cabl))
         return_value = c_int(0)
 
-        data: list[dict[str, Any]] = []
-        count = 0
+        data: list[dict[str, float | int | str]] = []
+        first_call = True
         while return_value.value < 2:
             return_value.value = self._dll.get(
                 1,
@@ -135,42 +206,20 @@ class _CableLoad:
                 load_case,
                 byref(cabl),
                 byref(record_length),
-                0 if count == 0 else 1
+                0 if first_call else 1
             )
 
             record_length = c_int(sizeof(cabl))
-            count += 1
-
+            first_call = False
             if return_value.value >= 2:
                 break
 
-            match cabl.m_typ:
-                case 10:
-                    type_ = "PG"
-                case 11:
-                    type_ = "PXX"
-                case 12:
-                    type_ = "PYY"
-                case 13:
-                    type_ = "PZZ"
-                case 30:
-                    type_ = "EX"
-                case 31:
-                    type_ = "WX"
-                case 61:
-                    type_ = "DT"
-                case 70:
-                    type_ = "VX"
-                case 80:
-                    type_ = "VX"
-                case 111:
-                    type_ = "PXP"
-                case 212:
-                    type_ = "PYP"
-                case 313:
-                    type_ = "PZP"
-                case _:
-                    raise RuntimeError(f"Unknown type: {cabl.m_typ}!")
+            try:
+                type_ = _CableLoad._LOAD_TYPE_MAP[cabl.m_typ]
+            except KeyError as e:
+                raise RuntimeError(
+                    f"Unknown cable load type {cabl.m_typ} for element {cabl.m_nr}!"
+                ) from e
 
             data.append(
                 {
@@ -184,8 +233,3 @@ class _CableLoad:
             )
 
         return data
-
-    def set_echo_level(self, echo_level: int) -> None:
-        """Set the echo level.
-        """
-        self._echo_level = echo_level
