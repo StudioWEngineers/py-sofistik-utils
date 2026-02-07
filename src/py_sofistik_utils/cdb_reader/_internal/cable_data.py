@@ -20,8 +20,6 @@ class _CableData:
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_CableData`` class.
-        """
         self._data: DataFrame = DataFrame(
             columns = [
                 "GROUP",
@@ -35,7 +33,6 @@ class _CableData:
         self._dll = dll
         self._echo_level = 0
         self._loaded_lc: set[int] = set()
-        self._dll = dll
 
     def clear(self) -> None:
         """Clear all the cable element informations.
