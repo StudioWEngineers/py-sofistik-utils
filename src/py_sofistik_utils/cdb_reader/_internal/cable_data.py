@@ -32,13 +32,11 @@ class _CableData:
         )
         self._dll = dll
         self._echo_level = 0
-        self._loaded_lc: set[int] = set()
 
     def clear(self) -> None:
         """Clear all the cable element informations.
         """
         self._data = self._data[0:0]
-        self._loaded_lc.clear()
 
     def get_element_connectivity(self, element_number: int) -> list[int]:
         """Return the cable connectivity for the given ``element_number``.
@@ -79,65 +77,6 @@ class _CableData:
                 return group_data[element_number]
 
         raise RuntimeError(f"Element number {element_number} not found!")
-
-    def get_element_property(self, element_number: int) -> int:
-        """Return the cable property number for the given ``element_number``.
-
-        Parameters
-        ----------
-        ``element_number``: int
-            The cable element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``element_number`` is not found.
-        """
-        raise NotImplementedError
-        for group_data in self._property_id.values():
-            if element_number in group_data:
-                return group_data[element_number]
-
-        raise RuntimeError(f"Element number {element_number} not found!")
-
-    def get_element_transformation_vector(self, element_number: int) -> DataFrame:
-        """Return the cable transformation vector for the given ``element_number``.
-
-        Parameters
-        ----------
-        ``element_number``: int
-            The cable element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``element_number`` is not found.
-        """
-        raise NotImplementedError
-        for group_data in self._transformation_vector.values():
-            if element_number in group_data:
-                return group_data[element_number]
-
-        raise RuntimeError(f"Element number {element_number} not found!")
-
-    def get_group_connectivity(self, group_number: int) -> dict[int, list[int]]:
-        """Return the cable connectivity for all the cables in the given ``group_number``.
-
-        Parameters
-        ----------
-        ``group_number``: int
-            The cable group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
-        """
-        raise NotImplementedError
-        if group_number in self._connectivity:
-            return self._connectivity[group_number]
-
-        raise RuntimeError(f"Group number {group_number} not found!")
 
     def load(self) -> None:
         """Load cable element information given the group divisor number.
