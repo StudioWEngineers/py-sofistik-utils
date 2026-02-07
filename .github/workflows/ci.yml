@@ -23,7 +23,7 @@ jobs:
         id: changed-files
         with:
           files: |
-            .github/workflows/workflow_ci.yml
+            .github/workflows/ci.yml
             src/**/*
             tests/**/*
             pyproject.toml
