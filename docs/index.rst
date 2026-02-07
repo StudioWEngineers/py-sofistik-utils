@@ -1,7 +1,7 @@
 Introduction
 ============
 
-``py-sofistik-utils`` is an open-source Windows-only Python package that provides utilities
+*py-sofistik-utils* is an open-source Windows-only Python package that provides utilities
 for interfacing with the SOFiSTiK finite element analysis (FEA) software.
 
 In particular, it provides classes and data structures to:
@@ -16,27 +16,10 @@ In particular, it provides classes and data structures to:
     It interfaces with proprietary SOFiSTiK DLLs that are **NOT** distributed with this
     repository or the PyPI wheels and must be supplied by the user.
 
-Installation
-------------
-
-You can install ``py-sofistik-utils`` and its dependencies via `pip <https://pip.pypa.io/>`_ from
-`PyPI <https://pypi.org/>`_:
-
-.. code:: shell
-
-   pip install py-sofistik-utils
-
-Its Python dependencies are:
-
-- `Python <https://www.python.org/>`_ 3.12+.
-- `pandas <https://pandas.pydata.org/>`_ 3.0+.
-
-See XXX for more information.
-
 How to cite this project?
 -------------------------
 
-Please use the following BibTeX template to cite ``py-sofistik-utils``:
+Please use the following BibTeX template to cite *py-sofistik-utils*:
 
 .. code-block:: bibtex
 
@@ -50,18 +33,36 @@ Please use the following BibTeX template to cite ``py-sofistik-utils``:
 Disclaimer
 ----------
 
-``py-sofistik-utils`` is an open-source set of tools that benefits from the collaboration
+*py-sofistik-utils* is an open-source set of tools that benefits from the collaboration
 of many contributors. While efforts have been made to ensure the implementation is correct,
 it remains the user's responsibility to verify and accept the results.
 
 Please refer to the `license <https://github.com/StudioWEngineers/py-sofistik-utils/blob/main/LICENSE>`_
 for the terms and conditions of use.
 
-Table of contents
------------------
-
 .. toctree::
-    :maxdepth: 1
+    :hidden:
 
     changelog
-    cdb_reader
+    faq
+
+.. toctree::
+    :caption: Basics
+    :hidden:
+
+    installation
+    usage
+
+.. toctree::
+    :caption: Testing
+    :maxdepth: 1
+    :hidden:
+
+    cdb/test_setup
+
+.. toctree::
+    :caption: API Reference
+    :maxdepth: 1
+    :hidden:
+
+    cdb/api
