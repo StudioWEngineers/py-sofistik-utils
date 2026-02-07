@@ -1,6 +1,5 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
@@ -79,16 +78,8 @@ class _CableData:
         raise RuntimeError(f"Element number {element_number} not found!")
 
     def load(self) -> None:
-        """Load cable element information given the group divisor number.
-
-        Parameters
-        ----------
-        ``group_divisor``: int, optional default to 10000
-
-        Raises
-        ------
-        RuntimeError
-            If the key does not exist or it is empty.
+        """Retrieve all cable data. If the key is not found, a warning is raised only if
+        ``echo_level > 0``.
         """
         if self._dll.key_exist(160, 0):
             cabl = CCABL()
@@ -97,8 +88,8 @@ class _CableData:
 
             self.clear()
 
-            data: list[dict[str, Any]] = []
-            count = 0
+            data: list[dict[str, float | int]] = []
+            first_call = True
             while return_value.value < 2:
                 return_value.value = self._dll.get(
                     1,
@@ -106,9 +97,11 @@ class _CableData:
                     0,
                     byref(cabl),
                     byref(record_length),
-                    0 if count == 0 else 1
+                    0 if first_call else 1
                 )
 
+                record_length = c_int(sizeof(cabl))
+                first_call = False
                 if return_value.value >= 2:
                     break
 
@@ -123,19 +116,26 @@ class _CableData:
                     }
                 )
 
-                record_length = c_int(sizeof(cabl))
-                count += 1
-
             # assigning groups
             group_data = _GroupData(self._dll)
             group_data.load()
 
-            data = DataFrame(data)
-            for grp, cable_range in group_data.iterator_cable():
-                data.loc[data.ELEM_ID.isin(cable_range), "GROUP"] = grp
+            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = temp_df["ELEM_ID"]
+
+            for grp, grp_range in group_data.iterator_cable():
+                if grp_range.stop == 0:
+                    continue
+
+                left = elem_ids.searchsorted(grp_range.start, side="left")
+                right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+            # set indices for fast lookup
+            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
 
             # merge data
             if self._data.empty:
-                self._data = data
+                self._data = temp_df
             else:
-                self._data = concat([self._data, data], ignore_index=True)
+                self._data = concat([self._data, temp_df])
