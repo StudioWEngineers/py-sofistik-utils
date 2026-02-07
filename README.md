@@ -1,5 +1,4 @@
 # py-sofistik-utils
-[![Continuous Integration](https://img.shields.io/github/actions/workflow/status/StudioWEngineers/py-sofistik-utils/build_and_publish.yml?label=build)](https://github.com/StudioWEngineers/py-sofistik-utils/actions/workflows/build_and_publish.yml)
 [![Continuous Integration](https://img.shields.io/github/actions/workflow/status/StudioWEngineers/py-sofistik-utils/ci.yml?label=tests)](https://github.com/StudioWEngineers/py-sofistik-utils/actions/workflows/ci.yml) 
 [![Documentation](https://img.shields.io/readthedocs/py-sofistik-utils/latest)](https://py-sofistik-utils.readthedocs.io/en/latest/)
 [![](https://img.shields.io/pypi/v/py-sofistik-utils.svg?color=brightgreen)](https://pypi.org/pypi/py-sofistik-utils/)
