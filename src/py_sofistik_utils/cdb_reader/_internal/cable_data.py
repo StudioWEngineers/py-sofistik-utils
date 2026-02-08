@@ -79,8 +79,8 @@ class _CableData:
         element_id : int
             The cable element number
         info : str, default "L0"
-            Either the start node ("N1"), the end node ("N2"), the initial length ("L0")
-            or the property number ("PROPERTY")
+            Either the start node (``"N1"``), the end node (``"N2"``), the initial length
+            (``"L0"``) or the property number (``"PROPERTY"``)
 
         Raises
         ------

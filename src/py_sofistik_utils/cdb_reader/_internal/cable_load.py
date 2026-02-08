@@ -36,7 +36,6 @@ class _CableLoad:
             Wind and snow loads are not implemented and will raise a runtime error if they
             are present in the requested load case.
     """
-
     _LOAD_TYPE_MAP = {
         10: "PG",
         11: "PXX",
@@ -115,8 +114,8 @@ class _CableLoad:
         load_type : str
             The load type
         point : str, default "PA"
-            Location on the cable where the load is applied; either the start ("PA") or
-            the end ("PE")
+            Location on the cable where the load is applied; either the start (``"PA"``)
+            or the end (``"PE"``)
 
         Raises
         ------
