@@ -48,7 +48,6 @@ class SOFiSTiKCDBReaderCableDataTestSuite(TestCase):
         self.cdb.initialize()
         self.cdb.cable_data.load()
 
-
     def tearDown(self) -> None:
         self.cdb.close()
 
