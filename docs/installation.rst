@@ -54,7 +54,7 @@ To verify the installation:
 
 .. code-block:: bash
 
-    python -c "import sofistik_utils; print(sofistik_utils.__version__)"
+    python -c "import py_sofistik_utils; print(py_sofistik_utils.__version__)"
 
 Editable (development) installation
 -----------------------------------
