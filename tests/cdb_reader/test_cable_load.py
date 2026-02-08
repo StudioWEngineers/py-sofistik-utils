@@ -7,7 +7,7 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 
 # local library specific imports
-from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
+from py_sofistik_utils import SOFiSTiKCDBReader
 
 
 CDB_PATH = environ.get("SOFISTIK_CDB_PATH")
