@@ -93,7 +93,7 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self.cdb.cable_load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.test_get()
+                self.cdb.cable_load.get(5009, 7, "PZP", "PA")
 
         self.cdb.cable_load.load(7)
         with self.subTest(msg="Check indexes management"):
@@ -103,6 +103,10 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         """Test for the `get` method after a `clear_all` call.
         """
         self.cdb.cable_load.clear_all()
-        self.cdb.cable_load.load(self.load_cases)
+        with self.subTest(msg="Check clear_all method"):
+            with self.assertRaises(LookupError):
+                self.cdb.cable_load.get(5009, 7, "PZP", "PA")
 
-        self.test_get()
+        self.cdb.cable_load.load(self.load_cases)
+        with self.subTest(msg="Check indexes management"):
+            self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
