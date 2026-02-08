@@ -11,12 +11,40 @@ from . sofistik_classes import CCABL_RES
 
 
 class _CableResults:
-    """
-    This class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the keys ``162/LC`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``162/LC`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``LOAD_CASE`` load case number
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``AXIAL_FORCE`` axial force
+        * ``AVG_AXIAL_FORCE``: average axial force
+        * ``AXIAL_DISPLACEMENT``: axial displacement
+        * ``RELAXED_LENGTH``: relaxed cable length
+        * ``TOTAL_STRAIN``: total strain
+        * ``EFFECTIVE_STIFFNESS``: effective stiffness
+
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and ``LOAD_CASE``
+        (in this specific order) to enable fast lookups via the `get` method. The
+        index columns are not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular:
+
+            * the maximum suspension of cable across axis and its components along the
+              global X, Y and Z axes
+            * vertical suspension of cable in load direction
+            * nonlinear effects
+
+            are currently not included. This is a deliberate design choice and may be
+            changed in the future without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data: DataFrame = DataFrame(
