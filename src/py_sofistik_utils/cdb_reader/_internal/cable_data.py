@@ -11,12 +11,33 @@ from . sofistik_classes import CCABL
 
 
 class _CableData:
-    """
-    This class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the keys ``160/00`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``160/00`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``N1`` id of the first node
+        * ``N2``: id of the second node
+        * ``L0``: initial length
+        * ``PROPERTY``: property number (cross-section)
+
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
+        via the `get` method. The index column is not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular,
+            prestress, element slip, maximum tension force, yielding load, and the
+            reference axis are currently not included.
+
+            This is a deliberate design choice and may be changed in the future without
+            breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data: DataFrame = DataFrame(
@@ -33,53 +54,50 @@ class _CableData:
         self._echo_level = 0
 
     def clear(self) -> None:
-        """Clear all the cable element informations.
+        """Clear all the loaded data.
         """
         self._data = self._data[0:0]
 
-    def get_element_connectivity(self, element_number: int) -> list[int]:
-        """Return the cable connectivity for the given ``element_number``.
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys ``161/LC``.
 
         Parameters
         ----------
-        ``element_number``: int
-            The cable element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``element_number`` is not found.
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
         """
-        raise NotImplementedError
-        for group_data in self._connectivity.values():
-            if element_number in group_data:
-                return group_data[element_number]
+        return self._data.copy(deep=deep)
 
-        raise RuntimeError(f"Element number {element_number} not found!")
-
-    def get_element_length(self, element_number: int) -> float:
-        """Return the cable initial length for the given ``element_number``.
+    def get(self, element_id: int, info: str = "L0") -> float | int:
+        """Retrieve the requested cable information.
 
         Parameters
         ----------
-        ``element_number``: int
+        element_id : int
             The cable element number
+        info : str, default "L0"
+            Either the start node ("N1"), the end node ("N2"), the initial length ("L0")
+            or the property number ("PROPERTY")
 
         Raises
         ------
-        RuntimeError
-            If the given ``element_number`` is not found.
+        LookupError
+            If the requested information is not found.
         """
-        raise NotImplementedError
-        for group_data in self._initial_length.values():
-            if element_number in group_data:
-                return group_data[element_number]
-
-        raise RuntimeError(f"Element number {element_number} not found!")
+        try:
+            return self._data.at[element_id, info]  # type: ignore
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Load entry not found for element id {element_id}, "
+                f"and information {info}!"
+            ) from e
 
     def load(self) -> None:
-        """Retrieve all cable data. If the key is not found, a warning is raised only if
-        ``echo_level > 0``.
+        """Retrieve all cable data. If the key does not exist or it is empty, a warning is
+        raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(160, 0):
             cabl = CCABL()
