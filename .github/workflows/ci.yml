@@ -92,3 +92,12 @@ jobs:
       - name: Run tests (SOFiSTiK ${{ matrix.sofistik }})
         run: |
           python -m unittest discover -s tests -p "test_*.py" --verbose
+
+  # dummy job to have a green badge in case check_relevant_changes != true
+  ci_status:
+    name: CI status
+    runs-on: ubuntu-latest
+    needs: check_relevant_changes
+    if: always()
+    steps:
+      - run: echo "CI completed"

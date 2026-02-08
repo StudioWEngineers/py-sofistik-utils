@@ -125,7 +125,7 @@ class _CableLoad:
         """
         try:
             return self._data.at[(element_id, load_case, load_type), point]  # type: ignore
-        except KeyError as e:
+        except (KeyError, ValueError) as e:
             raise LookupError(
                 f"Load entry not found for element id {element_id}, "
                 f"load case {load_case}, load type {load_type} and point {point}!"
