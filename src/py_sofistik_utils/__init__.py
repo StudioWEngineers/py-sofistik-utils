@@ -1,3 +1,6 @@
+"""
+The Studio W Python utilities for the SOFiSTiK finite element analysis software.
+"""
 # standard library imports
 from sys import version_info
 if version_info < (3, 12):
