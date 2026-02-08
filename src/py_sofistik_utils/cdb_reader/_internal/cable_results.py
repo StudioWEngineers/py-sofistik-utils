@@ -33,6 +33,7 @@ class _CableResults:
             ]
         )
         self._dll = dll
+        self._echo_level = 0
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
@@ -95,6 +96,16 @@ class _CableResults:
         else:
             self._data = concat([self._data, temp_df])
         self._loaded_lc.update(load_cases)
+
+    def set_echo_level(self, echo_level: int) -> None:
+        """Set the echo level.
+
+        Parameters
+        ----------
+        echo_level : int
+            the new echo level
+        """
+        self._echo_level = echo_level
 
     def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
         """Retrieve key ``162/load_case`` using SOFiSTiK dll.
