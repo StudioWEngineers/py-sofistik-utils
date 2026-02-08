@@ -127,7 +127,7 @@ class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
                 self.cdb.cable_res.get(102, 1000, "AXIAL_FORCE")
 
         self.cdb.cable_res.load(self.load_cases)
-        with self.subTest(msg="Axial force"):
+        with self.subTest(msg="Check indexes management"):
             self.assertEqual(
                 self.cdb.cable_res.get(102, 1000, "AXIAL_FORCE"), 1.7247849702835083
             )
