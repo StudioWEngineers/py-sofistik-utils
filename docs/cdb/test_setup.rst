@@ -82,5 +82,6 @@ the temporary environment variable approach, open an MSYS2 MINGW64 shell, naviga
     :maxdepth: 1
     :hidden:
 
+    tests/cable_data
     tests/cable_load
 
