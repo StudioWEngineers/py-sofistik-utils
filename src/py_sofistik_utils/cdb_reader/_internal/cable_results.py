@@ -66,6 +66,35 @@ class _CableResults:
         """
         return self._data.copy(deep=deep)
 
+    def get(self, element_id: int, load_case: int, quantity: str = "AXIAL_FORCE") -> float:
+        """Retrieve the requested cable result.
+
+        Parameters
+        ----------
+        element_id : int
+            The cable element number
+        load_case : int
+            The load case number
+        quantity : str, default "AXIAL_FORCE"
+            Quantity to be retrieved; either the axial force (``"AXIAL_FORCE"``), the
+            average axial force (``"AVG_AXIAL_FORCE"``), the total strain
+            (``"TOTAL_STRAIN"``), the relaxed length (``"RELAXED_LENGTH"``), the axial
+            displacement (``"AXIAL_DISPLACEMENT"``) or the effective stiffness
+            (``"EFFECTIVE_STIFFNESS``")
+
+        Raises
+        ------
+        LookupError
+            If the requested data is not found.
+        """
+        try:
+            return self._data.at[(element_id, load_case), quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Load entry not found for element id {element_id}, "
+                f"load case {load_case}, and quantity {quantity}!"
+            ) from e
+
     def load(self, load_cases: int | list[int]) -> None:
         """Retrieve cable results for the given ``load_cases``. If a load case is not
         found, a warning is raised only if ``echo_level > 0``.
