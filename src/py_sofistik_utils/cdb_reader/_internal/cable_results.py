@@ -36,20 +36,19 @@ class _CableResults:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given ``load_case`` number.
+        """Clear the loaded data for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
 
-        self._data = self._data.drop(self._data[self._data.LOAD_CASE == load_case].index)
+        self._data = self._data[
+            self._data.index.get_level_values("LOAD_CASE") != load_case
+        ]
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
-        """Clear all the results for all the load cases.
+        """Clear the loaded data for all the load cases.
         """
-        if not self._loaded_lc:
-            return
-
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
