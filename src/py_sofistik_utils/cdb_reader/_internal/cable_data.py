@@ -59,7 +59,7 @@ class _CableData:
         self._data = self._data[0:0]
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys ``161/LC``.
+        """Return the :class:`pandas.DataFrame` containing the loaded key ``160/00``.
 
         Parameters
         ----------
@@ -79,8 +79,8 @@ class _CableData:
         element_id : int
             The cable element number
         info : str, default "L0"
-            Either the start node ("N1"), the end node ("N2"), the initial length ("L0")
-            or the property number ("PROPERTY")
+            Either the start node (``"N1"``), the end node (``"N2"``), the initial length
+            (``"L0"``) or the property number (``"PROPERTY"``)
 
         Raises
         ------

@@ -7,7 +7,7 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 
 # local library specific imports
-from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
+from py_sofistik_utils import SOFiSTiKCDBReader
 
 
 CDB_PATH = environ.get("SOFISTIK_CDB_PATH")
@@ -15,10 +15,9 @@ DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
 SOFISTIK_VERSION = environ.get("SOFISTIK_VERSION")
 
 
-class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
-    """Tests for the `SOFiSTiKCDBReader`, `CableLoad` module.
-    """
-    _EXPECTED_DATA = [
+_COLUMNS = ["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
+
+_DATA = [
         (1,  500, 5001, "PG",  +1.0,   -1.0),
         (2,  500, 5001, "PXX", +2.0,   +2.0),
         (6,  500, 5001, "PYP", -6.0,   -6.0),
@@ -42,6 +41,10 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         (11, 501, 5014, "VX",  +11.0,  +11.0)
     ]
 
+
+class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
+    """Tests for the `SOFiSTiKCDBReader`, `CableLoad` module.
+    """
     def setUp(self) -> None:
         if not CDB_PATH:
             self.fail("SOFISTIK_CDB_PATH environment variable is not set")
@@ -52,10 +55,9 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         if not SOFISTIK_VERSION:
             self.fail("SOFISTIK_VERSION environment variable is not set")
 
-        self.expected_data = DataFrame(
-              SOFiSTiKCDBReaderCableLoadTestSuite._EXPECTED_DATA,
-              columns=["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
-            ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+        self.expected_data = DataFrame(_DATA, columns=_COLUMNS).set_index(
+            ["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False
+        )
         self.load_cases = list(range(1, 12, 1))
 
         self.cdb = SOFiSTiKCDBReader(
@@ -91,7 +93,7 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self.cdb.cable_load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.test_get()
+                self.cdb.cable_load.get(5009, 7, "PZP", "PA")
 
         self.cdb.cable_load.load(7)
         with self.subTest(msg="Check indexes management"):
@@ -101,6 +103,10 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         """Test for the `get` method after a `clear_all` call.
         """
         self.cdb.cable_load.clear_all()
-        self.cdb.cable_load.load(self.load_cases)
+        with self.subTest(msg="Check clear_all method"):
+            with self.assertRaises(LookupError):
+                self.cdb.cable_load.get(5009, 7, "PZP", "PA")
 
-        self.test_get()
+        self.cdb.cable_load.load(self.load_cases)
+        with self.subTest(msg="Check indexes management"):
+            self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
