@@ -19,19 +19,20 @@ class _CableResults:
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_CableResults`` class.
-        """
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "LOAD_CASE",
+                "GROUP",
+                "ELEM_ID",
+                "AXIAL_FORCE",
+                "AVG_AXIAL_FORCE",
+                "AXIAL_DISPLACEMENT",
+                "RELAXED_LENGTH",
+                "TOTAL_STRAIN",
+                "EFFECTIVE_STIFFNESS"
+            ]
+        )
         self._dll = dll
-
-        self._data: DataFrame = DataFrame(columns = ["LOAD_CASE",
-                                                     "GROUP",
-                                                     "ELEM_ID",
-                                                     "AXIAL_FORCE",
-                                                     "AVG_AXIAL_FORCE",
-                                                     "AXIAL_DISPLACEMENT",
-                                                     "RELAXED_LENGTH",
-                                                     "TOTAL_STRAIN",
-                                                     "EFFECTIVE_STIFFNESS"])
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
