@@ -1,9 +1,8 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
-from pandas import DataFrame
+from pandas import concat, DataFrame
 
 # local library specific imports
 from . group_data import _GroupData
@@ -12,38 +11,44 @@ from . sofistik_classes import CTRUS
 
 
 class _TrussData:
-    """The ``_TrussData`` class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * read-only access to the cdb file (only to the part related to the beam geometry);
-    * store these information in a convenient format;
-    * access these information.
+        * access keys ``150/00`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
 
-    Beam data are stored in a :class:`pandas.DataFrame` with the following columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
 
-    * ``GROUP``: the beam group number
-    * ``ELEM_ID``: the beam number
-    * ``STATION``: :class:`numpy.ndarray` defining the position of the output stations
-    * ``ADIMENSIONAL_STATION``: :class:`numpy.ndarray` defining the position of the output stations
-      unitarized by the beam length
-    * ``CONNECTIVITY``: :class:`numpy.ndarray` containing the start end nodes of the beam
-    * ``TRANS_MATRIX``: the beam transformation matrix (3 x 3 :class:`numpy.ndarray`)
-    * ``SPAR``: :class:`numpy.ndarray` with distances along a continuous beam or parameter values along
-      the reference axis
-    * ``PROPERTIES``: `list` containing the property number for each station
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``N1`` id of the first node
+        * ``N2``: id of the second node
+        * ``L0``: initial length
+        * ``PROPERTY``: property number (cross-section)
+        * ``GAP``: slip of the element
 
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
+        via the `get` method. The index column is not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular, the
+            normal direction, prestress, maximum tension force, yielding load, and the
+            reference axis are currently not included.
+
+            This is a deliberate design choice and may be changed in the future without
+            breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `_`TrussData`` class.
-        """
         self._data: DataFrame = DataFrame(
             columns = [
                 "GROUP",
                 "ELEM_ID",
-                "PROPERTY",
                 "N1",
                 "N2",
                 "L0",
-                "PRE",
+                "PROPERTY",
                 "GAP"
             ]
         )
@@ -54,52 +59,103 @@ class _TrussData:
         """
         self._data = self._data[0:0]
 
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key ``150/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
+    def get(self, element_id: int, info: str = "L0") -> float | int:
+        """Retrieve the requested truss information.
+
+        Parameters
+        ----------
+        element_id : int
+            The truss element number
+        info : str, default "L0"
+            Either the start node (``"N1"``), the end node (``"N2"``), the initial length
+            (``"L0"``), the property number (``"PROPERTY"``) or the gap (``"GAP"``).
+
+        Raises
+        ------
+        LookupError
+            If the requested information is not found.
+        """
+        try:
+            return self._data.at[element_id, info]  # type: ignore
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Load entry not found for element id {element_id}, "
+                f"and information {info}!"
+            ) from e
+
     def load(self) -> None:
-        """Load truss data.
+        """Retrieve all truss data. If the key does not exist or it is empty, a warning is
+        raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(150, 0):
             truss = CTRUS()
-            rec_length = c_int(sizeof(truss))
+            record_length = c_int(sizeof(truss))
             return_value = c_int(0)
 
             self.clear()
 
-            temp_data: list[dict[str, Any]] = []
-            count = 0
+            data: list[dict[str, float | int]] = []
+            first_call = True
             while return_value.value < 2:
                 return_value.value = self._dll.get(
                     1,
                     150,
                     0,
                     byref(truss),
-                    byref(rec_length),
-                    0 if count == 0 else 1
+                    byref(record_length),
+                    0 if first_call else 1
                 )
 
+                record_length = c_int(sizeof(truss))
+                first_call = False
                 if return_value.value >= 2:
                     break
 
-                temp_data.append(
+                data.append(
                     {
                         "GROUP":    0,
                         "ELEM_ID":  truss.m_nr,
-                        "PROPERTY": truss.m_nrq,
                         "N1":       truss.m_node[0],
                         "N2":       truss.m_node[1],
                         "L0":       truss.m_dl,
-                        "PRE":      truss.m_pre,
+                        "PROPERTY": truss.m_nrq,
                         "GAP":      truss.m_gap
                     }
                 )
-
-                rec_length = c_int(sizeof(truss))
-                count += 1
-
-            self._data = DataFrame(temp_data)
 
             # assigning groups
             group_data = _GroupData(self._dll)
             group_data.load()
 
-            for grp, truss_range in group_data.iterator_truss():
-                self._data.loc[self._data.ELEM_ID.isin(truss_range), "GROUP"] = grp
+            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = temp_df["ELEM_ID"]
+
+            for grp, grp_range in group_data.iterator_truss():
+                if grp_range.stop == 0:
+                    continue
+
+                left = elem_ids.searchsorted(grp_range.start, side="left")
+                right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+            # set indices for fast lookup
+            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
+
+            # merge data
+            if self._data.empty:
+                self._data = temp_df
+            else:
+                self._data = concat([self._data, temp_df])
