@@ -63,6 +63,30 @@ class _TrussData:
         """
         return self._data.copy(deep=deep)
 
+    def get(self, element_id: int, info: str = "L0") -> float | int:
+        """Retrieve the requested truss information.
+
+        Parameters
+        ----------
+        element_id : int
+            The cable element number
+        info : str, default "L0"
+            Either the start node (``"N1"``), the end node (``"N2"``), the initial length
+            (``"L0"``), the property number (``"PROPERTY"``) or the gap (``"GAP"``).
+
+        Raises
+        ------
+        LookupError
+            If the requested information is not found.
+        """
+        try:
+            return self._data.at[element_id, info]  # type: ignore
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Load entry not found for element id {element_id}, "
+                f"and information {info}!"
+            ) from e
+
     def load(self) -> None:
         """Retrieve all truss data. If the key does not exist or it is empty, a warning is
         raised only if ``echo_level > 0``.
