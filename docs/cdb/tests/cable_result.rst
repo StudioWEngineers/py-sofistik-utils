@@ -1,0 +1,75 @@
+CableResult
+-----------
+
+Related test suite: ``test_cable_result.py``
+
+Expected CDB file name: ``CABLE_RESULT.cdb``
+
+Runs with: SOFiSTiK 2025
+
+Version: 1
+
+.. code-block:: text
+
+    +PROG AQUA
+    HEAD MATERIAL AND SECTIONS
+        NORM EN 199X-200X
+        STEE NO 1 TYPE YC ES 160000.0 GAM 80.1688 TITL 'PFEIFER PG 40'
+        PROF 100 TYPE BAR Z1 17.37 MNO 1
+    END
+
+    +PROG SOFIMSHA
+    HEAD GEOMETRY REV-1-SOF-2025
+    SYST 3D GDIR NEGZ GDIV 10
+        NODE NO 01 X 0.0 Y 0.0 Z 0.0 FIX PX,PY,PZ
+        NODE NO 02 X 1.0 Y 0.0 Z 0.0
+        NODE NO 03 X 2.0 Y 0.0 Z 0.0
+        NODE NO 04 X 3.0 Y 0.0 Z 0.0 FIX PX,PY,PZ
+
+        GRP 10 TITL 'CABLES'
+            LOOP#I 3
+                CABL NO #I+1 NA 1+#I NE #I+2
+            ENDLOOP
+    END
+
+    +PROG SOFILOAD
+    HEAD NODAL LOADS
+        LC 1 TITL 'NODAL LOADS'
+            NODE NO 02 TYPE PZZ -10.0
+            NODE NO 03 TYPE PZZ -10.0
+    END
+
+    +PROG SOFILOAD
+    HEAD IMPOSED DISPLACEMENT
+        LC 2 TITL 'IMPOSED DISPLACEMENT'
+            NODE NO 04 TYPE WXX -100.0[mm]
+    END
+
+    +PROG TEMPLATE
+    HEAD ASE CONTROLS
+        #DEFINE ASE_CONTROL
+            CTRL CABL 1
+            CTRL OPT ITER VAL 3 V2 1
+        #ENDDEF
+    END
+
+    +PROG TEMPLATE
+    HEAD BASE VARIABLES
+        STO#TOLERANCE 0.0000000000000001
+    END
+
+    +PROG ASE
+    HEAD ONLY SW
+        SYST PROB TH3 ITER 250 TOL #TOLERANCE
+        #INCLUDE ASE_CONTROL
+        LC 1000 DLZ 1.0 TITL 'ONLY SW'
+    END
+
+    +PROG ASE
+    HEAD SW + NODAL
+        SYST PROB TH3 ITER 250 TOL #TOLERANCE
+        #INCLUDE ASE_CONTROL
+        LC 1001 DLZ 1.0 TITL 'SW + NODAL + IMPOSED'
+            LCC 1 FACT 1.0
+            LCC 2 FACT 1.0
+    END

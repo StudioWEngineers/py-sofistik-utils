@@ -33,9 +33,15 @@ class _TrussData:
 
         .. note::
 
-            Not all available quantities are retrieved and stored. In particular, the
-            normal direction, prestress, maximum tension force, yielding load, and the
-            reference axis are currently not included.
+            Not all available quantities are retrieved and stored. In particular:
+
+            * normal direction
+            * prestress
+            * maximum tension force
+            * yielding load
+            * reference axis
+
+            are currently not included.
 
             This is a deliberate design choice and may be changed in the future without
             breaking the existing API.
