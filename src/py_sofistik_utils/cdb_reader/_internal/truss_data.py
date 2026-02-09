@@ -1,9 +1,8 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
-from pandas import DataFrame
+from pandas import concat, DataFrame
 
 # local library specific imports
 from . group_data import _GroupData
@@ -37,11 +36,10 @@ class _TrussData:
             columns = [
                 "GROUP",
                 "ELEM_ID",
-                "PROPERTY",
                 "N1",
                 "N2",
                 "L0",
-                "PRE",
+                "PROPERTY",
                 "GAP"
             ]
         )
@@ -53,51 +51,65 @@ class _TrussData:
         self._data = self._data[0:0]
 
     def load(self) -> None:
-        """Load truss data.
+        """Retrieve all truss data. If the key does not exist or it is empty, a warning is
+        raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(150, 0):
             truss = CTRUS()
-            rec_length = c_int(sizeof(truss))
+            record_length = c_int(sizeof(truss))
             return_value = c_int(0)
 
             self.clear()
 
-            temp_data: list[dict[str, Any]] = []
-            count = 0
+            data: list[dict[str, float | int]] = []
+            first_call = True
             while return_value.value < 2:
                 return_value.value = self._dll.get(
                     1,
                     150,
                     0,
                     byref(truss),
-                    byref(rec_length),
-                    0 if count == 0 else 1
+                    byref(record_length),
+                    0 if first_call else 1
                 )
 
+                record_length = c_int(sizeof(truss))
+                first_call = False
                 if return_value.value >= 2:
                     break
 
-                temp_data.append(
+                data.append(
                     {
                         "GROUP":    0,
                         "ELEM_ID":  truss.m_nr,
-                        "PROPERTY": truss.m_nrq,
                         "N1":       truss.m_node[0],
                         "N2":       truss.m_node[1],
                         "L0":       truss.m_dl,
-                        "PRE":      truss.m_pre,
+                        "PROPERTY": truss.m_nrq,
                         "GAP":      truss.m_gap
                     }
                 )
-
-                rec_length = c_int(sizeof(truss))
-                count += 1
-
-            self._data = DataFrame(temp_data)
 
             # assigning groups
             group_data = _GroupData(self._dll)
             group_data.load()
 
-            for grp, truss_range in group_data.iterator_truss():
-                self._data.loc[self._data.ELEM_ID.isin(truss_range), "GROUP"] = grp
+            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = temp_df["ELEM_ID"]
+
+            for grp, grp_range in group_data.iterator_truss():
+                if grp_range.stop == 0:
+                    continue
+
+                left = elem_ids.searchsorted(grp_range.start, side="left")
+                right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+            # set indices for fast lookup
+            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
+
+            # merge data
+            if self._data.empty:
+                self._data = temp_df
+            else:
+                self._data = concat([self._data, temp_df])
