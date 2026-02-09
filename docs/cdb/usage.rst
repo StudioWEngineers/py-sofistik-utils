@@ -1,4 +1,7 @@
-SOFiSTiKCDBReader
-=================
+.. _usage_cdb_reader:
 
-Thi section provides basic instruction to access a cdb file.
+CDB Reader
+==========
+
+Methods for loading and accessing data from a CDB file are provided by the
+``SofistikCDBReader`` class.

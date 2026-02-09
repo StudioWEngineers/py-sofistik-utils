@@ -30,7 +30,7 @@ must be available at runtime:
 - ``libmmd.dll``
 
 These three DLLs must be located in the same directory and that directory must be accessible
-to Python at runtime. Refer to section :ref:`usage <usage>` for details.
+to Python at runtime. Refer to section :ref:`usage <usage_cdb_reader>` for details.
 They are automatically installed with SOFiSTiK and are usually located in the following folders:
 
 - ``...\SOFiSTiK\202X\SOFiSTiK 202X\interfaces\64bit\``
