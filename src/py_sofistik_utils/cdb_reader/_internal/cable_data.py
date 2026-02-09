@@ -32,8 +32,8 @@ class _CableData:
 
         .. note::
 
-            Not all available quantities are retrieved and stored. In particular,
-            prestress, element slip, maximum tension force, yielding load, and the
+            Not all available quantities are retrieved and stored. In particular, the
+            normal direction, prestress, element slip, maximum tension force, yielding load, and the
             reference axis are currently not included.
 
             This is a deliberate design choice and may be changed in the future without

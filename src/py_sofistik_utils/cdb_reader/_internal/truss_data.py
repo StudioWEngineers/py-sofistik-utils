@@ -11,25 +11,34 @@ from . sofistik_classes import CTRUS
 
 
 class _TrussData:
-    """The ``_TrussData`` class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * read-only access to the cdb file (only to the part related to the beam geometry);
-    * store these information in a convenient format;
-    * access these information.
+        * access keys ``150/00`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
 
-    Beam data are stored in a :class:`pandas.DataFrame` with the following columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
 
-    * ``GROUP``: the beam group number
-    * ``ELEM_ID``: the beam number
-    * ``STATION``: :class:`numpy.ndarray` defining the position of the output stations
-    * ``ADIMENSIONAL_STATION``: :class:`numpy.ndarray` defining the position of the output stations
-      unitarized by the beam length
-    * ``CONNECTIVITY``: :class:`numpy.ndarray` containing the start end nodes of the beam
-    * ``TRANS_MATRIX``: the beam transformation matrix (3 x 3 :class:`numpy.ndarray`)
-    * ``SPAR``: :class:`numpy.ndarray` with distances along a continuous beam or parameter values along
-      the reference axis
-    * ``PROPERTIES``: `list` containing the property number for each station
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``N1`` id of the first node
+        * ``N2``: id of the second node
+        * ``L0``: initial length
+        * ``PROPERTY``: property number (cross-section)
+        * ``GAP``: slip of the element
 
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
+        via the `get` method. The index column is not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular, the
+            normal direction, prestress, maximum tension force, yielding load, and the
+            reference axis are currently not included.
+
+            This is a deliberate design choice and may be changed in the future without
+            breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data: DataFrame = DataFrame(
@@ -69,7 +78,7 @@ class _TrussData:
         Parameters
         ----------
         element_id : int
-            The cable element number
+            The truss element number
         info : str, default "L0"
             Either the start node (``"N1"``), the end node (``"N2"``), the initial length
             (``"L0"``), the property number (``"PROPERTY"``) or the gap (``"GAP"``).
