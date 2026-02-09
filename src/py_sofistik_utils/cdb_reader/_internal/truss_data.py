@@ -33,8 +33,6 @@ class _TrussData:
 
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the `_`TrussData`` class.
-        """
         self._data: DataFrame = DataFrame(
             columns = [
                 "GROUP",
