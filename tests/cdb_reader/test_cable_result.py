@@ -1,6 +1,6 @@
 # standard library imports
 from os import environ
-from unittest import TestCase
+from unittest import skipUnless, TestCase
 
 # third party library imports
 from pandas import DataFrame
@@ -12,7 +12,7 @@ from py_sofistik_utils import SOFiSTiKCDBReader
 
 CDB_PATH = environ.get("SOFISTIK_CDB_PATH")
 DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
-SOFISTIK_VERSION = environ.get("SOFISTIK_VERSION")
+VERSION = environ.get("SOFISTIK_VERSION")
 
 
 _COLUMNS = [
@@ -37,29 +37,16 @@ _DATA = [
 ]
 
 
+@skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
 class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
     """Tests for the `SOFiSTiKCDBReader`, `CableResult` module.
     """
     def setUp(self) -> None:
-        if not CDB_PATH:
-            self.fail("SOFISTIK_CDB_PATH environment variable is not set")
-
-        if not DLL_PATH:
-            self.fail("SOFISTIK_DLL_PATH environment variable is not set")
-
-        if not SOFISTIK_VERSION:
-            self.fail("SOFISTIK_VERSION environment variable is not set")
-
         self.expected_data = DataFrame(
             _DATA, columns=_COLUMNS).set_index(["ELEM_ID", "LOAD_CASE"], drop=False)
         self.load_cases = list(range(1000, 1002, 1))
 
-        self.cdb = SOFiSTiKCDBReader(
-            CDB_PATH,
-            "CABLE_RESULT",
-            DLL_PATH,
-            int(SOFISTIK_VERSION)
-        )
+        self.cdb = SOFiSTiKCDBReader(CDB_PATH, "CABLE_RESULT", DLL_PATH, int(VERSION))  # type: ignore
         self.cdb.initialize()
         self.cdb.cable_res.load(self.load_cases)
 

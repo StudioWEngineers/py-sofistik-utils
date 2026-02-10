@@ -73,6 +73,11 @@ the temporary environment variable approach, open an MSYS2 MINGW64 shell, naviga
     SOFISTIK_VERSION="2023" \
     py -m unittest discover
 
+.. warning::
+    Tests that depend on SOFiSTiK DLLs or CDB files are conditionally skipped using
+    ``unittest.skipUnless``. Make sure the required environment variables are defined so
+    the tests are executed.
+
 .. note::
     Based on experience using this library in production with multiple SOFiSTiK versions,
     the provided DLL files have proven to be stable across releases. As a result, it is
