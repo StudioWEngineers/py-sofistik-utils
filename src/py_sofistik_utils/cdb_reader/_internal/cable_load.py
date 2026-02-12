@@ -112,7 +112,8 @@ class _CableLoad:
         load_case : int
             The load case number
         load_type : str
-            The load type
+            The load type; either ``"PG"``, ``"PXX"``, ``"PYY"``, ``"PZZ"``, ``"EX"``,
+            ``"WX"``, ``"DT"``, ``"VX"``, ``"PXP"``, ``"PYP"`` or ``"PZP"``
         point : str, default "PA"
             Location on the cable where the load is applied; either the start (``"PA"``)
             or the end (``"PE"``)
