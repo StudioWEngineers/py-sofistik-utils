@@ -97,3 +97,10 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self.cdb.cable_load.load(self.load_cases)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+
+    def test_load_with_duplicated_load_cases(self) -> None:
+        """Test for the `load` method with duplicated entries.
+        """
+        self.cdb.cable_load.clear_all()
+        self.cdb.cable_load.load(self.load_cases + [10])
+        self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)

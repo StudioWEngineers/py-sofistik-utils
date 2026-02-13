@@ -147,6 +147,8 @@ class _CableLoad:
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
+        else:
+            load_cases = list(set(load_cases))  # remove duplicated entries
 
         # load data
         temp_list: list[dict[str, float | int | str]] = []

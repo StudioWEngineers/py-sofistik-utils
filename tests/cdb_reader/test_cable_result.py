@@ -118,3 +118,10 @@ class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
             self.assertEqual(
                 self.cdb.cable_res.get(102, 1000, "AXIAL_FORCE"), 1.7247849702835083
             )
+
+    def test_load_with_duplicated_load_cases(self) -> None:
+        """Test for the `load` method with duplicated entries.
+        """
+        self.cdb.cable_res.clear_all()
+        self.cdb.cable_res.load(self.load_cases + [1000])
+        self.assertEqual(self.cdb.cable_res.get(103, 1000, "RELAXED_LENGTH"), 1)
