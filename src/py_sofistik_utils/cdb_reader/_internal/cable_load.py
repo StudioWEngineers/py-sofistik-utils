@@ -31,6 +31,20 @@ class _CableLoad:
         ``TYPE`` (in this specific order) to enable fast lookups via the `get` method. The
         index columns are not dropped from the ``DataFrame``.
 
+        The load ``TYPE`` can be one of the following:
+
+        * ``PG`` Load in gravity direction
+        * ``PXX`` Load in global X-direction
+        * ``PYY`` Load in global Y-direction
+        * ``PZZ`` Load in global Z-direction
+        * ``PXP`` Load in global x-direction measured in projection
+        * ``PYP`` Load in global y-direction measured in projection
+        * ``PZP`` Load in global z-direction measured in projection
+        * ``EX`` Strain in axial direction
+        * ``VX`` Prestress
+        * ``WX`` Change of length
+        * ``DT`` Temperature difference
+
         .. important::
 
             Wind and snow loads are not implemented and will raise a runtime error if they
