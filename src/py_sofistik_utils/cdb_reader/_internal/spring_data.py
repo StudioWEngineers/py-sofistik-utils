@@ -37,6 +37,19 @@ class _SpringData:
         """
         self._data = self._data[0:0]
 
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key ``170/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
     def load(self) -> None:
         """Retrieve all spring data. If the key does not exist or it is empty, a warning
         is raised only if ``echo_level > 0``.
