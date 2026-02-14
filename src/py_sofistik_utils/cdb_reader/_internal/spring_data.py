@@ -50,6 +50,51 @@ class _SpringData:
         """
         return self._data.copy(deep=deep)
 
+    def get(
+            self,
+            element_id: int,
+            quantity: str = "CP",
+            default: float | int | None = None
+        ) -> float | int:
+        """Retrieve the requested spring quantity.
+
+        Parameters
+        ----------
+        element_id : int
+            Spring element number
+        quantity : str, default "CP"
+            Quantity to retrieve. Must be one of:
+
+            - ``"N1"``
+            - ``"N2"``
+            - ``"CP"``
+            - ``"CT"``
+            - ``"CM"``
+
+        default : float or int or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float or int
+            The requested quantity if found. Otherwise, returns ``default`` when it is not
+            None.
+
+        Raises
+        ------
+        LookupError
+            If the requested quantity is not found and ``default`` is None.
+        """
+        try:
+            return self._data.at[element_id, quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Spring data entry not found for element id {element_id}, "
+                f"and quantity {quantity}!"
+            ) from e
+
     def load(self) -> None:
         """Retrieve all spring data. If the key does not exist or it is empty, a warning
         is raised only if ``echo_level > 0``.
@@ -113,82 +158,6 @@ class _SpringData:
                 self._data = temp_df
             else:
                 self._data = concat([self._data, temp_df])
-
-    def get_element_connectivity(self, spring_nmb: int) -> list[int]:
-        """Return the connectivity for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._connectivity.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def get_element_axial_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring axial stiffness for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._axial_stiffness.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def get_element_lateral_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring lateral stiffness for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._lateral_stiffness.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def get_element_rotational_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring rotational stiffness for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._rotational_stiffness.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
 
     def has_axial_stiffness(self, spring_nmb: int) -> bool:
         """Return `True` if the spring has an axial stiffness `!= 0`.
