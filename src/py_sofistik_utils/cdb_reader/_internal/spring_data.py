@@ -2,6 +2,7 @@
 from ctypes import byref, c_int, sizeof
 
 # third party library imports
+from pandas import concat, DataFrame
 
 # local library specific imports
 from . sofistik_dll import SofDll
@@ -16,22 +17,24 @@ class _SpringData:
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_SpringData`` class.
-        """
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "GROUP",
+                "ELEM_ID",
+                "N1",
+                "N2",
+                "CP",
+                "CT",
+                "CM"
+            ]
+        )
         self._dll = dll
-
-        self._axial_stiffness: dict[int, dict[int, float]] = {}
-        self._connectivity: dict[int, dict[int, list[int]]] = {}
-        self._lateral_stiffness: dict[int, dict[int, float]] = {}
-        self._rotational_stiffness: dict[int, dict[int, float]] = {}
+        self._echo_level = 0
 
     def clear(self) -> None:
-        """Clear all the spring data for all the spring elements and groups.
+        """Clear all the loaded data.
         """
-        self._axial_stiffness.clear()
-        self._connectivity.clear()
-        self._lateral_stiffness.clear()
-        self._rotational_stiffness.clear()
+        self._data = self._data[0:0]
 
     def load(self, group_divisor: int = 10000) -> None:
         """Load the spring data.
