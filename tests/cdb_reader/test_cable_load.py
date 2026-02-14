@@ -72,7 +72,11 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
     def test_get(self) -> None:
         """Test for the `get` method.
         """
-        self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+        with self.subTest(msg="Existing entry"):
+            self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+
+        with self.subTest(msg="Non existing entry with default"):
+            self.assertEqual(self.cdb.cable_load.get(9009, 7, "PZP", "PA", -3), -3.0)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.

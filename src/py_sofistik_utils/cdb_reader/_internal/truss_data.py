@@ -78,28 +78,49 @@ class _TrussData:
         """
         return self._data.copy(deep=deep)
 
-    def get(self, element_id: int, info: str = "L0") -> float | int:
-        """Retrieve the requested truss information.
+    def get(
+            self,
+            element_id: int,
+            quantity: str = "L0",
+            default: float | int | None = None
+        ) -> float | int:
+        """Retrieve the requested truss quantity.
 
         Parameters
         ----------
         element_id : int
-            The truss element number
-        info : str, default "L0"
-            Either the start node (``"N1"``), the end node (``"N2"``), the initial length
-            (``"L0"``), the property number (``"PROPERTY"``) or the gap (``"GAP"``).
+            Truss element number
+        quantity : str, default "L0"
+            Quantity to retrieve. Must be one of:
+
+            - ``"N1"``
+            - ``"N2"``
+            - ``"L0"``
+            - ``"PROPERTY"``
+            - ``"GAP"``
+
+        default : float or int or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float or int
+            The requested quantity if found. Otherwise, returns ``default`` when it is not
+            None.
 
         Raises
         ------
         LookupError
-            If the requested information is not found.
+            If the requested quantity is not found and ``default`` is None.
         """
         try:
-            return self._data.at[element_id, info]  # type: ignore
+            return self._data.at[element_id, quantity]  # type: ignore
         except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
             raise LookupError(
-                f"Load entry not found for element id {element_id}, "
-                f"and information {info}!"
+                f"Truss data entry not found for element id {element_id}, "
+                f"and quantity {quantity}!"
             ) from e
 
     def load(self) -> None:

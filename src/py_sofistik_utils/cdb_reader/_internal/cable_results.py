@@ -94,32 +94,52 @@ class _CableResults:
         """
         return self._data.copy(deep=deep)
 
-    def get(self, element_id: int, load_case: int, quantity: str = "AXIAL_FORCE") -> float:
+    def get(
+            self,
+            element_id: int,
+            load_case: int,
+            quantity: str = "AXIAL_FORCE",
+            default: float | None = None
+        ) -> float:
         """Retrieve the requested cable result.
 
         Parameters
         ----------
         element_id : int
-            The cable element number
+            Cable element number
         load_case : int
-            The load case number
+            Load case number
         quantity : str, default "AXIAL_FORCE"
-            Quantity to be retrieved; either the axial force (``"AXIAL_FORCE"``), the
-            average axial force (``"AVG_AXIAL_FORCE"``), the total strain
-            (``"TOTAL_STRAIN"``), the relaxed length (``"RELAXED_LENGTH"``), the axial
-            displacement (``"AXIAL_DISPLACEMENT"``) or the effective stiffness
-            (``"EFFECTIVE_STIFFNESS``")
+            Quantity to retrieve. Must be one of:
+
+            - ``"AXIAL_FORCE"``
+            - ``"AVG_AXIAL_FORCE"``
+            - ``"TOTAL_STRAIN"``
+            - ``"RELAXED_LENGTH"``
+            - ``"AXIAL_DISPLACEMENT"``
+            - ``"EFFECTIVE_STIFFNESS"``
+
+        default : float or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float
+            The requested value if found. If not found, returns ``default`` when it is not
+            None.
 
         Raises
         ------
         LookupError
-            If the requested data is not found.
+            If the requested result is not found and ``default`` is None.
         """
         try:
             return self._data.at[(element_id, load_case), quantity]  # type: ignore
         except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
             raise LookupError(
-                f"Load entry not found for element id {element_id}, "
+                f"Cable result entry not found for element id {element_id}, "
                 f"load case {load_case}, and quantity {quantity}!"
             ) from e
 

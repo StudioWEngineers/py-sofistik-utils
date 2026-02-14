@@ -63,9 +63,12 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
         with self.subTest(msg="Property number"):
             self.assertEqual(self.cdb.truss_data.get(1001, "PROPERTY"), 2)
 
-        with self.subTest(msg="Non existing entry"):
+        with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
                     self.assertEqual(self.cdb.truss_data.get(505, "N3"), 1)
+
+        with self.subTest(msg="Non existing entry with default"):
+            self.assertEqual(self.cdb.truss_data.get(505, "N3", 9), 9)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.

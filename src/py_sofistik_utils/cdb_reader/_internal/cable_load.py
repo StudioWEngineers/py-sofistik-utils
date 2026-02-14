@@ -101,33 +101,56 @@ class _CableLoad:
             element_id: int,
             load_case: int,
             load_type: str,
-            point: str = "PA"
+            point: str = "PA",
+            default: float | None = None
         ) -> float:
         """Retrieve the requested cable load.
 
         Parameters
         ----------
         element_id : int
-            The cable element number
+            Cable element number
         load_case : int
-            The load case number
+            Load case number
         load_type : str
-            The load type; either ``"PG"``, ``"PXX"``, ``"PYY"``, ``"PZZ"``, ``"EX"``,
-            ``"WX"``, ``"DT"``, ``"VX"``, ``"PXP"``, ``"PYP"`` or ``"PZP"``
+            Load type to retrieve. Must be one of:
+
+            - ``"PG"``
+            - ``"PXX"``
+            - ``"PYY"``
+            - ``"PZZ"``
+            - ``"EX"``
+            - ``"WX"``
+            - ``"DT"``
+            - ``"VX"``
+            - ``"PXP"``
+            - ``"PYP"``
+            - ``"PZP"``
+
         point : str, default "PA"
             Location on the cable where the load is applied; either the start (``"PA"``)
             or the end (``"PE"``)
+        default : float or None, default None
+            Value to return if the requested load is not found
+
+        Returns
+        -------
+        value : float
+            The requested load if found. Otherwise, returns ``default`` when it is not
+            None.
 
         Raises
         ------
         LookupError
-            If the requested data is not found.
+            If the requested load is not found and ``default`` is None.
         """
         try:
             return self._data.at[(element_id, load_case, load_type), point]  # type: ignore
         except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
             raise LookupError(
-                f"Load entry not found for element id {element_id}, "
+                f"Cable load entry not found for element id {element_id}, "
                 f"load case {load_case}, load type {load_type} and point {point}!"
             ) from e
 

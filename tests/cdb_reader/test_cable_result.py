@@ -93,6 +93,13 @@ class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
                 self.cdb.cable_res.get(102, 1000, "EFFECTIVE_STIFFNESS"), 0.8180915713310242
             )
 
+        with self.subTest(msg="Non existing entry without default"):
+            with self.assertRaises(LookupError):
+                self.cdb.cable_res.get(102, 1000, "NON-EXISTING")
+
+        with self.subTest(msg="Non existing entry with default"):
+            self.assertEqual(self.cdb.cable_res.get(102, 1000, "NON-EXISTING", 5), 5)
+
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
         """
