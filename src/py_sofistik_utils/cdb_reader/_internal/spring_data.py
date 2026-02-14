@@ -5,6 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI
 
@@ -36,43 +37,69 @@ class _SpringData:
         """
         self._data = self._data[0:0]
 
-    def load(self, group_divisor: int = 10000) -> None:
-        """Load the spring data.
+    def load(self) -> None:
+        """Retrieve all spring data. If the key does not exist or it is empty, a warning
+        is raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(170, 0):
             spring = CSPRI()
-            rec_length = c_int(sizeof(spring))
-            return_value = 0
+            record_length = c_int(sizeof(spring))
+            return_value = c_int(0)
 
             self.clear()
 
-            count = 0
-            while return_value < 2:
-                return_value = self._dll.get(
+            data: list[dict[str, float | int]] = []
+            first_call = True
+            while return_value.value < 2:
+                return_value.value = self._dll.get(
                     1,
                     170,
                     0,
                     byref(spring),
-                    byref(rec_length),
-                    0 if count == 0 else 1
+                    byref(record_length),
+                    0 if first_call else 1
                 )
 
-                spring_nmb: int = spring.m_nr
-                grp_nmb = spring_nmb // group_divisor
+                record_length = c_int(sizeof(spring))
+                first_call = False
+                if return_value.value >= 2:
+                    break
 
-                if grp_nmb not in self._connectivity:
-                    self._axial_stiffness[grp_nmb] = {}
-                    self._connectivity[grp_nmb] = {}
-                    self._lateral_stiffness[grp_nmb] = {}
-                    self._rotational_stiffness[grp_nmb] = {}
+                data.append(
+                    {
+                        "GROUP":    0,
+                        "ELEM_ID":  spring.m_nr,
+                        "N1":       spring.m_node[0],
+                        "N2":       spring.m_node[1],
+                        "CP":       spring.m_cp,
+                        "CT":       spring.m_cq,
+                        "CM":       spring.m_cm
+                    }
+                )
 
-                self._axial_stiffness[grp_nmb].update({spring_nmb: spring.m_cp})
-                self._connectivity[grp_nmb].update({spring_nmb: list(spring.m_node)})
-                self._lateral_stiffness[grp_nmb].update({spring_nmb: spring.m_cq})
-                self._rotational_stiffness[grp_nmb].update({spring_nmb: spring.m_cm})
+            # assigning groups
+            group_data = _GroupData(self._dll)
+            group_data.load()
 
-                rec_length = c_int(sizeof(spring))
-                count += 1
+            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = temp_df["ELEM_ID"]
+
+            for grp, grp_range in group_data.iterator_spring():
+                if grp_range.stop == 0:
+                    continue
+
+                left = elem_ids.searchsorted(grp_range.start, side="left")
+                right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+            # set indices for fast lookup
+            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
+
+            # merge data
+            if self._data.empty:
+                self._data = temp_df
+            else:
+                self._data = concat([self._data, temp_df])
 
     def get_element_connectivity(self, spring_nmb: int) -> list[int]:
         """Return the connectivity for the given ``spring_nmb``.
