@@ -18,10 +18,8 @@ class _TrussLoad:
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_TrussLoad`` class.
-        """
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
