@@ -95,6 +95,32 @@ class _SpringData:
                 f"and quantity {quantity}!"
             ) from e
 
+    def has_stiffness(self, element_id: int, component: str = "CP") -> bool:
+        """Return whether the specified stiffness component of a spring element is
+        non-zero.
+
+        Parameters
+        ----------
+        element_id : int
+            Spring element number
+        component : str, default "CP"
+            Stiffness component to test. Must be one of:
+
+            - ``"CP"``
+            - ``"CT"``
+            - ``"CM"``
+
+        Returns
+        -------
+        bool
+            True if the requested stiffness component exists and is non-zero. False if the
+            component is zero or the element is not found.
+        """
+        try:
+            return self._data.at[element_id, component] != 0.0
+        except (KeyError, ValueError):
+            return False
+
     def load(self) -> None:
         """Retrieve all spring data. If the key does not exist or it is empty, a warning
         is raised only if ``echo_level > 0``.
@@ -158,48 +184,3 @@ class _SpringData:
                 self._data = temp_df
             else:
                 self._data = concat([self._data, temp_df])
-
-    def has_axial_stiffness(self, spring_nmb: int) -> bool:
-        """Return `True` if the spring has an axial stiffness `!= 0`.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        return self.get_element_axial_stiffness(spring_nmb) != 0.0
-
-    def has_lateral_stiffness(self, spring_nmb: int) -> bool:
-        """Return `True` if the spring has a lateral stiffness `!= 0`.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        return self.get_element_lateral_stiffness(spring_nmb) != 0.0
-
-    def has_rotational_stiffness(self, spring_nmb: int) -> bool:
-        """Return `True` if the spring has a rotational stiffness != 0.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        return self.get_element_rotational_stiffness(spring_nmb) != 0.0
