@@ -208,3 +208,13 @@ class _SpringResults:
                 count += 1
 
             self._loaded_lc.add(load_case)
+
+    def set_echo_level(self, echo_level: int) -> None:
+        """Set the echo level.
+
+        Parameters
+        ----------
+        echo_level : int
+            the new echo level
+        """
+        self._echo_level = echo_level
