@@ -2,192 +2,222 @@
 from ctypes import byref, c_int, sizeof
 
 # third party library imports
+from pandas import concat, DataFrame
 
 # local library specific imports
-from . sofistik_dll import SofDll
+from . group_data import _GroupData
 from . sofistik_classes import CSPRI
+from . sofistik_dll import SofDll
 
 
 class _SpringData:
-    """The ``_SpringData`` class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the key ``170/00`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``170/00`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``N1`` id of the first node
+        * ``N2``: id of the second node
+        * ``CP``: axial stiffness
+        * ``CT``: lateral stiffness
+        * ``CM``: rotational stiffness
+
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
+        via the `get` method. The index column is not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular:
+
+            * material or work law number
+            * normal direction
+            * reference area
+            * prestress
+            * slip
+            * maximum tension force
+            * yielding load
+            * reference axis
+            * friction coefficient
+            * cohesion coefficient
+            * dilatancy factor
+            * transversal slip
+
+            are currently not included, together with quantities for coupled damping
+            elements.
+
+            This is a deliberate design choice and may be changed in the future without
+            breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_SpringData`` class.
-        """
+        self._data: DataFrame = DataFrame(
+            columns = [
+                "GROUP",
+                "ELEM_ID",
+                "N1",
+                "N2",
+                "CP",
+                "CT",
+                "CM"
+            ]
+        )
         self._dll = dll
-
-        self._axial_stiffness: dict[int, dict[int, float]] = {}
-        self._connectivity: dict[int, dict[int, list[int]]] = {}
-        self._lateral_stiffness: dict[int, dict[int, float]] = {}
-        self._rotational_stiffness: dict[int, dict[int, float]] = {}
+        self._echo_level = 0
 
     def clear(self) -> None:
-        """Clear all the spring data for all the spring elements and groups.
+        """Clear all the loaded data.
         """
-        self._axial_stiffness.clear()
-        self._connectivity.clear()
-        self._lateral_stiffness.clear()
-        self._rotational_stiffness.clear()
+        self._data = self._data[0:0]
 
-    def load(self, group_divisor: int = 10000) -> None:
-        """Load the spring data.
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key ``170/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
+    def get(
+            self,
+            element_id: int,
+            quantity: str = "CP",
+            default: float | int | None = None
+        ) -> float | int:
+        """Retrieve the requested spring quantity.
+
+        Parameters
+        ----------
+        element_id : int
+            Spring element number
+        quantity : str, default "CP"
+            Quantity to retrieve. Must be one of:
+
+            - ``"N1"``
+            - ``"N2"``
+            - ``"CP"``
+            - ``"CT"``
+            - ``"CM"``
+
+        default : float or int or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float or int
+            The requested quantity if found. Otherwise, returns ``default`` when it is not
+            None.
+
+        Raises
+        ------
+        LookupError
+            If the requested quantity is not found and ``default`` is None.
+        """
+        try:
+            return self._data.at[element_id, quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Spring data entry not found for element id {element_id}, "
+                f"and quantity {quantity}!"
+            ) from e
+
+    def has_stiffness(self, element_id: int, component: str = "CP") -> bool:
+        """Return whether the specified stiffness component of a spring element is
+        non-zero.
+
+        Parameters
+        ----------
+        element_id : int
+            Spring element number
+        component : str, default "CP"
+            Stiffness component to test. Must be one of:
+
+            - ``"CP"``
+            - ``"CT"``
+            - ``"CM"``
+
+        Returns
+        -------
+        bool
+            True if the requested stiffness component exists and is non-zero. False if the
+            component is zero or the element is not found.
+        """
+        try:
+            return self._data.at[element_id, component] != 0.0
+        except (KeyError, ValueError):
+            return False
+
+    def load(self) -> None:
+        """Retrieve all spring data. If the key does not exist or it is empty, a warning
+        is raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(170, 0):
             spring = CSPRI()
-            rec_length = c_int(sizeof(spring))
-            return_value = 0
+            record_length = c_int(sizeof(spring))
+            return_value = c_int(0)
 
             self.clear()
 
-            count = 0
-            while return_value < 2:
-                return_value = self._dll.get(
+            data: list[dict[str, float | int]] = []
+            first_call = True
+            while return_value.value < 2:
+                return_value.value = self._dll.get(
                     1,
                     170,
                     0,
                     byref(spring),
-                    byref(rec_length),
-                    0 if count == 0 else 1
+                    byref(record_length),
+                    0 if first_call else 1
                 )
 
-                spring_nmb: int = spring.m_nr
-                grp_nmb = spring_nmb // group_divisor
+                record_length = c_int(sizeof(spring))
+                first_call = False
+                if return_value.value >= 2:
+                    break
 
-                if grp_nmb not in self._connectivity:
-                    self._axial_stiffness[grp_nmb] = {}
-                    self._connectivity[grp_nmb] = {}
-                    self._lateral_stiffness[grp_nmb] = {}
-                    self._rotational_stiffness[grp_nmb] = {}
+                data.append(
+                    {
+                        "GROUP":    0,
+                        "ELEM_ID":  spring.m_nr,
+                        "N1":       spring.m_node[0],
+                        "N2":       spring.m_node[1],
+                        "CP":       spring.m_cp,
+                        "CT":       spring.m_cq,
+                        "CM":       spring.m_cm
+                    }
+                )
 
-                self._axial_stiffness[grp_nmb].update({spring_nmb: spring.m_cp})
-                self._connectivity[grp_nmb].update({spring_nmb: list(spring.m_node)})
-                self._lateral_stiffness[grp_nmb].update({spring_nmb: spring.m_cq})
-                self._rotational_stiffness[grp_nmb].update({spring_nmb: spring.m_cm})
+            # assigning groups
+            group_data = _GroupData(self._dll)
+            group_data.load()
 
-                rec_length = c_int(sizeof(spring))
-                count += 1
+            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = temp_df["ELEM_ID"]
 
-    def get_element_connectivity(self, spring_nmb: int) -> list[int]:
-        """Return the connectivity for the given ``spring_nmb``.
+            for grp, grp_range in group_data.iterator_spring():
+                if grp_range.stop == 0:
+                    continue
 
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
+                left = elem_ids.searchsorted(grp_range.start, side="left")
+                right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
 
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._connectivity.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
+            # set indices for fast lookup
+            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
 
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def get_element_axial_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring axial stiffness for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._axial_stiffness.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def get_element_lateral_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring lateral stiffness for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._lateral_stiffness.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def get_element_rotational_stiffness(self, spring_nmb: int) -> float:
-        """Return the spring rotational stiffness for the given ``spring_nmb``.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The sprig element number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        for group_data in self._rotational_stiffness.values():
-            if spring_nmb in group_data:
-                return group_data[spring_nmb]
-
-        raise RuntimeError(f"Element number {spring_nmb} not found!")
-
-    def has_axial_stiffness(self, spring_nmb: int) -> bool:
-        """Return `True` if the spring has an axial stiffness `!= 0`.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        return self.get_element_axial_stiffness(spring_nmb) != 0.0
-
-    def has_lateral_stiffness(self, spring_nmb: int) -> bool:
-        """Return `True` if the spring has a lateral stiffness `!= 0`.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        return self.get_element_lateral_stiffness(spring_nmb) != 0.0
-
-    def has_rotational_stiffness(self, spring_nmb: int) -> bool:
-        """Return `True` if the spring has a rotational stiffness != 0.
-
-        Parameters
-        ----------
-        ``spring_nmb``: int
-            The spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``spring_nmb`` is not found.
-        """
-        return self.get_element_rotational_stiffness(spring_nmb) != 0.0
+            # merge data
+            if self._data.empty:
+                self._data = temp_df
+            else:
+                self._data = concat([self._data, temp_df])
