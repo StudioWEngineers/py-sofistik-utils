@@ -21,7 +21,7 @@ class _PlateData:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``_PlateData`` class.
         """
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "GROUP",
                 "ELEM_ID",

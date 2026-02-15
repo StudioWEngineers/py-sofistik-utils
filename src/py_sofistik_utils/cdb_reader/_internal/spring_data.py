@@ -55,7 +55,7 @@ class _SpringData:
             breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "GROUP",
                 "ELEM_ID",

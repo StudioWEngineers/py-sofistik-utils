@@ -37,7 +37,7 @@ class _NodeResults:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``NodeResults`` class.
         """
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "LOAD_CASE",
                 "ID",

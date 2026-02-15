@@ -66,7 +66,7 @@ class _CableLoad:
     }
 
     def __init__(self, dll: SofDll) -> None:
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "LOAD_CASE",
                 "GROUP",

@@ -36,7 +36,7 @@ class _BeamResults:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``_BeamResults`` class.
         """
-        self._data: DataFrame = DataFrame(columns = ["LOAD_CASE",
+        self._data = DataFrame(columns = ["LOAD_CASE",
                                                      "GROUP",
                                                      "ELEM_ID",
                                                      "STATION",

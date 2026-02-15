@@ -38,7 +38,7 @@ class _BeamData:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``BeamData`` class.
         """
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "GROUP",
                 "ELEM_ID",

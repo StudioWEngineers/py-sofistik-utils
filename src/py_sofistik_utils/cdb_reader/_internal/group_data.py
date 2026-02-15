@@ -23,7 +23,7 @@ class _GroupData:
         """The initializer of the ``_GroupData`` class.
         """
         self._dll = dll
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "GROUP",
                 "GROUP_NAME",

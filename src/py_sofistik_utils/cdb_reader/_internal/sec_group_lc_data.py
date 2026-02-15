@@ -24,7 +24,7 @@ class _SecondaryGroupLCData:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``_SecondaryGroupLCData`` class.
         """
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "LOAD_CASE",
                 "GROUP",

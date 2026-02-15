@@ -22,7 +22,7 @@ class _BeamLoad:
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the `_BeamLoad` class.
         """
-        self._data: DataFrame = DataFrame(
+        self._data = DataFrame(
             columns = [
                 "LOAD_CASE",
                 "GROUP",
