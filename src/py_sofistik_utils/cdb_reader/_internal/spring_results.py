@@ -5,6 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
+from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI_RES
 
@@ -112,7 +113,7 @@ class _SpringResults:
         quantity : str, default "FORCE"
             Quantity to retrieve. Must be one of:
 
-            - ``FORCE`
+            - ``FORCE``
             - ``TRANSVERSAL_FORCE``
             - ``MOMENT``
             - ``DISPLACEMENT``
@@ -143,71 +144,51 @@ class _SpringResults:
                 f"load case {load_case}, and quantity {quantity}!"
             ) from e
 
-    def load(self, load_case: int, grp_divisor: int = 10000) -> None:
-        """Load the results for the given ``load_case``.
+    def load(self, load_cases: int | list[int]) -> None:
+        """Retrieve spring results for the given ``load_cases``. If a load case is not
+        found, a warning is raised only if ``echo_level > 0``.
+
+        Parameters
+        ----------
+        load_cases : int | list[int]
+            load case numbers
         """
-        if self._dll.key_exist(170, load_case):
-            spring = CSPRI_RES()
-            record_length = c_int(sizeof(spring))
-            return_value = c_int(0)
+        if isinstance(load_cases, int):
+            load_cases = [load_cases]
+        else:
+            load_cases = list(set(load_cases))  # remove duplicated entries
 
-            if load_case not in self._loaded_lc:
-                self._displacements[load_case] = {}
-                self._forces[load_case] = {}
-                self._moment[load_case] = {}
-                self._rotation[load_case] = {}
-
-            else:
+        # load data
+        temp_list: list[dict[str, float | int | str]] = []
+        for load_case in load_cases:
+            if self._dll.key_exist(170, load_case):
                 self.clear(load_case)
+                temp_list.extend(self._load(load_case))
 
-            count = 0
-            while return_value.value < 2:
-                return_value.value = self._dll.get(
-                    1,
-                    170,
-                    load_case,
-                    byref(spring),
-                    byref(record_length),
-                    0 if count == 0 else 1
-                )
+        # assigning groups
+        group_data = _GroupData(self._dll)
+        group_data.load()
 
-                spring_nmb: int = spring.m_nr
-                if spring_nmb == 0:
-                    record_length = c_int(sizeof(spring))
-                    count += 1
-                    continue
+        temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
+        elem_ids = temp_df["ELEM_ID"]
 
-                grp_nmp = spring.m_nr // grp_divisor
+        for grp, grp_range in group_data.iterator_spring():
+            if grp_range.stop == 0:
+                continue
 
-                if grp_nmp not in self._displacements[load_case]:
-                    self._displacements[load_case].update({grp_nmp: {}})
-                    self._forces[load_case].update({grp_nmp: {}})
-                    self._moment[load_case].update({grp_nmp: {}})
-                    self._rotation[load_case].update({grp_nmp: {}})
+            left = elem_ids.searchsorted(grp_range.start, side="left")
+            right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+            temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
 
-                self._displacements[load_case][grp_nmp].update(
-                    {spring_nmb: array([spring.m_v,
-                                           spring.m_vt,
-                                           spring.m_vtx,
-                                           spring.m_vty,
-                                           spring.m_vtz], dtype = float64)})
+        # set indices for fast lookup
+        temp_df = temp_df.set_index(["ELEM_ID", "LOAD_CASE"], drop=False)
 
-                self._rotation[load_case][grp_nmp].update({spring_nmb: spring.m_phi})
-
-                self._forces[load_case].update(
-                    {spring_nmb: array(
-                        [spring.m_p,
-                         spring.m_pt,
-                         spring.m_ptx,
-                         spring.m_pty,
-                         spring.m_ptz], dtype = float64)})
-
-                self._moment[load_case].update({spring_nmb: spring.m_m})
-
-                record_length = c_int(sizeof(spring))
-                count += 1
-
-            self._loaded_lc.add(load_case)
+        # merge data
+        if self._data.empty:
+            self._data = temp_df
+        else:
+            self._data = concat([self._data, temp_df])
+        self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:
         """Set the echo level.
@@ -218,3 +199,44 @@ class _SpringResults:
             the new echo level
         """
         self._echo_level = echo_level
+
+    def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
+        """Retrieve key ``170/load_case`` using SOFiSTiK dll.
+        """
+        spri_res = CSPRI_RES()
+        record_length = c_int(sizeof(spri_res))
+        return_value = c_int(0)
+
+        data: list[dict[str, float | int | str]] = []
+        first_call = True
+        while return_value.value < 2:
+            return_value.value = self._dll.get(
+                1,
+                170,
+                load_case,
+                byref(spri_res),
+                byref(record_length),
+                0 if first_call else 1
+            )
+
+            record_length = c_int(sizeof(spri_res))
+            first_call = False
+            if return_value.value >= 2:
+                break
+
+            if spri_res.m_nr > 0:
+                data.append(
+                    {
+                        "LOAD_CASE": load_case,
+                        "GROUP": 0,
+                        "ELEM_ID": spri_res.m_nr,
+                        "FORCE": spri_res.m_p,
+                        "TRANSVERSAL_FORCE": spri_res.m_pt,
+                        "MOMENT": spri_res.m_m,
+                        "DISPLACEMENT": spri_res.m_v,
+                        "TRANSVERSAL_DISPLACEMENT": spri_res.m_vt,
+                        "ROTATION": spri_res.m_phi
+                    }
+                )
+
+        return data
