@@ -10,11 +10,41 @@ from . sofistik_classes import CSPRI_RES
 
 
 class _SpringResults:
-    """The ``_SpringResults`` class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the keys ``170/LC`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``170/LC`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``LOAD_CASE`` load case number
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``FORCE`` axial force
+        * ``TRANSVERSAL_FORCE``: transversal force
+        * ``MOMENT``: axial moment
+        * ``DISPLACEMENT``: axial displacement
+        * ``TRANSVERSAL_DISPLACEMENT``: transversal displacement
+        * ``ROTATION``: axial rotation
+
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and ``LOAD_CASE``
+        (in this specific order) to enable fast lookups via the `get` method. The
+        index columns are not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular:
+
+            * the three components along the global X, Y and Z axes for:
+                - spring force
+                - spring displacement
+            * nonlinear effects
+            * all quantities available if a workload has beed defined
+
+            are currently not included. This is a deliberate design choice and may be
+            changed in the future without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
@@ -52,7 +82,7 @@ class _SpringResults:
         self._loaded_lc.clear()
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys ``162/LC``.
+        """Return the :class:`pandas.DataFrame` containing the loaded keys ``170/LC``.
 
         Parameters
         ----------
