@@ -2,8 +2,7 @@
 from ctypes import byref, c_int, sizeof
 
 # third party library imports
-from numpy import array, float64
-from numpy.typing import NDArray
+from pandas import concat, DataFrame
 
 # local library specific imports
 from . sofistik_dll import SofDll
@@ -18,16 +17,22 @@ class _SpringResults:
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``SpringResults`` class.
-        """
+        self._data = DataFrame(
+            columns = [
+                "LOAD_CASE",
+                "GROUP",
+                "ELEM_ID",
+                "FORCE",
+                "TRANSVERSAL_FORCE",
+                "MOMENT",
+                "DISPLACEMENT",
+                "TRANSVERSAL_DISPLACEMENT",
+                "ROTATION"
+            ]
+        )
         self._dll = dll
-
+        self._echo_level = 0
         self._loaded_lc: set[int] = set()
-
-        self._displacements: dict[int, dict[int, dict[int, NDArray[float64]]]] = {}
-        self._forces: dict[int, dict[int, NDArray[float64]]] = {}
-        self._moment: dict[int, dict[int, dict[int, dict[int, float]]]] = {}
-        self._rotation: dict[int, dict[int, dict[int, float]]] = {}
 
     def clear(self, load_case: int) -> None:
         """Clear the results for for the given load cases and all the springs.
