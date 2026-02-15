@@ -35,26 +35,20 @@ class _SpringResults:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for for the given load cases and all the springs.
+        """Clear the loaded data for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
-            raise RuntimeError(f"No displacements loaded for load case {load_case}!")
+            return
 
-        self._displacements[load_case].clear()
-        self._forces[load_case].clear()
-        self._moment[load_case].clear()
-        self._rotation[load_case].clear()
-
+        self._data = self._data[
+            self._data.index.get_level_values("LOAD_CASE") != load_case
+        ]
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
-        """Clear the results for all the load cases and all the springs.
+        """Clear the loaded data for all the load cases.
         """
-        self._displacements.clear()
-        self._forces.clear()
-        self._moment.clear()
-        self._rotation.clear()
-
+        self._data = self._data[0:0]
         self._loaded_lc.clear()
 
     def load(self, load_case: int, grp_divisor: int = 10000) -> None:
