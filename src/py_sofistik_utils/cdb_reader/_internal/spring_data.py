@@ -11,11 +11,48 @@ from . sofistik_classes import CSPRI
 
 
 class _SpringData:
-    """The ``_SpringData`` class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the key ``170/00`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``170/00`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the following
+        columns:
+
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``N1`` id of the first node
+        * ``N2``: id of the second node
+        * ``CP``: axial stiffness
+        * ``CT``: lateral stiffness
+        * ``CM``: rotational stiffness
+
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
+        via the `get` method. The index column is not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In particular:
+
+            * material or work law number
+            * normal direction
+            * reference area
+            * prestress
+            * slip
+            * maximum tension force
+            * yielding load
+            * reference axis
+            * friction coefficient
+            * cohesion coefficient
+            * dilatancy factor
+            * transversal slip
+
+            are currently not included, together with quantities for coupled damping
+            elements.
+
+            This is a deliberate design choice and may be changed in the future without
+            breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data: DataFrame = DataFrame(
