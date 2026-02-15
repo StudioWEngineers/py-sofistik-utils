@@ -63,38 +63,63 @@ class _TrussLoad:
         """
         return self._data.copy(deep=deep)
 
-    def get_element_load(
+    def get(
             self,
-            element_number: int,
+            element_id: int,
             load_case: int,
-            load_type: str
-        ) -> Any:
-        """Return the cable connectivity for the given ``element_number``.
+            load_type: str,
+            point: str = "PA",
+            default: float | None = None
+    ) -> float:
+        """Retrieve the requested truss load.
 
         Parameters
         ----------
-        ``element_number``: int
-            The cable element number
-        ``load_case``: int
-            The load case number
-        ``load_type``: str
-            The load type
+        element_id : int
+            Truss element number
+        load_case : int
+            Load case number
+        load_type : str
+            Load type to retrieve. Must be one of:
+
+            - ``"PG"``
+            - ``"PXX"``
+            - ``"PYY"``
+            - ``"PZZ"``
+            - ``"EX"``
+            - ``"WX"``
+            - ``"DT"``
+            - ``"VX"``
+            - ``"PXP"``
+            - ``"PYP"``
+            - ``"PZP"``
+
+        point : str, default "PA"
+            Location on the truss where the load is applied; either the start
+            (``"PA"``) or the end (``"PE"``)
+        default : float or None, default None
+            Value to return if the requested load is not found
+
+        Returns
+        -------
+        value : float
+            The requested load if found. Otherwise, returns ``default`` when it
+            is not None.
 
         Raises
         ------
         LookupError
-            If the requested data is not found.
+            If the requested load is not found and ``default`` is None.
         """
-        raise NotImplementedError
-        e_mask = self._data["ELEM_ID"] == element_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-        lt_mask = self._data["TYPE"] == load_type
-
-        if (e_mask & lc_mask & lt_mask).eq(False).all():
-            err_msg = f"LC {load_case}, LT {load_type}, EL_ID {element_number} not found!"
-            raise LookupError(err_msg)
-
-        return self._data[e_mask & lc_mask & lt_mask].copy(deep=True)
+        try:
+            return self._data.at[(element_id, load_case, load_type), point]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Truss load entry not found for element id {element_id}, load"
+                f" case {load_case}, load type {load_type} and point {point}!"
+            ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
         """Load cable element loads for the given the ``load_cases``.
