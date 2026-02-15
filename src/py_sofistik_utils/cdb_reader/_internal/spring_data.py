@@ -6,8 +6,8 @@ from pandas import concat, DataFrame
 
 # local library specific imports
 from . group_data import _GroupData
-from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI
+from . sofistik_dll import SofDll
 
 
 class _SpringData:
