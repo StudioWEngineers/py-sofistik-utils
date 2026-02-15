@@ -51,6 +51,19 @@ class _SpringResults:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys ``162/LC``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
     def load(self, load_case: int, grp_divisor: int = 10000) -> None:
         """Load the results for the given ``load_case``.
         """
