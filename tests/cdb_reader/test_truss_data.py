@@ -17,7 +17,7 @@ VERSION = environ.get("SOFISTIK_VERSION")
 
 @skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
 class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
-    """Tests for the `SOFiSTiKCDBReader`, `TrussData` module.
+    """Tests for the `_TrussData` class.
     """
     def setUp(self) -> None:
         self.expected_data = DataFrame(

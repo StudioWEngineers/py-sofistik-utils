@@ -35,7 +35,7 @@ _DATA = [
 
 @skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
 class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
-    """Tests for the `SOFiSTiKCDBReader`, `_SpringResult` module.
+    """Tests for the `_SpringResult` class.
     """
     def setUp(self) -> None:
         self.expected_data = DataFrame(

@@ -44,7 +44,7 @@ _DATA = [
 
 @skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
 class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
-    """Tests for the `SOFiSTiKCDBReader`, `CableLoad` module.
+    """Tests for the `_CableLoad` class.
     """
     def setUp(self) -> None:
         self.expected_data = DataFrame(_DATA, columns=_COLUMNS).set_index(
