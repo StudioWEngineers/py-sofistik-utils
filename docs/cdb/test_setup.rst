@@ -91,4 +91,5 @@ the temporary environment variable approach, open an MSYS2 MINGW64 shell, naviga
     tests/cable_load
     tests/cable_result
     tests/spring_data
+    tests/spring_result
     tests/truss_data
