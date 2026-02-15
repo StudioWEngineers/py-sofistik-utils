@@ -94,6 +94,55 @@ class _SpringResults:
         """
         return self._data.copy(deep=deep)
 
+    def get(
+            self,
+            element_id: int,
+            load_case: int,
+            quantity: str = "FORCE",
+            default: float | None = None
+        ) -> float:
+        """Retrieve the requested cable result.
+
+        Parameters
+        ----------
+        element_id : int
+            Cable element number
+        load_case : int
+            Load case number
+        quantity : str, default "FORCE"
+            Quantity to retrieve. Must be one of:
+
+            - ``FORCE`
+            - ``TRANSVERSAL_FORCE``
+            - ``MOMENT``
+            - ``DISPLACEMENT``
+            - ``TRANSVERSAL_DISPLACEMENT``
+            - ``ROTATION``
+
+        default : float or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float
+            The requested value if found. If not found, returns ``default`` when it is not
+            None.
+
+        Raises
+        ------
+        LookupError
+            If the requested result is not found and ``default`` is None.
+        """
+        try:
+            return self._data.at[(element_id, load_case), quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Spring result entry not found for element id {element_id}, "
+                f"load case {load_case}, and quantity {quantity}!"
+            ) from e
+
     def load(self, load_case: int, grp_divisor: int = 10000) -> None:
         """Load the results for the given ``load_case``.
         """
@@ -159,57 +208,3 @@ class _SpringResults:
                 count += 1
 
             self._loaded_lc.add(load_case)
-
-    def get_element_displacements(
-            self,
-            load_case: int,
-            spring_nmb: int
-        ) -> NDArray[float64]:
-        """Return the spring displacements for the given ``load_case``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-        ``spring_nmb``: int
-            Spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``load_case`` or ``spring_nmb`` are not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise RuntimeError(f"Load case {load_case} not found!")
-
-        for group_result in self._displacements[load_case].values():
-            if spring_nmb in group_result:
-                return group_result[spring_nmb]
-
-        err_msg = f"Element number {spring_nmb} not found in load case {load_case}!"
-        raise RuntimeError(err_msg)
-
-    def get_element_rotation( self, load_case: int, spring_nmb: int) -> float:
-        """Return the spring rotation for the given ``load_case``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-        ``spring_nmb``: int
-            Spring number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``load_case`` or ``spring_nmb`` are not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise RuntimeError(f"Load case {load_case} not found!")
-
-        for group_result in self._rotation[load_case].values():
-            if spring_nmb in group_result:
-                return group_result[spring_nmb]
-
-        err_msg = f"Spring number {spring_nmb} not found in load case {load_case}!"
-        raise RuntimeError(err_msg)
