@@ -64,10 +64,10 @@ class SOFiSTiKCDBReaderCableDataTestSuite(TestCase):
 
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
-                    self.assertEqual(self.cdb.cable_data.get(505, "N3"), 1)
+                self.cdb.cable_data.get(505, "N3")
 
         with self.subTest(msg="Non existing entry with default"):
-                    self.assertEqual(self.cdb.cable_data.get(505, "N3", 2), 2)
+            self.assertEqual(self.cdb.cable_data.get(505, "N3", 2), 2)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
@@ -75,7 +75,7 @@ class SOFiSTiKCDBReaderCableDataTestSuite(TestCase):
         self.cdb.cable_data.clear()
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.assertEqual(self.cdb.cable_data.get(505, "N1"), 1)
+                self.cdb.cable_data.get(505, "N1")
 
         self.cdb.cable_data.load()
         with self.subTest(msg="Check indexes management"):

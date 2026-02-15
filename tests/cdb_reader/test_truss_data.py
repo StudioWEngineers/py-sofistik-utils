@@ -65,7 +65,7 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
 
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
-                    self.assertEqual(self.cdb.truss_data.get(505, "N3"), 1)
+                self.cdb.truss_data.get(505, "N3")
 
         with self.subTest(msg="Non existing entry with default"):
             self.assertEqual(self.cdb.truss_data.get(505, "N3", 9), 9)
@@ -76,7 +76,7 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
         self.cdb.truss_data.clear()
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.assertEqual(self.cdb.truss_data.get(1001, "PROPERTY"), 2)
+                self.cdb.truss_data.get(1001, "PROPERTY")
 
         self.cdb.truss_data.load()
         with self.subTest(msg="Check indexes management"):
