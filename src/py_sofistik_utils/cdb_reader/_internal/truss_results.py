@@ -63,29 +63,52 @@ class _TrussResult:
         """
         return self._data.copy(deep=deep)
 
-    def get_element_force(self, element_number: int, load_case: int) -> float:
-        """Return the cable connectivity for the given ``element_number``.
+    def get(
+            self,
+            element_id: int,
+            load_case: int,
+            quantity: str = "AXIAL_FORCE",
+            default: float | None = None
+    ) -> float:
+        """Retrieve the requested truss result.
 
         Parameters
         ----------
-        ``element_number``: int
-            The cable element number
-        ``load_case``: int
-            The load case number
+        element_id : int
+            Truss element number
+        load_case : int
+            Load case number
+        quantity : str, default "AXIAL_FORCE"
+            Quantity to retrieve. Must be one of:
+
+            - ``"AXIAL_FORCE"``
+            - ``"AXIAL_DISPLACEMENT"``
+
+        default : float or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float
+            The requested value if found. If not found, returns ``default``
+            when it is not None.
 
         Raises
         ------
         LookupError
-            If the requested data is not found.
+            If the requested result is not found and ``default`` is None.
         """
-        e_mask = self._data["ELEM_ID"] == element_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (e_mask & lc_mask).eq(False).all():
-            err_msg = f"LC {load_case}, EL_ID {element_number} not found!"
-            raise LookupError(err_msg)
-
-        return float(self._data.AXIAL_FORCE[e_mask & lc_mask].values[0])
+        try:
+            return self._data.at[
+                (element_id, load_case), quantity
+            ]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Truss result entry not found for element id {element_id}, "
+                f"load case {load_case}, and quantity {quantity}!"
+            ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
         """Load cable element loads for the given the ``load_cases``.
