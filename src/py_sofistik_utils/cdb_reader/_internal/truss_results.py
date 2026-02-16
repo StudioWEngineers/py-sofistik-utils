@@ -123,6 +123,11 @@ class _TrussResult:
         for grp, truss_range in group_data.iterator_truss():
             self._data.loc[self._data.ELEM_ID.isin(truss_range), "GROUP"] = grp
 
+    def set_echo_level(self, echo_level: int) -> None:
+        """Set the echo level.
+        """
+        self._echo_level = echo_level
+
     def _load(self, load_case: int) -> list[dict[str, Any]]:
         """
         """
@@ -159,8 +164,3 @@ class _TrussResult:
             )
 
         return data
-
-    def set_echo_level(self, echo_level: int) -> None:
-        """Set the echo level.
-        """
-        self._echo_level = echo_level
