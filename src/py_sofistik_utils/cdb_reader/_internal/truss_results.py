@@ -1,6 +1,5 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
@@ -111,55 +110,65 @@ class _TrussResult:
             ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Load cable element loads for the given the ``load_cases``.
-
-        If a load case is not found, a warning is raised only if ``echo_level`` is ``> 0``.
+        """Retrieve cable results for the given ``load_cases``. If a load case
+        is not found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
-        ``load_cases``: int | list[int], load case numbers
+        load_cases : int | list[int]
+            Load case numbers
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
+        else:
+            load_cases = list(set(load_cases))  # remove duplicated entries
 
+        # load data
+        temp_list = []
         for load_case in load_cases:
-            if self._dll.key_exist(151, load_case):
+            if self._dll.key_exist(152, load_case):
                 self.clear(load_case)
-
-                # load data
-                data = DataFrame(self._load(load_case))
-
-                # merge data
-                if self._data.empty:
-                    self._data = data
-                else:
-                    self._data = concat([self._data, data], ignore_index=True)
-                self._loaded_lc.add(load_case)
-
-            else:
-                continue
+                temp_list.extend(self._load(load_case))
 
         # assigning groups
         group_data = _GroupData(self._dll)
         group_data.load()
 
-        for grp, truss_range in group_data.iterator_truss():
-            self._data.loc[self._data.ELEM_ID.isin(truss_range), "GROUP"] = grp
+        temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
+        elem_ids = temp_df["ELEM_ID"]
+
+        for grp, grp_range in group_data.iterator_truss():
+            if grp_range.stop == 0:
+                continue
+
+            left = elem_ids.searchsorted(grp_range.start, side="left")
+            right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+            temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+
+        # set indices for fast lookup
+        temp_df = temp_df.set_index(["ELEM_ID", "LOAD_CASE"], drop=False)
+
+        # merge data
+        if self._data.empty:
+            self._data = temp_df
+        else:
+            self._data = concat([self._data, temp_df])
+        self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:
         """Set the echo level.
         """
         self._echo_level = echo_level
 
-    def _load(self, load_case: int) -> list[dict[str, Any]]:
-        """
+    def _load(self, load_case: int) -> list[dict[str, float | int]]:
+        """Retrieve key ``162/load_case`` using SOFiSTiK dll.
         """
         trus = CTRUS_RES()
         record_length = c_int(sizeof(trus))
         return_value = c_int(0)
 
-        data: list[dict[str, Any]] = []
-        count = 0
+        data: list[dict[str, float | int]] = []
+        first_call = True
         while return_value.value < 2:
             return_value.value = self._dll.get(
                 1,
@@ -167,23 +176,23 @@ class _TrussResult:
                 load_case,
                 byref(trus),
                 byref(record_length),
-                0 if count == 0 else 1
+                0 if first_call else 1
             )
 
             record_length = c_int(sizeof(trus))
-            count += 1
-
+            first_call = False
             if return_value.value >= 2:
                 break
 
-            data.append(
-                {
-                    "LOAD_CASE":    load_case,
-                    "GROUP":        0,
-                    "ELEM_ID":      trus.m_nr,
-                    "AXIAL_FORCE":  trus.m_n,
-                    "AXIAL_DISP":   trus.m_v
-                }
-            )
+            if trus.m_nr != 0:
+                data.append(
+                    {
+                        "LOAD_CASE":    load_case,
+                        "GROUP":        0,
+                        "ELEM_ID":      trus.m_nr,
+                        "AXIAL_FORCE":  trus.m_n,
+                        "AXIAL_DISPLACEMENT":   trus.m_v
+                    }
+                )
 
         return data
