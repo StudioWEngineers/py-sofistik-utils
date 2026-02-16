@@ -19,15 +19,13 @@ class _TrussResult:
     * provide access to these data.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_TrussResult`` class.
-        """
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
                 "AXIAL_FORCE",
-                "AXIAL_DISP"
+                "AXIAL_DISPLACEMENT"
             ]
         )
         self._dll = dll
