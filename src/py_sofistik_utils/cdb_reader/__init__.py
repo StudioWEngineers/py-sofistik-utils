@@ -17,7 +17,6 @@ from . _internal.property import _PropertyData
 from . _internal.sec_group_lc_data import _SecondaryGroupLCData
 from . _internal.spring_data import _SpringData
 from . _internal.spring_results import _SpringResults
-from . _internal.sys_info import _SysInfo
 from . _internal.truss_data import _TrussData
 from . _internal.truss_load import _TrussLoad
 from . _internal.truss_results import _TrussResult
@@ -45,7 +44,6 @@ __all__ = [
     "_SecondaryGroupLCData",
     "_SpringData",
     "_SpringResults",
-    "_SysInfo",
     "_TrussData",
     "_TrussLoad",
     "_TrussResult"

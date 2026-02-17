@@ -27,7 +27,6 @@ from . _internal.sec_group_lc_data import _SecondaryGroupLCData
 from . _internal.spring_data import _SpringData
 from . _internal.spring_results import _SpringResults
 from . _internal.sofistik_dll import SofDll
-from . _internal.sys_info import _SysInfo
 from . _internal.truss_data import _TrussData
 from . _internal.truss_load import _TrussLoad
 from . _internal.truss_results import _TrussResult
@@ -53,7 +52,6 @@ class SOFiSTiKCDBReader:
     sec_grp_lc_data: _SecondaryGroupLCData
     spring_data: _SpringData
     spring_res: _SpringResults
-    sys_info: _SysInfo
     truss_data: _TrussData
     truss_load: _TrussLoad
     truss_results: _TrussResult
@@ -95,7 +93,6 @@ class SOFiSTiKCDBReader:
 
         self.load_case = _LoadCases(self._dll)
         self.properties = _PropertyData(self._dll)
-        self.sys_info = _SysInfo(self._dll)
 
         self.truss_data = _TrussData(self._dll)
         self.truss_load = _TrussLoad(self._dll)
@@ -118,7 +115,6 @@ class SOFiSTiKCDBReader:
         self.spring_res.clear_all()
         #self.load_case.clear_all()
         #self.properties.clear_all_values()
-        #self.sys_info.clear()
 
     def clear_data(self) -> None:
         """Clear all the loaded data.
@@ -132,7 +128,6 @@ class SOFiSTiKCDBReader:
         self.spring_data.clear()
         #self.load_case.clear_all()
         #self.properties.clear_all_values()
-        #self.sys_info.clear()
 
     def clear_results(self) -> None:
         """Clear all the loaded results.
