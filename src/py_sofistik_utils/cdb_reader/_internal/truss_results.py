@@ -11,11 +11,35 @@ from . sofistik_dll import SofDll
 
 
 class _TrussResult:
-    """The ``_TrussResult`` class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the keys ``152/LC`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``152/LC`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
+
+        * ``LOAD_CASE`` load case number
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``AXIAL_FORCE`` axial force
+        * ``AXIAL_DISPLACEMENT``: axial displacement
+
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
+        ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
+        `get` method. The index columns are not dropped from the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In
+            particular:
+
+            * damage parameter
+            * nonlinear effects
+
+            are currently not included. This is a deliberate design choice and
+            may be changed in the future without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
