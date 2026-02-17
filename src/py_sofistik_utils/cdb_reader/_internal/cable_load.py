@@ -17,8 +17,8 @@ class _CableLoad:
         * store the retrieved data in a convenient format;
         * provide access to the data after the CDB is closed.
 
-        The underlying data structure is a :class:`pandas.DataFrame` with the following
-        columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
 
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
@@ -27,9 +27,10 @@ class _CableLoad:
         * ``PA``: load value at cable start point
         * ``PE``: load value at cable end point
 
-        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``, ``LOAD_CASE`` and
-        ``TYPE`` (in this specific order) to enable fast lookups via the `get` method. The
-        index columns are not dropped from the ``DataFrame``.
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``,
+        ``LOAD_CASE`` and ``TYPE`` (in this specific order) to enable fast
+        lookups via the `get` method. The index columns are not dropped from
+        the ``DataFrame``.
 
         The load ``TYPE`` can be one of the following:
 
@@ -47,8 +48,8 @@ class _CableLoad:
 
         .. important::
 
-            Wind and snow loads are not implemented and will raise a runtime error if they
-            are present in the requested load case.
+            Wind and snow loads are not implemented and will raise a runtime
+            error if they are present in the requested load case.
     """
     _LOAD_TYPE_MAP = {
         10: "PG",
@@ -67,7 +68,7 @@ class _CableLoad:
 
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
@@ -98,15 +99,16 @@ class _CableLoad:
         self._loaded_lc.clear()
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys ``161/LC``.
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``161/LC``.
 
         Parameters
         ----------
         deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the calling
-            object's data and indices. Modifications to the data or indices of the
-            copy will not be reflected in the original object (refer to
-            :meth:`pandas.DataFrame.copy` documentation for details).
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
         return self._data.copy(deep=deep)
 
@@ -117,7 +119,7 @@ class _CableLoad:
             load_type: str,
             point: str = "PA",
             default: float | None = None
-        ) -> float:
+    ) -> float:
         """Retrieve the requested cable load.
 
         Parameters
@@ -142,16 +144,16 @@ class _CableLoad:
             - ``"PZP"``
 
         point : str, default "PA"
-            Location on the cable where the load is applied; either the start (``"PA"``)
-            or the end (``"PE"``)
+            Location on the cable where the load is applied; either the start
+            (``"PA"``) or the end (``"PE"``)
         default : float or None, default None
             Value to return if the requested load is not found
 
         Returns
         -------
         value : float
-            The requested load if found. Otherwise, returns ``default`` when it is not
-            None.
+            The requested load if found. Otherwise, returns ``default`` when it
+            is not None.
 
         Raises
         ------
@@ -159,18 +161,21 @@ class _CableLoad:
             If the requested load is not found and ``default`` is None.
         """
         try:
-            return self._data.at[(element_id, load_case, load_type), point]  # type: ignore
+            return self._data.at[
+                (element_id, load_case, load_type),
+                point
+            ]  # type: ignore
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
             raise LookupError(
-                f"Cable load entry not found for element id {element_id}, "
-                f"load case {load_case}, load type {load_type} and point {point}!"
+                f"Cable load entry not found for element id {element_id}, load"
+                f" case {load_case}, load type {load_type} and point {point}!"
             ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Retrieve cable load data for the given ``load_cases``. If a load case is not
-        found, a warning is raised only if ``echo_level > 0``.
+        """Retrieve cable load data for the given ``load_cases``. If a load
+        case is not found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
@@ -179,8 +184,8 @@ class _CableLoad:
 
         Notes
         -----
-        Wind and snow loads are not implemented and will raise a runtime error if they are
-        present in the requested load case.
+        Wind and snow loads are not implemented and will raise a runtime error
+        if they are present in the requested load case.
         """
         if isinstance(load_cases, int):
             load_cases = [load_cases]
@@ -188,18 +193,18 @@ class _CableLoad:
             load_cases = list(set(load_cases))  # remove duplicated entries
 
         # load data
-        temp_list: list[dict[str, float | int | str]] = []
+        data: list[dict[str, float | int | str]] = []
         for load_case in load_cases:
             if self._dll.key_exist(161, load_case):
                 self.clear(load_case)
-                temp_list.extend(self._load(load_case))
+                data.extend(self._load(load_case))
 
         # assigning groups
         group_data = _GroupData(self._dll)
         group_data.load()
 
-        temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
-        elem_ids = temp_df["ELEM_ID"]
+        df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+        elem_ids = df["ELEM_ID"]
 
         for grp, grp_range in group_data.iterator_cable():
             if grp_range.stop == 0:
@@ -207,16 +212,16 @@ class _CableLoad:
 
             left = elem_ids.searchsorted(grp_range.start, side="left")
             right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
-            temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+            df.loc[df.index[left:right], "GROUP"] = grp
 
         # set indices for fast lookup
-        temp_df = temp_df.set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+        df = df.set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
 
         # merge data
         if self._data.empty:
-            self._data = temp_df
+            self._data = df
         else:
-            self._data = concat([self._data, temp_df])
+            self._data = concat([self._data, df])
         self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:
@@ -257,7 +262,8 @@ class _CableLoad:
                 type_ = _CableLoad._LOAD_TYPE_MAP[cabl.m_typ]
             except KeyError as e:
                 raise RuntimeError(
-                    f"Unknown cable load type {cabl.m_typ} for element {cabl.m_nr}!"
+                    f"Unknown cable load type {cabl.m_typ} for element"
+                    f" {cabl.m_nr}!"
                 ) from e
 
             data.append(
