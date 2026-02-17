@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL_RES
 
 
-class _CableResults:
+class _CableResult:
     """This class provides methods and a data structure to:
 
         * access keys ``162/LC`` of the CDB file;
