@@ -54,7 +54,7 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
 
         self.cdb = SOFiSTiKCDBReader(CDB_PATH, "CABLE_LOAD", DLL_PATH, int(VERSION))  # type: ignore
         self.cdb.initialize()
-        self.cdb.cable_load.load(self.load_cases)
+        self.cdb.cable.load.load(self.load_cases)
 
     def tearDown(self) -> None:
         self.cdb.close()
@@ -67,44 +67,44 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         # (e.g. -0.008 is represented as -0.00800000037997961). The chosen tolerance
         # rtol=1e-7 is stricter than pandas default and reflects the maximum relative
         # error observed in practice, ensuring stable and reproducible comparisons.
-        assert_frame_equal(self.expected_data, self.cdb.cable_load.data(), rtol=1E-7)
+        assert_frame_equal(self.expected_data, self.cdb.cable.load.data(), rtol=1E-7)
 
     def test_get(self) -> None:
         """Test for the `get` method.
         """
         with self.subTest(msg="Existing entry"):
-            self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)
 
         with self.subTest(msg="Non existing entry with default"):
-            self.assertEqual(self.cdb.cable_load.get(9009, 7, "PZP", "PA", -3), -3.0)
+            self.assertEqual(self.cdb.cable.load.get(9009, 7, "PZP", "PA", -3), -3.0)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
         """
-        self.cdb.cable_load.clear(7)
+        self.cdb.cable.load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.cable_load.get(5009, 7, "PZP", "PA")
+                self.cdb.cable.load.get(5009, 7, "PZP", "PA")
 
-        self.cdb.cable_load.load(7)
+        self.cdb.cable.load.load(7)
         with self.subTest(msg="Check indexes management"):
             self.test_get()
 
     def test_get_after_clear_all(self) -> None:
         """Test for the `get` method after a `clear_all` call.
         """
-        self.cdb.cable_load.clear_all()
+        self.cdb.cable.load.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.cable_load.get(5009, 7, "PZP", "PA")
+                self.cdb.cable.load.get(5009, 7, "PZP", "PA")
 
-        self.cdb.cable_load.load(self.load_cases)
+        self.cdb.cable.load.load(self.load_cases)
         with self.subTest(msg="Check indexes management"):
-            self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)
 
     def test_load_with_duplicated_load_cases(self) -> None:
         """Test for the `load` method with duplicated entries.
         """
-        self.cdb.cable_load.clear_all()
-        self.cdb.cable_load.load(self.load_cases + [10])
-        self.assertEqual(self.cdb.cable_load.get(5009, 7, "PZP", "PA"), -7.0)
+        self.cdb.cable.load.clear_all()
+        self.cdb.cable.load.load(self.load_cases + [10])
+        self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)

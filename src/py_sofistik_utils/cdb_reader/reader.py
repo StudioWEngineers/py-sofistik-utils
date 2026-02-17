@@ -14,9 +14,7 @@ from . _internal.beam_data import _BeamData
 from . _internal.beam_load import _BeamLoad
 from . _internal.beam_results import _BeamResults
 from . _internal.beam_stresses import _BeamStress
-from . _internal.cable_data import _CableData
-from . _internal.cable_load import _CableLoad
-from . _internal.cable_results import _CableResults
+from . _internal.cable import _Cable
 from . _internal.group_data import _GroupData
 from . _internal.group_lc_data import _GroupLCData
 from . _internal.load_cases import _LoadCases
@@ -39,9 +37,7 @@ class SOFiSTiKCDBReader:
     beam_geo: _BeamData
     beam_load: _BeamLoad
     beam_res: _BeamResults
-    cable_data: _CableData
-    cable_load: _CableLoad
-    cable_res: _CableResults
+    cable: _Cable
     beam_stress: _BeamStress
     grp_data: _GroupData
     grp_lc_data: _GroupLCData
@@ -62,7 +58,7 @@ class SOFiSTiKCDBReader:
             file_name: str,
             path_to_dlls: str,
             version: int = 2023
-        ) -> None:
+    ) -> None:
         """The initializer of the ``SOFiSTiKCDBReader`` class.
         """
         self._echo_level = 0
@@ -76,9 +72,7 @@ class SOFiSTiKCDBReader:
         self.beam_load = _BeamLoad(self._dll)
         self.beam_stress = _BeamStress(self._dll)
 
-        self.cable_data = _CableData(self._dll)
-        self.cable_load = _CableLoad(self._dll)
-        self.cable_res = _CableResults(self._dll)
+        self.cable = _Cable(self._dll)
 
         self.grp_data = _GroupData(self._dll)
         self.grp_lc_data = _GroupLCData(self._dll)
@@ -103,9 +97,9 @@ class SOFiSTiKCDBReader:
         """
         #self.beam_res.clear_all_forces()
         #self.beam_geo.clear_connectivity()
-        self.cable_data.clear()
-        self.cable_load.clear_all()
-        self.cable_res.clear_all()
+        self.cable.data.clear()
+        self.cable.load.clear_all()
+        self.cable.result.clear_all()
         self.grp_data.clear()
         self.grp_lc_data.clear_all()
         self.sec_grp_lc_data.clear_all()
@@ -120,7 +114,7 @@ class SOFiSTiKCDBReader:
         """Clear all the loaded data.
         """
         #self.beam_geo.clear_connectivity()
-        self.cable_data.clear()
+        self.cable.data.clear()
         self.grp_data.clear()
         self.grp_lc_data.clear_all()
         self.sec_grp_lc_data.clear_all()
@@ -133,7 +127,7 @@ class SOFiSTiKCDBReader:
         """Clear all the loaded results.
         """
         #self.beam_res.clear_all_forces()
-        self.cable_res.clear_all()
+        self.cable.result.clear_all()
         self.nodes.results.clear_all()
         self.spring_res.clear_all()
         #self.load_case.clear_all()
