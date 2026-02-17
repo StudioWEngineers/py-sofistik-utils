@@ -184,7 +184,7 @@ class _TrussResult:
             if return_value.value >= 2:
                 break
 
-            if trus.m_nr != 0:
+            if trus.m_nr > 0:
                 data.append(
                     {
                         "LOAD_CASE":    load_case,
