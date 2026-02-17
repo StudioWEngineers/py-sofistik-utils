@@ -15,44 +15,47 @@ DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
 VERSION = environ.get("SOFISTIK_VERSION")
 
 
-_COLUMNS = ["LOAD_CASE","GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
+_COLUMNS = ["LOAD_CASE", "GROUP", "ELEM_ID", "TYPE", "PA", "PE"]
 
 _DATA = [
-        (1,  500, 5001, "PG",  +1.0,   -1.0),
-        (2,  500, 5001, "PXX", +2.0,   +2.0),
-        (6,  500, 5001, "PYP", -6.0,   -6.0),
-        (8,  500, 5001, "EX",  -0.008, -0.008),
-        (11, 500, 5001, "VX",  +11.0,  +11.0),
-        (2,  500, 5009, "PXX", +2.0,   +2.0),
-        (6,  500, 5009, "PYP", -6.0,   -6.0),
-        (7,  500, 5009, "PZP", -7.0,   -7.0),
-        (11, 500, 5009, "VX",  +11.0,  +11.0),
-        (3,  501, 5011, "PYY", -3.0,   -3.0),
-        (4,  501, 5011, "PZZ", -4.0,   -4.0),
-        (5,  501, 5011, "PXP", +5.0,   +5.0),
-        (9,  501, 5011, "WX",  +0.009, +0.009),
-        (10, 501, 5011, "DT",  -10.0,  -10.0),
-        (11, 501, 5011, "VX",  +11.0,  +11.0),
-        (3,  501, 5014, "PYY", -3.0,   -3.0),
-        (5,  501, 5014, "PXP", +5.0,   +5.0),
-        (8,  501, 5014, "EX",  -0.008, -0.008),
-        (9,  501, 5014, "WX",  +0.009, +0.009),
-        (10, 501, 5014, "DT",  -10.0,  -10.0),
-        (11, 501, 5014, "VX",  +11.0,  +11.0)
-    ]
+    (1,  500, 5001, "PG",  +1.0,   -1.0),
+    (2,  500, 5001, "PXX", +2.0,   +2.0),
+    (6,  500, 5001, "PYP", -6.0,   -6.0),
+    (8,  500, 5001, "EX",  -0.008, -0.008),
+    (11, 500, 5001, "VX",  +11.0,  +11.0),
+    (2,  500, 5009, "PXX", +2.0,   +2.0),
+    (6,  500, 5009, "PYP", -6.0,   -6.0),
+    (7,  500, 5009, "PZP", -7.0,   -7.0),
+    (11, 500, 5009, "VX",  +11.0,  +11.0),
+    (3,  501, 5011, "PYY", -3.0,   -3.0),
+    (4,  501, 5011, "PZZ", -4.0,   -4.0),
+    (5,  501, 5011, "PXP", +5.0,   +5.0),
+    (9,  501, 5011, "WX",  +0.009, +0.009),
+    (10, 501, 5011, "DT",  -10.0,  -10.0),
+    (11, 501, 5011, "VX",  +11.0,  +11.0),
+    (3,  501, 5014, "PYY", -3.0,   -3.0),
+    (5,  501, 5014, "PXP", +5.0,   +5.0),
+    (8,  501, 5014, "EX",  -0.008, -0.008),
+    (9,  501, 5014, "WX",  +0.009, +0.009),
+    (10, 501, 5014, "DT",  -10.0,  -10.0),
+    (11, 501, 5014, "VX",  +11.0,  +11.0)
+]
 
 
-@skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
+@skipUnless(
+    all([CDB_PATH, DLL_PATH, VERSION]),
+    "SOFiSTiK environment variables not set!"
+)
 class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
-    """Tests for the `_CableLoad` class.
-    """
     def setUp(self) -> None:
-        self.expected_data = DataFrame(_DATA, columns=_COLUMNS).set_index(
-            ["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False
-        )
         self.load_cases = list(range(1, 12, 1))
 
-        self.cdb = SOFiSTiKCDBReader(CDB_PATH, "CABLE_LOAD", DLL_PATH, int(VERSION))  # type: ignore
+        self.cdb = SOFiSTiKCDBReader(
+            CDB_PATH,  # type: ignore
+            "CABLE_LOAD",
+            DLL_PATH,  # type: ignore
+            int(VERSION)  # type: ignore
+        )
         self.cdb.initialize()
         self.cdb.cable.load.load(self.load_cases)
 
@@ -60,27 +63,29 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        """Test for the `data` method.
-        """
+        data = DataFrame(
+            _DATA,
+            columns=_COLUMNS
+        ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+
         # NOTE:
-        # Float values loaded from the CDB contain inherent numerical noise
-        # (e.g. -0.008 is represented as -0.00800000037997961). The chosen tolerance
-        # rtol=1e-7 is stricter than pandas default and reflects the maximum relative
-        # error observed in practice, ensuring stable and reproducible comparisons.
-        assert_frame_equal(self.expected_data, self.cdb.cable.load.data(), rtol=1E-7)
+        # Float values loaded from the CDB contain inherent numerical noise.
+        # The chosen tolerance is stricter than pandas default and reflects the
+        # maximum relative error observed in practice, ensuring stable and
+        # reproducible comparisons.
+        assert_frame_equal(data, self.cdb.cable.load.data(), rtol=1E-7)
 
     def test_get(self) -> None:
-        """Test for the `get` method.
-        """
         with self.subTest(msg="Existing entry"):
-            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)
+            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7)
 
         with self.subTest(msg="Non existing entry with default"):
-            self.assertEqual(self.cdb.cable.load.get(9009, 7, "PZP", "PA", -3), -3.0)
+            self.assertEqual(
+                self.cdb.cable.load.get(9009, 7, "PZP", "PA", -3),
+                -3
+            )
 
     def test_get_after_clear(self) -> None:
-        """Test for the `get` method after a `clear` call.
-        """
         self.cdb.cable.load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
@@ -91,8 +96,6 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
             self.test_get()
 
     def test_get_after_clear_all(self) -> None:
-        """Test for the `get` method after a `clear_all` call.
-        """
         self.cdb.cable.load.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
@@ -100,11 +103,9 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
 
         self.cdb.cable.load.load(self.load_cases)
         with self.subTest(msg="Check indexes management"):
-            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)
+            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7)
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        """Test for the `load` method with duplicated entries.
-        """
         self.cdb.cable.load.clear_all()
         self.cdb.cable.load.load(self.load_cases + [10])
         self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)
