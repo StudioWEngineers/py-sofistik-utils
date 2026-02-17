@@ -17,8 +17,8 @@ class _CableData:
         * store the retrieved data in a convenient format;
         * provide access to the data after the CDB is closed.
 
-        The underlying data structure is a :class:`pandas.DataFrame` with the following
-        columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
 
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
@@ -27,12 +27,14 @@ class _CableData:
         * ``L0``: initial length
         * ``PROPERTY``: property number (cross-section)
 
-        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
-        via the `get` method. The index column is not dropped from the ``DataFrame``.
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
+        fast lookups via the `get` method. The index column is not dropped from
+        the ``DataFrame``.
 
         .. note::
 
-            Not all available quantities are retrieved and stored. In particular:
+            Not all available quantities are retrieved and stored. In
+            particular:
 
             * normal direction
             * prestress
@@ -43,12 +45,12 @@ class _CableData:
 
             are currently not included.
 
-            This is a deliberate design choice and may be changed in the future without
-            breaking the existing API.
+            This is a deliberate design choice and may be changed in the future
+            without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "GROUP",
                 "ELEM_ID",
                 "N1",
@@ -66,15 +68,16 @@ class _CableData:
         self._data = self._data[0:0]
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key ``160/00``.
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``160/00``.
 
         Parameters
         ----------
         deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the calling
-            object's data and indices. Modifications to the data or indices of the
-            copy will not be reflected in the original object (refer to
-            :meth:`pandas.DataFrame.copy` documentation for details).
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
         return self._data.copy(deep=deep)
 
@@ -83,7 +86,7 @@ class _CableData:
             element_id: int,
             quantity: str = "L0",
             default: float | int | None = None
-        ) -> float | int:
+    ) -> float | int:
         """Retrieve the requested cable quantity.
 
         Parameters
@@ -104,8 +107,8 @@ class _CableData:
         Returns
         -------
         value : float or int
-            The requested quantity if found. Otherwise, returns ``default`` when it is not
-            None.
+            The requested quantity if found. Otherwise, returns ``default``
+            when it is not None.
 
         Raises
         ------
@@ -123,8 +126,8 @@ class _CableData:
             ) from e
 
     def load(self) -> None:
-        """Retrieve all cable data. If the key does not exist or it is empty, a warning is
-        raised only if ``echo_level > 0``.
+        """Retrieve all cable data. If the key does not exist or it is empty, a
+        warning is raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(160, 0):
             cabl = CCABL()
@@ -165,8 +168,8 @@ class _CableData:
             group_data = _GroupData(self._dll)
             group_data.load()
 
-            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
-            elem_ids = temp_df["ELEM_ID"]
+            df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = df["ELEM_ID"]
 
             for grp, grp_range in group_data.iterator_cable():
                 if grp_range.stop == 0:
@@ -174,13 +177,13 @@ class _CableData:
 
                 left = elem_ids.searchsorted(grp_range.start, side="left")
                 right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
-                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+                df.loc[df.index[left:right], "GROUP"] = grp
 
             # set indices for fast lookup
-            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
+            df = df.set_index(["ELEM_ID"], drop=False)
 
             # merge data
             if self._data.empty:
-                self._data = temp_df
+                self._data = df
             else:
-                self._data = concat([self._data, temp_df])
+                self._data = concat([self._data, df])
