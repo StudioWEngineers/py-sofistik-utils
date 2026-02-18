@@ -14,7 +14,7 @@ class _Spring:
 
     The class aggregates the low-level interfaces ``_SpringData`` and
     ``_SpringResult`` into a single abstraction. It provides a structured entry
-    point for reading, manipulating and evaluating truss definitions, applied
+    point for reading, manipulating and evaluating spring definitions, applied
     loads, and analysis results.
     """
     data: _SpringData
