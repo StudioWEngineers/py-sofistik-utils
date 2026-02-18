@@ -10,24 +10,24 @@ SOFiSTiK cdb file and serialize its content.
 # third party library imports
 
 # local library specific imports
-from . _internal.beam_data import _BeamData
-from . _internal.beam_load import _BeamLoad
-from . _internal.beam_results import _BeamResults
-from . _internal.beam_stresses import _BeamStress
-from . _internal.cable import _Cable
-from . _internal.group_data import _GroupData
-from . _internal.group_lc_data import _GroupLCData
-from . _internal.load_cases import _LoadCases
-from . _internal.nodes import _Nodes
-from . _internal.plate_data import _PlateData
-from . _internal.property import _PropertyData
-from . _internal.sec_group_lc_data import _SecondaryGroupLCData
-from . _internal.spring_data import _SpringData
-from . _internal.spring_results import _SpringResults
-from . _internal.sofistik_dll import SofDll
-from . _internal.truss_data import _TrussData
-from . _internal.truss_load import _TrussLoad
-from . _internal.truss_results import _TrussResult
+from . _internals.beam_data import _BeamData
+from . _internals.beam_load import _BeamLoad
+from . _internals.beam_results import _BeamResults
+from . _internals.beam_stresses import _BeamStress
+from . _internals.cable import _Cable
+from . _internals.group_data import _GroupData
+from . _internals.group_lc_data import _GroupLCData
+from . _internals.load_cases import _LoadCases
+from . _internals.nodes import _Nodes
+from . _internals.plate_data import _PlateData
+from . _internals.property import _PropertyData
+from . _internals.sec_group_lc_data import _SecondaryGroupLCData
+from . _internals.spring_data import _SpringData
+from . _internals.spring_results import _SpringResults
+from . _internals.sofistik_dll import SofDll
+from . _internals.truss_data import _TrussData
+from . _internals.truss_load import _TrussLoad
+from . _internals.truss_results import _TrussResult
 
 
 class SOFiSTiKCDBReader:

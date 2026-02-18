@@ -4,7 +4,7 @@ from unittest import TestCase
 # third party library imports
 
 # local library specific imports
-from py_sofistik_utils.cdb_reader._internal.sofistik_utilities import (
+from py_sofistik_utils.cdb_reader._internals.sofistik_utilities import (
     decode_cdb_status,
     decode_nodal_boundary_condition,
     get_element_type,
