@@ -47,15 +47,15 @@ _DATA = [
     "SOFiSTiK environment variables not set!"
 )
 class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
-    """Tests for the `_TrussLoad` class.
-    """
     def setUp(self) -> None:
-        self.data = DataFrame(_DATA, columns=_COLUMNS).set_index(
-            ["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False
-        )
         self.load_cases = list(range(1, 12, 1))
 
-        self.cdb = SOFiSTiKCDBReader(CDB_PATH, "TRUSS_LOAD", DLL_PATH, int(VERSION))  # type: ignore
+        self.cdb = SOFiSTiKCDBReader(
+            CDB_PATH,  # type: ignore
+            "TRUSS_LOAD",
+            DLL_PATH,  # type: ignore
+            int(VERSION)  # type: ignore
+        )
         self.cdb.initialize()
         self.cdb.truss.load.load(self.load_cases)
 
@@ -63,28 +63,30 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        """Test for the `data` method.
-        """
+        data = DataFrame(
+            _DATA,
+            columns=_COLUMNS
+        ).set_index(["ELEM_ID", "LOAD_CASE", "TYPE"], drop=False)
+
         # NOTE:
         # Float values loaded from the CDB contain inherent numerical noise
         # (e.g. -0.008 is represented as -0.00800000037997961). The chosen
         # tolerance rtol=1e-7 is stricter than pandas default and reflects the
         # maximum relative error observed in practice, ensuring stable and
         # reproducible comparisons.
-        assert_frame_equal(self.data, self.cdb.truss.load.data(), rtol=1E-7)
+        assert_frame_equal(data, self.cdb.truss.load.data(), rtol=1E-7)
 
     def test_get(self) -> None:
-        """Test for the `get` method.
-        """
         with self.subTest(msg="Existing entry"):
             self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)
 
         with self.subTest(msg="Non existing entry with default"):
-            self.assertEqual(self.cdb.truss.load.get(9009, 7, "PZP", "PA", -3), -3)
+            self.assertEqual(
+                self.cdb.truss.load.get(9009, 7, "PZP", "PA", -3),
+                -3
+            )
 
     def test_get_after_clear(self) -> None:
-        """Test for the `get` method after a `clear` call.
-        """
         self.cdb.truss.load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
@@ -95,8 +97,6 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
             self.test_get()
 
     def test_get_after_clear_all(self) -> None:
-        """Test for the `get` method after a `clear_all` call.
-        """
         self.cdb.truss.load.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
@@ -107,8 +107,6 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
             self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        """Test for the `load` method with duplicated entries.
-        """
         self.cdb.truss.load.clear_all()
         self.cdb.truss.load.load(self.load_cases + [10])
         self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)

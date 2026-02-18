@@ -15,12 +15,26 @@ DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
 VERSION = environ.get("SOFISTIK_VERSION")
 
 
-@skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
+@skipUnless(
+    all([CDB_PATH, DLL_PATH, VERSION]),
+    "SOFiSTiK environment variables not set!"
+)
 class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
-    """Tests for the `_TrussData` class.
-    """
     def setUp(self) -> None:
-        self.expected_data = DataFrame(
+        self.cdb = SOFiSTiKCDBReader(
+            CDB_PATH,  # type: ignore
+            "TRUSS_DATA",
+            DLL_PATH,  # type: ignore
+            int(VERSION)  # type: ignore
+        )
+        self.cdb.initialize()
+        self.cdb.truss.data.load()
+
+    def tearDown(self) -> None:
+        self.cdb.close()
+
+    def test_data(self) -> None:
+        data = DataFrame(
             {
                 "GROUP": [10, 20],
                 "ELEM_ID": [1001, 2002],
@@ -32,25 +46,14 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
             }
         ).set_index("ELEM_ID", drop=False)
 
-        self.cdb = SOFiSTiKCDBReader(CDB_PATH, "TRUSS_DATA", DLL_PATH, int(VERSION))  # type: ignore
-        self.cdb.initialize()
-        self.cdb.truss.data.load()
-
-    def tearDown(self) -> None:
-        self.cdb.close()
-
-    def test_data(self) -> None:
-        """Test for the `data` method.
-        """
         # NOTE:
-        # Float values loaded from the CDB contain inherent numerical noise. The chosen
-        # tolerance is stricter than pandas default and reflects the maximum relative
-        # error observed in practice, ensuring stable and reproducible comparisons.
-        assert_frame_equal(self.expected_data, self.cdb.truss.data.data(), rtol=1E-7)
+        # Float values loaded from the CDB contain inherent numerical noise.
+        # The chosen tolerance is stricter than pandas default and reflects the
+        # maximum relative error observed in practice, ensuring stable and
+        # reproducible comparisons.
+        assert_frame_equal(data, self.cdb.truss.data.data(), rtol=1E-7)
 
     def test_get(self) -> None:
-        """Test for the `get` method.
-        """
         with self.subTest(msg="First node id"):
             self.assertEqual(self.cdb.truss.data.get(2002, "N1"), 2)
 
@@ -58,7 +61,10 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
             self.assertEqual(self.cdb.truss.data.get(1001, "N2"), 2)
 
         with self.subTest(msg="Initial length"):
-            self.assertEqual(self.cdb.truss.data.get(1001, "L0"), 5.024937629699707)
+            self.assertEqual(
+                self.cdb.truss.data.get(1001, "L0"),
+                5.024937629699707
+            )
 
         with self.subTest(msg="Property number"):
             self.assertEqual(self.cdb.truss.data.get(1001, "PROPERTY"), 2)
@@ -71,8 +77,6 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
             self.assertEqual(self.cdb.truss.data.get(505, "N3", 9), 9)
 
     def test_get_after_clear(self) -> None:
-        """Test for the `get` method after a `clear` call.
-        """
         self.cdb.truss.data.clear()
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
