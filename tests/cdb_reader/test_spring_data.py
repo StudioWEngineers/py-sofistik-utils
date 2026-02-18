@@ -15,12 +15,26 @@ DLL_PATH = environ.get("SOFISTIK_DLL_PATH")
 VERSION = environ.get("SOFISTIK_VERSION")
 
 
-@skipUnless(all([CDB_PATH, DLL_PATH, VERSION]), "SOFiSTiK environment variables not set!")
+@skipUnless(
+    all([CDB_PATH, DLL_PATH, VERSION]),
+    "SOFiSTiK environment variables not set!"
+)
 class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
-    """Tests for the `_SpringData` class.
-    """
     def setUp(self) -> None:
-        self.expected_data = DataFrame(
+        self.cdb = SOFiSTiKCDBReader(
+            CDB_PATH,  # type: ignore
+            "SPRING_DATA",
+            DLL_PATH,  # type: ignore
+            int(VERSION)  # type: ignore
+        )
+        self.cdb.initialize()
+        self.cdb.spring.data.load()
+
+    def tearDown(self) -> None:
+        self.cdb.close()
+
+    def test_data(self) -> None:
+        data = DataFrame(
             {
                 "GROUP": [10, 20],
                 "ELEM_ID": [1001, 2020],
@@ -32,25 +46,14 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
             }
         ).set_index("ELEM_ID", drop=False)
 
-        self.cdb = SOFiSTiKCDBReader(CDB_PATH, "SPRING_DATA", DLL_PATH, int(VERSION))  # type: ignore
-        self.cdb.initialize()
-        self.cdb.spring.data.load()
-
-    def tearDown(self) -> None:
-        self.cdb.close()
-
-    def test_data(self) -> None:
-        """Test for the `data` method.
-        """
         # NOTE:
-        # Float values loaded from the CDB contain inherent numerical noise. The chosen
-        # tolerance is stricter than pandas default and reflects the maximum relative
-        # error observed in practice, ensuring stable and reproducible comparisons.
-        assert_frame_equal(self.expected_data, self.cdb.spring.data.data(), rtol=1E-7)
+        # Float values loaded from the CDB contain inherent numerical noise.
+        # The chosen tolerance is stricter than pandas default and reflects the
+        # maximum relative error observed in practice, ensuring stable and
+        # reproducible comparisons.
+        assert_frame_equal(data, self.cdb.spring.data.data(), rtol=1E-7)
 
     def test_get(self) -> None:
-        """Test for the `get` method.
-        """
         with self.subTest(msg="First node id"):
             self.assertEqual(self.cdb.spring.data.get(1001, "N1"), 1)
 
