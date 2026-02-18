@@ -48,7 +48,7 @@ __all__ = [
     "_SecondaryGroupLCData",
     "_Spring",
     "_SpringData",
-    "_SpringResults",
+    "_SpringResult",
     "_Truss",
     "_TrussData",
     "_TrussLoad",
