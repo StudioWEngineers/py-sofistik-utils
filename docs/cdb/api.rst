@@ -49,6 +49,7 @@ associated public API.
     _SecondaryGroupLCData
     _SpringData
     _SpringResults
+    _Truss
     _TrussData
     _TrussLoad
     _TrussResult

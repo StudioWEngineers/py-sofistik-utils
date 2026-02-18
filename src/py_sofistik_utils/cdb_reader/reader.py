@@ -25,9 +25,7 @@ from . _internals.sec_group_lc_data import _SecondaryGroupLCData
 from . _internals.spring_data import _SpringData
 from . _internals.spring_results import _SpringResults
 from . _internals.sofistik_dll import SofDll
-from . _internals.truss_data import _TrussData
-from . _internals.truss_load import _TrussLoad
-from . _internals.truss_results import _TrussResult
+from . _internals.truss import _Truss
 
 
 class SOFiSTiKCDBReader:
@@ -48,9 +46,7 @@ class SOFiSTiKCDBReader:
     sec_grp_lc_data: _SecondaryGroupLCData
     spring_data: _SpringData
     spring_res: _SpringResults
-    truss_data: _TrussData
-    truss_load: _TrussLoad
-    truss_results: _TrussResult
+    truss: _Truss
 
     def __init__(
             self,
@@ -88,9 +84,7 @@ class SOFiSTiKCDBReader:
         self.load_case = _LoadCases(self._dll)
         self.properties = _PropertyData(self._dll)
 
-        self.truss_data = _TrussData(self._dll)
-        self.truss_load = _TrussLoad(self._dll)
-        self.truss_results = _TrussResult(self._dll)
+        self.truss = _Truss(self._dll)
 
     def clear(self) -> None:
         """Clear all the loaded data and results.

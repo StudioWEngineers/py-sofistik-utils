@@ -57,7 +57,7 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
 
         self.cdb = SOFiSTiKCDBReader(CDB_PATH, "TRUSS_LOAD", DLL_PATH, int(VERSION))  # type: ignore
         self.cdb.initialize()
-        self.cdb.truss_load.load(self.load_cases)
+        self.cdb.truss.load.load(self.load_cases)
 
     def tearDown(self) -> None:
         self.cdb.close()
@@ -71,44 +71,44 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
         # tolerance rtol=1e-7 is stricter than pandas default and reflects the
         # maximum relative error observed in practice, ensuring stable and
         # reproducible comparisons.
-        assert_frame_equal(self.data, self.cdb.truss_load.data(), rtol=1E-7)
+        assert_frame_equal(self.data, self.cdb.truss.load.data(), rtol=1E-7)
 
     def test_get(self) -> None:
         """Test for the `get` method.
         """
         with self.subTest(msg="Existing entry"):
-            self.assertEqual(self.cdb.truss_load.get(5009, 7, "PZP", "PA"), -7)
+            self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)
 
         with self.subTest(msg="Non existing entry with default"):
-            self.assertEqual(self.cdb.truss_load.get(9009, 7, "PZP", "PA", -3), -3)
+            self.assertEqual(self.cdb.truss.load.get(9009, 7, "PZP", "PA", -3), -3)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
         """
-        self.cdb.truss_load.clear(7)
+        self.cdb.truss.load.clear(7)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.truss_load.get(5009, 7, "PZP", "PA")
+                self.cdb.truss.load.get(5009, 7, "PZP", "PA")
 
-        self.cdb.truss_load.load(7)
+        self.cdb.truss.load.load(7)
         with self.subTest(msg="Check indexes management"):
             self.test_get()
 
     def test_get_after_clear_all(self) -> None:
         """Test for the `get` method after a `clear_all` call.
         """
-        self.cdb.truss_load.clear_all()
+        self.cdb.truss.load.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.truss_load.get(5009, 7, "PZP", "PA")
+                self.cdb.truss.load.get(5009, 7, "PZP", "PA")
 
-        self.cdb.truss_load.load(self.load_cases)
+        self.cdb.truss.load.load(self.load_cases)
         with self.subTest(msg="Check indexes management"):
-            self.assertEqual(self.cdb.truss_load.get(5009, 7, "PZP", "PA"), -7)
+            self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)
 
     def test_load_with_duplicated_load_cases(self) -> None:
         """Test for the `load` method with duplicated entries.
         """
-        self.cdb.truss_load.clear_all()
-        self.cdb.truss_load.load(self.load_cases + [10])
-        self.assertEqual(self.cdb.truss_load.get(5009, 7, "PZP", "PA"), -7)
+        self.cdb.truss.load.clear_all()
+        self.cdb.truss.load.load(self.load_cases + [10])
+        self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)
