@@ -71,6 +71,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/_autosummary_cdb/
+docs/_autosummary_dat/
 
 # PyBuilder
 .pybuilder/
