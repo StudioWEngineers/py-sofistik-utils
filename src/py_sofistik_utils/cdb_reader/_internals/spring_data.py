@@ -17,8 +17,8 @@ class _SpringData:
         * store the retrieved data in a convenient format;
         * provide access to the data after the CDB is closed.
 
-        The underlying data structure is a :class:`pandas.DataFrame` with the following
-        columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
 
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
@@ -28,12 +28,14 @@ class _SpringData:
         * ``CT``: lateral stiffness
         * ``CM``: rotational stiffness
 
-        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
-        via the `get` method. The index column is not dropped from the ``DataFrame``.
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
+        fast lookups via the `get` method. The index column is not dropped from
+        the ``DataFrame``.
 
         .. note::
 
-            Not all available quantities are retrieved and stored. In particular:
+            Not all available quantities are retrieved and stored. In
+            particular:
 
             * material or work law number
             * normal direction
@@ -48,15 +50,15 @@ class _SpringData:
             * dilatancy factor
             * transversal slip
 
-            are currently not included, together with quantities for coupled damping
-            elements.
+            are currently not included, together with quantities for coupled
+            damping elements.
 
-            This is a deliberate design choice and may be changed in the future without
-            breaking the existing API.
+            This is a deliberate design choice and may be changed in the future
+            without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "GROUP",
                 "ELEM_ID",
                 "N1",
@@ -75,15 +77,16 @@ class _SpringData:
         self._data = self._data[0:0]
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key ``170/00``.
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``170/00``.
 
         Parameters
         ----------
         deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the calling
-            object's data and indices. Modifications to the data or indices of the
-            copy will not be reflected in the original object (refer to
-            :meth:`pandas.DataFrame.copy` documentation for details).
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
         return self._data.copy(deep=deep)
 
@@ -92,7 +95,7 @@ class _SpringData:
             element_id: int,
             quantity: str = "CP",
             default: float | int | None = None
-        ) -> float | int:
+    ) -> float | int:
         """Retrieve the requested spring quantity.
 
         Parameters
@@ -114,8 +117,8 @@ class _SpringData:
         Returns
         -------
         value : float or int
-            The requested quantity if found. Otherwise, returns ``default`` when it is not
-            None.
+            The requested quantity if found. Otherwise, returns ``default``
+            when it is not None.
 
         Raises
         ------
@@ -133,8 +136,8 @@ class _SpringData:
             ) from e
 
     def has_stiffness(self, element_id: int, component: str = "CP") -> bool:
-        """Return whether the specified stiffness component of a spring element is
-        non-zero.
+        """Return whether the specified stiffness component of a spring element
+        is non-zero.
 
         Parameters
         ----------
@@ -150,8 +153,8 @@ class _SpringData:
         Returns
         -------
         bool
-            True if the requested stiffness component exists and is non-zero. False if the
-            component is zero or the element is not found.
+            True if the requested stiffness component exists and is non-zero.
+            False if the component is zero or the element is not found.
         """
         try:
             return self._data.at[element_id, component] != 0.0
@@ -159,8 +162,8 @@ class _SpringData:
             return False
 
     def load(self) -> None:
-        """Retrieve all spring data. If the key does not exist or it is empty, a warning
-        is raised only if ``echo_level > 0``.
+        """Retrieve all spring data. If the key does not exist or it is empty,
+        a warning is raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(170, 0):
             spring = CSPRI()

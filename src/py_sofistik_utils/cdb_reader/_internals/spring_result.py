@@ -17,8 +17,8 @@ class _SpringResult:
         * store the retrieved data in a convenient format;
         * provide access to the data after the CDB is closed.
 
-        The underlying data structure is a :class:`pandas.DataFrame` with the following
-        columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
 
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
@@ -30,13 +30,14 @@ class _SpringResult:
         * ``TRANSVERSAL_DISPLACEMENT``: transversal displacement
         * ``ROTATION``: axial rotation
 
-        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and ``LOAD_CASE``
-        (in this specific order) to enable fast lookups via the `get` method. The
-        index columns are not dropped from the ``DataFrame``.
+        The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
+        ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
+        `get` method. The index columns are not dropped from the ``DataFrame``.
 
         .. note::
 
-            Not all available quantities are retrieved and stored. In particular:
+            Not all available quantities are retrieved and stored. In
+            particular:
 
             * the three components along the global X, Y and Z axes for:
                 - spring force
@@ -44,12 +45,12 @@ class _SpringResult:
             * nonlinear effects
             * all quantities available if a workload has beed defined
 
-            are currently not included. This is a deliberate design choice and may be
-            changed in the future without breaking the existing API.
+            are currently not included. This is a deliberate design choice and
+            may be changed in the future without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
@@ -83,15 +84,16 @@ class _SpringResult:
         self._loaded_lc.clear()
 
     def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys ``170/LC``.
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``170/LC``.
 
         Parameters
         ----------
         deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the calling
-            object's data and indices. Modifications to the data or indices of the
-            copy will not be reflected in the original object (refer to
-            :meth:`pandas.DataFrame.copy` documentation for details).
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
         return self._data.copy(deep=deep)
 
@@ -101,7 +103,7 @@ class _SpringResult:
             load_case: int,
             quantity: str = "FORCE",
             default: float | None = None
-        ) -> float:
+    ) -> float:
         """Retrieve the requested cable result.
 
         Parameters
@@ -126,8 +128,8 @@ class _SpringResult:
         Returns
         -------
         value : float
-            The requested value if found. If not found, returns ``default`` when it is not
-            None.
+            The requested value if found. If not found, returns ``default``
+            when it is not None.
 
         Raises
         ------
@@ -135,7 +137,10 @@ class _SpringResult:
             If the requested result is not found and ``default`` is None.
         """
         try:
-            return self._data.at[(element_id, load_case), quantity]  # type: ignore
+            return self._data.at[
+                (element_id, load_case),
+                quantity
+            ]  # type: ignore
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
@@ -145,8 +150,8 @@ class _SpringResult:
             ) from e
 
     def load(self, load_cases: int | list[int]) -> None:
-        """Retrieve spring results for the given ``load_cases``. If a load case is not
-        found, a warning is raised only if ``echo_level > 0``.
+        """Retrieve spring results for the given ``load_cases``. If a load case
+        is not found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
