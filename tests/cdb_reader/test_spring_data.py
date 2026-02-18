@@ -34,7 +34,7 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
 
         self.cdb = SOFiSTiKCDBReader(CDB_PATH, "SPRING_DATA", DLL_PATH, int(VERSION))  # type: ignore
         self.cdb.initialize()
-        self.cdb.spring_data.load()
+        self.cdb.spring.data.load()
 
     def tearDown(self) -> None:
         self.cdb.close()
@@ -46,42 +46,42 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
         # Float values loaded from the CDB contain inherent numerical noise. The chosen
         # tolerance is stricter than pandas default and reflects the maximum relative
         # error observed in practice, ensuring stable and reproducible comparisons.
-        assert_frame_equal(self.expected_data, self.cdb.spring_data.data(), rtol=1E-7)
+        assert_frame_equal(self.expected_data, self.cdb.spring.data.data(), rtol=1E-7)
 
     def test_get(self) -> None:
         """Test for the `get` method.
         """
         with self.subTest(msg="First node id"):
-            self.assertEqual(self.cdb.spring_data.get(1001, "N1"), 1)
+            self.assertEqual(self.cdb.spring.data.get(1001, "N1"), 1)
 
         with self.subTest(msg="Second node id"):
-            self.assertEqual(self.cdb.spring_data.get(2020, "N2"), 0)
+            self.assertEqual(self.cdb.spring.data.get(2020, "N2"), 0)
 
         with self.subTest(msg="CP"):
-            self.assertEqual(self.cdb.spring_data.get(1001, "CP"), 1.0)
+            self.assertEqual(self.cdb.spring.data.get(1001, "CP"), 1.0)
 
         with self.subTest(msg="CT"):
-            self.assertEqual(self.cdb.spring_data.get(1001, "CT"), 2.5)
+            self.assertEqual(self.cdb.spring.data.get(1001, "CT"), 2.5)
 
         with self.subTest(msg="CM"):
-            self.assertEqual(self.cdb.spring_data.get(2020, "CM"), 1.5)
+            self.assertEqual(self.cdb.spring.data.get(2020, "CM"), 1.5)
 
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
-                self.cdb.spring_data.get(505, "N3")
+                self.cdb.spring.data.get(505, "N3")
 
         with self.subTest(msg="Non existing entry with default"):
-            self.assertEqual(self.cdb.spring_data.get(2021, "CM", 9), 9)
+            self.assertEqual(self.cdb.spring.data.get(2021, "CM", 9), 9)
 
     def test_get_after_clear(self) -> None:
         """Test for the `get` method after a `clear` call.
         """
-        self.cdb.spring_data.clear()
+        self.cdb.spring.data.clear()
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.spring_data.get(1001, "CM")
+                self.cdb.spring.data.get(1001, "CM")
 
-        self.cdb.spring_data.load()
+        self.cdb.spring.data.load()
         with self.subTest(msg="Check indexes management"):
             self.test_get()
 
@@ -89,7 +89,7 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
         """Test for the `has_stiffness` method.
         """
         with self.subTest(msg="Positive check"):
-            self.assertTrue(self.cdb.spring_data.has_stiffness(1001, "CP"))
+            self.assertTrue(self.cdb.spring.data.has_stiffness(1001, "CP"))
 
         with self.subTest(msg="Positive check"):
-            self.assertFalse(self.cdb.spring_data.has_stiffness(1001, "CM"))
+            self.assertFalse(self.cdb.spring.data.has_stiffness(1001, "CM"))

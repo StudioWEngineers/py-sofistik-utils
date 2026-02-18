@@ -22,8 +22,7 @@ from . _internals.nodes import _Nodes
 from . _internals.plate_data import _PlateData
 from . _internals.property import _PropertyData
 from . _internals.sec_group_lc_data import _SecondaryGroupLCData
-from . _internals.spring_data import _SpringData
-from . _internals.spring_results import _SpringResults
+from . _internals.spring import _Spring
 from . _internals.sofistik_dll import SofDll
 from . _internals.truss import _Truss
 
@@ -44,8 +43,7 @@ class SOFiSTiKCDBReader:
     plate_data: _PlateData
     properties: _PropertyData
     sec_grp_lc_data: _SecondaryGroupLCData
-    spring_data: _SpringData
-    spring_res: _SpringResults
+    spring: _Spring
     truss: _Truss
 
     def __init__(
@@ -78,8 +76,7 @@ class SOFiSTiKCDBReader:
 
         self.plate_data = _PlateData(self._dll)
 
-        self.spring_data = _SpringData(self._dll)
-        self.spring_res = _SpringResults(self._dll)
+        self.spring = _Spring(self._dll)
 
         self.load_case = _LoadCases(self._dll)
         self.properties = _PropertyData(self._dll)
@@ -99,8 +96,8 @@ class SOFiSTiKCDBReader:
         self.sec_grp_lc_data.clear_all()
         self.nodes.data.clear()
         self.nodes.results.clear_all()
-        self.spring_data.clear()
-        self.spring_res.clear_all()
+        self.spring.data.clear()
+        self.spring.result.clear_all()
         #self.load_case.clear_all()
         #self.properties.clear_all_values()
 
@@ -113,7 +110,7 @@ class SOFiSTiKCDBReader:
         self.grp_lc_data.clear_all()
         self.sec_grp_lc_data.clear_all()
         self.nodes.data.clear()
-        self.spring_data.clear()
+        self.spring.data.clear()
         #self.load_case.clear_all()
         #self.properties.clear_all_values()
 
@@ -123,7 +120,7 @@ class SOFiSTiKCDBReader:
         #self.beam_res.clear_all_forces()
         self.cable.result.clear_all()
         self.nodes.results.clear_all()
-        self.spring_res.clear_all()
+        self.spring.result.clear_all()
         #self.load_case.clear_all()
 
     def close(self) -> None:

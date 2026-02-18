@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI_RES
 
 
-class _SpringResults:
+class _SpringResult:
     """This class provides methods and a data structure to:
 
         * access keys ``170/LC`` of the CDB file;
