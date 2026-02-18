@@ -5,7 +5,7 @@
 # local library specific imports
 from . truss_data import _TrussData
 from . truss_load import _TrussLoad
-from . truss_results import _TrussResult
+from . truss_result import _TrussResult
 from . sofistik_dll import SofDll
 
 

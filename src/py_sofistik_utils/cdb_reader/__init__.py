@@ -21,7 +21,7 @@ from . _internals.spring_results import _SpringResults
 from . _internals.truss import _Truss
 from . _internals.truss_data import _TrussData
 from . _internals.truss_load import _TrussLoad
-from . _internals.truss_results import _TrussResult
+from . _internals.truss_result import _TrussResult
 
 from . reader import SOFiSTiKCDBReader
 
