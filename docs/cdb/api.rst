@@ -40,7 +40,7 @@ associated public API.
     _GroupData
     _GroupLCData
     _LoadCases
-    _Nodes
+    _Node
     _NodeData
     _NodeResults
     _NodeResiduals

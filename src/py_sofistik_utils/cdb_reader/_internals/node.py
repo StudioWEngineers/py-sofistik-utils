@@ -10,7 +10,7 @@ from . node_results import _NodeResults
 from . sofistik_dll import SofDll
 
 
-class _Nodes:
+class _Node:
     """
     The ``Nodes`` class is a wrapper that manages informations about nodes through
     member variables of classes ``NodeData``, ``NodeResiduals`` and ``NodeResults``.

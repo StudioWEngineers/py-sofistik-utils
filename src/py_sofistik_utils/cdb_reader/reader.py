@@ -18,7 +18,7 @@ from . _internals.cable import _Cable
 from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
-from . _internals.nodes import _Nodes
+from . _internals.node import _Node
 from . _internals.plate_data import _PlateData
 from . _internals.property import _PropertyData
 from . _internals.sec_group_lc_data import _SecondaryGroupLCData
@@ -39,7 +39,7 @@ class SOFiSTiKCDBReader:
     grp_data: _GroupData
     grp_lc_data: _GroupLCData
     load_case: _LoadCases
-    nodes: _Nodes
+    node: _Node
     plate_data: _PlateData
     properties: _PropertyData
     sec_grp_lc_data: _SecondaryGroupLCData
@@ -72,7 +72,7 @@ class SOFiSTiKCDBReader:
         self.grp_lc_data = _GroupLCData(self._dll)
         self.sec_grp_lc_data = _SecondaryGroupLCData(self._dll)
 
-        self.nodes = _Nodes(self._dll)
+        self.nodes = _Node(self._dll)
 
         self.plate_data = _PlateData(self._dll)
 
