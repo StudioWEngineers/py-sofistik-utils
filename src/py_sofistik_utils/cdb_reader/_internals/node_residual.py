@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISPI
 
 
-class _NodeResiduals:
+class _NodeResidual:
     """
     This class provides abstractions to load and access information
     about the nodal residuals for non-linear analyses, contained in keys ``26/LC`` of

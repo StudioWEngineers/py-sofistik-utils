@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISP
 
 
-class _NodeResults:
+class _NodeResult:
     """
     The ``NodeResults`` class provides abstractions to load and access information
     about the nodal results, contained in keys ``24/LC`` of the CDB file.

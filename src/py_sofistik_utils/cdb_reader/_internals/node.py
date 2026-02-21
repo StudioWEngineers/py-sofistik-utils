@@ -5,8 +5,8 @@ from pandas import concat, DataFrame
 
 # local library specific imports
 from . node_data import _NodeData
-from . node_residuals import _NodeResiduals
-from . node_results import _NodeResults
+from . node_residual import _NodeResidual
+from . node_result import _NodeResult
 from . sofistik_dll import SofDll
 
 
@@ -19,15 +19,15 @@ class _Node:
     """
 
     data: _NodeData
-    residuals: _NodeResiduals
-    results: _NodeResults
+    residuals: _NodeResidual
+    results: _NodeResult
 
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``Nodes`` class.
         """
         self.data = _NodeData(dll)
-        self.residuals = _NodeResiduals(dll)
-        self.results = _NodeResults(dll)
+        self.residuals = _NodeResidual(dll)
+        self.results = _NodeResult(dll)
 
         self._calculated_lc: set[int] = set()
         self._data = DataFrame(columns = ["LOAD_CASE", "ID", "X", "Y", "Z"])

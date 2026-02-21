@@ -42,8 +42,8 @@ associated public API.
     _LoadCases
     _Node
     _NodeData
-    _NodeResults
-    _NodeResiduals
+    _NodeResult
+    _NodeResidual
     _PlateData
     _PropertyData
     _SecondaryGroupLCData
