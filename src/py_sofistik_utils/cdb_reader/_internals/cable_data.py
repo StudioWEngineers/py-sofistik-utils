@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL
 
 
-class _CableData:
+class CableData:
     """This class provides methods and a data structure to:
 
         * access keys ``160/00`` of the CDB file;

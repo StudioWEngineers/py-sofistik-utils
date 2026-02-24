@@ -10,7 +10,7 @@ from . sofistik_classes import CCABL_LOA
 from . sofistik_dll import SofDll
 
 
-class _CableLoad:
+class CableLoad:
     """This class provides methods and a data structure to:
 
         * access keys ``161/LC`` of the CDB file;
@@ -259,7 +259,7 @@ class _CableLoad:
                 break
 
             try:
-                type_ = _CableLoad._LOAD_TYPE_MAP[cabl.m_typ]
+                type_ = CableLoad._LOAD_TYPE_MAP[cabl.m_typ]
             except KeyError as e:
                 raise RuntimeError(
                     f"Unknown cable load type {cabl.m_typ} for element"

@@ -14,7 +14,7 @@ from . _internals.beam_data import _BeamData
 from . _internals.beam_load import _BeamLoad
 from . _internals.beam_results import _BeamResults
 from . _internals.beam_stresses import _BeamStress
-from . _internals.cable import _Cable
+from . _internals.cable import Cables
 from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
@@ -34,7 +34,7 @@ class SOFiSTiKCDBReader:
     beam_geo: _BeamData
     beam_load: _BeamLoad
     beam_res: _BeamResults
-    cable: _Cable
+    cable: Cables
     beam_stress: _BeamStress
     grp_data: _GroupData
     grp_lc_data: _GroupLCData
@@ -66,7 +66,7 @@ class SOFiSTiKCDBReader:
         self.beam_load = _BeamLoad(self._dll)
         self.beam_stress = _BeamStress(self._dll)
 
-        self.cable = _Cable(self._dll)
+        self.cable = Cables(self._dll)
 
         self.grp_data = _GroupData(self._dll)
         self.grp_lc_data = _GroupLCData(self._dll)
