@@ -2,10 +2,10 @@ from . _internals.beam_data import _BeamData
 from . _internals.beam_load import _BeamLoad
 from . _internals.beam_results import _BeamResults
 from . _internals.beam_stresses import _BeamStress
-from . _internals.cable import _Cable
-from . _internals.cable_data import _CableData
-from . _internals.cable_load import _CableLoad
-from . _internals.cable_result import _CableResult
+from . _internals.cable import Cables
+from . _internals.cable_data import CableData
+from . _internals.cable_load import CableLoad
+from . _internals.cable_result import CableResult
 from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
@@ -32,10 +32,10 @@ __all__ = [
     "_BeamLoad",
     "_BeamResults",
     "_BeamStress",
-    "_Cable",
-    "_CableData",
-    "_CableLoad",
-    "_CableResult",
+    "Cables",
+    "CableData",
+    "CableLoad",
+    "CableResult",
     "_GroupData",
     "_GroupLCData",
     "_LoadCases",
