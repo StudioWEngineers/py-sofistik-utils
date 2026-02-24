@@ -27,7 +27,7 @@ Reference documentation is available in [HTML](https://py-sofistik-utils.readthe
 All material in this repository is licensed under a three-clause [BSD
 license](LICENSE).
 
-Please use the following BibTeX template to cite py-sofistik-utils:
+Please use the following BibTeX template to cite *py-sofistik-utils*:
 
 ```bibtex
 @misc{py-sofistik-utils,
