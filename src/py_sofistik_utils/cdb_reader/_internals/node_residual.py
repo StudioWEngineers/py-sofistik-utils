@@ -1,6 +1,5 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
@@ -11,35 +10,39 @@ from . sofistik_classes import CN_DISPI
 
 
 class _NodeResidual:
-    """
-    This class provides abstractions to load and access information
-    about the nodal residuals for non-linear analyses, contained in keys ``26/LC`` of
-    the CDB file.
+    """This class provides methods and a data structure to:
 
-    Data are stored in a :class:`pandas.DataFrame` having the following columns:
+        * access keys ``170/LC`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
 
-    * ``LOAD_CASE``: load combination number
-    * ``ID``: node number
-    * ``UX``: X component of the nodal residual displacement (translation)
-    * ``UY``: Y component of the nodal residual displacement (translation)
-    * ``UZ``: Z component of the nodal residual displacement (translation)
-    * ``URX``: X component of the nodal residual displacement (rotation)
-    * ``URY``: Y component of the nodal residual displacement (rotation)
-    * ``URZ``: Z component of the nodal residual displacement (rotation)
-    * ``URB``: twist residual rotation
-    * ``PX``: X component of the nodal residual reaction (translation)
-    * ``PY``: Y component of the nodal residual reaction (translation)
-    * ``PZ``: Z component of the nodal residual reaction (translation)
-    * ``MX``: X component of the nodal residual reaction (rotation)
-    * ``MY``: Y component of the nodal residual reaction (rotation)
-    * ``MZ``: Z component of the nodal residual reaction (rotation)
-    * ``MB``: warping residual moment
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
+
+        * ``LOAD_CASE``: load combination number
+        * ``ID``: node number
+        * ``UX``: X component of the nodal residual displacement (translation)
+        * ``UY``: Y component of the nodal residual displacement (translation)
+        * ``UZ``: Z component of the nodal residual displacement (translation)
+        * ``URX``: X component of the nodal residual displacement (rotation)
+        * ``URY``: Y component of the nodal residual displacement (rotation)
+        * ``URZ``: Z component of the nodal residual displacement (rotation)
+        * ``URB``: twist residual rotation
+        * ``PX``: X component of the nodal residual reaction (translation)
+        * ``PY``: Y component of the nodal residual reaction (translation)
+        * ``PZ``: Z component of the nodal residual reaction (translation)
+        * ``MX``: X component of the nodal residual reaction (rotation)
+        * ``MY``: Y component of the nodal residual reaction (rotation)
+        * ``MZ``: Z component of the nodal residual reaction (rotation)
+        * ``MB``: warping residual moment
+
+        The ``DataFrame`` uses a MultiIndex with levels ``ID`` and
+        ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
+        `get` method. The index column is not dropped from the ``DataFrame``.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_NodeResiduals`` class.
-        """
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "ID",
                 "UX",
@@ -62,16 +65,18 @@ class _NodeResidual:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the residuals for the given ``load case``.
+        """Clear the loaded data for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
 
-        self._data = self._data.drop(self._data[self._data.LOAD_CASE == load_case].index)
+        self._data = self._data[
+            self._data.index.get_level_values("LOAD_CASE") != load_case
+        ]
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
-        """Clear the residuals for all the load cases.
+        """Clear the loaded data for all the load cases.
         """
         if not self._loaded_lc:
             return
@@ -79,142 +84,141 @@ class _NodeResidual:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def get_displacements(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the translational components of the displacement residuals for the given
-        ``load_case``.
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``26/LC``.
 
         Parameters
         ----------
-        ``load_case``: int
-            Load case number
-        ``node_nmb``: int
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
+    def get(
+            self,
+            node_id: int,
+            load_case: int,
+            quantity: str = "UX",
+            default: float | None = None
+    ) -> float:
+        """Retrieve the requested nodal result.
+
+        Parameters
+        ----------
+        node_id : int
             Node number
+        load_case : int
+            Load case number
+        quantity : str, default "UX"
+            Quantity to retrieve. Must be one of:
+
+            - ``UX``
+            - ``UY``
+            - ``UZ``
+            - ``URX``
+            - ``URY``
+            - ``URZ``
+            - ``URB``
+            - ``PX``
+            - ``PY``
+            - ``PZ``
+            - ``MX``
+            - ``MY``
+            - ``MZ``
+            - ``MB``
+
+        default : float or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float
+            The requested value if found. If not found, returns ``default``
+            when it is not None.
 
         Raises
         ------
         LookupError
-            If the given ``load_case`` or ``node_nmb`` are not found.
+            If the requested result is not found and ``default`` is None.
         """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
+        try:
+            return self._data.at[(node_id, load_case), quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Node result entry not found for element id {node_id}, load "
+                f"case {load_case}, and quantity {quantity}!"
+            ) from e
 
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (id_mask & lc_mask).eq(False).all():
-            raise LookupError(f"Node {node_number} not found in load case {load_case}!")
-
-        return self._data.loc[lc_mask & id_mask, ("UX", "UY", "UZ")].copy(deep=True)
-
-    def get_reaction_forces(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal translational components of the reaction force residuals for
-        the given ``load_case``.
+    def load(self, load_cases: int | list[int]) -> None:
+        """Retrieve nodal results for the given ``load_cases``. If a load case
+        is not found, a warning is raised only if ``echo_level > 0``.
 
         Parameters
         ----------
-        ``load_case``: int
-            Load case number
-        ``node_nmb``: int
-            Node number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` or ``node_nmb`` are not found.
+        load_cases : int | list[int]
+            load case numbers
         """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
+        if isinstance(load_cases, int):
+            load_cases = [load_cases]
+        else:
+            load_cases = list(set(load_cases))  # remove duplicated entries
 
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
+        # load data
+        temp_list: list[dict[str, float | int]] = []
+        for load_case in load_cases:
+            if self._dll.key_exist(26, load_case):
+                self.clear(load_case)
+                temp_list.extend(self._load(load_case))
 
-        if (id_mask & lc_mask).eq(False).all():
-            raise LookupError(f"Node {node_number} not found in load case {load_case}!")
+        # set indices for fast lookup
+        temp_df = (
+            DataFrame(temp_list)
+            .set_index(["ID", "LOAD_CASE"], drop=False)
+        )
 
-        return self._data.loc[lc_mask & id_mask, ("PX", "PY", "PZ")].copy(deep=True)
+        # merge data
+        if self._data.empty:
+            self._data = temp_df
+        else:
+            self._data = concat([self._data, temp_df])
+        self._loaded_lc.update(load_cases)
 
-    def get_reaction_moments(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal rotational components of the residuals forces for the given
-        ``load_case``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-        ``node_nmb``: int
-            Node number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` or ``node_nmb`` are not found.
+    def _load(self, load_case: int) -> list[dict[str, float | int]]:
+        """Retrieve key ``26/load_case`` using SOFiSTiK dll.
         """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
+        node = CN_DISPI()
+        record_length = c_int(sizeof(node))
+        return_value = c_int(0)
 
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
+        self.clear(load_case)
 
-        if (id_mask & lc_mask).eq(False).all():
-            raise LookupError(f"Node {node_number} not found in load case {load_case}!")
+        data: list[dict[str, float | int]] = []
+        first_call = True
+        while return_value.value < 2:
+            return_value.value = self._dll.get(
+                1,
+                26,
+                load_case,
+                byref(node),
+                byref(record_length),
+                0 if first_call else 1
+            )
 
-        return self._data.loc[lc_mask & id_mask, ("MX", "MY", "MZ", "MB")].copy(deep=True)
+            record_length = c_int(sizeof(node))
+            first_call = False
+            if return_value.value >= 2:
+                break
 
-    def get_rotations(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal rotational components of the residuals for the given
-        ``load_case``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-        ``node_nmb``: int
-            Node number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` or ``node_nmb`` are not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
-
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (id_mask & lc_mask).eq(False).all():
-            raise LookupError(f"Node {node_number} not found in load case {load_case}!")
-
-        return self._data.loc[lc_mask & id_mask, ("URX", "URY", "URZ", "URB")].copy(deep=True)
-
-    def load(self, load_case: int) -> None:
-        """Load the nodal residuals for the given ``load_case``.
-        """
-        if self._dll.key_exist(26, load_case):
-            node = CN_DISPI()
-            rec_length = c_int(sizeof(node))
-            return_value = c_int(0)
-
-            self.clear(load_case)
-
-            temp_container: list[dict[str, Any]] = []
-            count = 0
-            while return_value.value < 2:
-                return_value.value = self._dll.get(
-                    1,
-                    26,
-                    load_case,
-                    byref(node),
-                    byref(rec_length),
-                    0 if count == 0 else 1
-                )
-
-                rec_length = c_int(sizeof(node))
-                count += 1
-
-                temp_container.append(
+            if node.m_nr > 0:
+                data.append(
                     {
-                        "LOAD_CASE":load_case,
+                        "LOAD_CASE": load_case,
                         "ID": node.m_nr,
                         "UX": node.m_ux,
                         "UY": node.m_uy,
@@ -233,15 +237,4 @@ class _NodeResidual:
                     }
                 )
 
-            # remove duplicated data as well as max min values
-            del temp_container[0:2]
-            del temp_container[-1]
-
-            if self._data.empty:
-                self._data = DataFrame(temp_container)
-            else:
-                self._data = concat(
-                    [self._data, DataFrame(temp_container)],
-                    ignore_index=True
-                )
-            self._loaded_lc.add(load_case)
+        return data
