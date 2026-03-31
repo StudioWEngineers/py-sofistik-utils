@@ -1,6 +1,5 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
@@ -35,10 +34,8 @@ class _NodeResult:
         * ``MB``: warping moment
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``NodeResults`` class.
-        """
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "ID",
                 "UX",
@@ -61,16 +58,18 @@ class _NodeResult:
         self._loaded_lc: set[int] = set()
 
     def clear(self, load_case: int) -> None:
-        """Clear the results for the given ``load case``.
+        """Clear the loaded data for the given ``load_case`` number.
         """
         if load_case not in self._loaded_lc:
             return
 
-        self._data = self._data.drop(self._data[self._data.LOAD_CASE == load_case].index)
+        self._data = self._data[
+            self._data.index.get_level_values("LOAD_CASE") != load_case
+        ]
         self._loaded_lc.remove(load_case)
 
     def clear_all(self) -> None:
-        """Clear the results for all the load cases.
+        """Clear the loaded data for all the load cases.
         """
         if not self._loaded_lc:
             return
@@ -78,194 +77,147 @@ class _NodeResult:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def get_all_displacements(self, load_case: int) -> DataFrame:
-        """Return all of the nodal translational components of the displacements for the
-        given ``load_case``.
+    def data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``24/LC``.
 
         Parameters
         ----------
-        ``load_case``: int
-            Load case number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` is not found.
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
+        return self._data.copy(deep=deep)
 
-        lc_mask = self._data["LOAD_CASE"] == load_case
-        return self._data.loc[lc_mask, ("ID", "UX", "UY", "UZ")].copy(deep=True)  # type: ignore
-
-    def get_displacements(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal translational components of the displacements for the given
-        ``load_case`` and ``node_number``.
+    def get(
+            self,
+            node_id: int,
+            load_case: int,
+            quantity: str = "UX",
+            default: float | None = None
+    ) -> float:
+        """Retrieve the requested nodal result.
 
         Parameters
         ----------
-        ``load_case``: int
-            Load case number
-        ``node_number``: int
+        node_id : int
             Node number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` or ``node_nmb`` are not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
-
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (lc_mask & id_mask).eq(False).all():
-            err_msg = f"Node {node_number} not found in load case {load_case}!"
-            raise LookupError(err_msg)
-
-        return self._data.loc[lc_mask & id_mask, ("UX", "UY", "UZ")].copy(deep=True)  # type: ignore
-
-    def get_reaction_forces(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal translational components of the reaction forces for the given
-        ``load_case`` and ``node_number``.
-
-        Parameters
-        ----------
-        ``load_case``: int
+        load_case : int
             Load case number
-        ``node_number``: int
-            Node number
+        quantity : str, default "UX"
+            Quantity to retrieve. Must be one of:
+
+            - ``UX``
+            - ``UY``
+            - ``UZ``
+            - ``URX``
+            - ``URY``
+            - ``URZ``
+            - ``URB``
+            - ``PX``
+            - ``PY``
+            - ``PZ``
+            - ``MX``
+            - ``MY``
+            - ``MZ``
+            - ``MB``
+
+        default : float or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float
+            The requested value if found. If not found, returns ``default``
+            when it is not None.
 
         Raises
         ------
         LookupError
-            If the given ``load_case`` or ``node_number`` are not found.
+            If the requested result is not found and ``default`` is None.
         """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
-
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (id_mask & lc_mask).eq(False).all():
-            err_msg = f"Node {node_number} not found in load case {load_case}!"
-            raise LookupError(err_msg)
-
-        return self._data.loc[lc_mask & id_mask, ("PX", "PY", "PZ")].copy(deep=True)  # type: ignore
-
-    def get_reaction_moments(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal rotational components of the reaction forces for the given
-        ``load_case`` and ``node_number``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-        ``node_number``: int
-            Node number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` or ``node_number`` are not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
-
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (id_mask & lc_mask).eq(False).all():
-            err_msg = f"Node {node_number} not found in load case {load_case}!"
-            raise LookupError(err_msg)
-
-        return self._data.loc[lc_mask & id_mask, ("MX", "MY", "MZ", "MB")].copy(deep=True)  # type: ignore
-
-    def get_rotations(self, load_case: int, node_number: int) -> DataFrame:
-        """Return the nodal rotational components of the displacements for the given
-        ``load_case`` and ``node_number``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-        ``node_number``: int
-            Node number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` or ``node_number`` are not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
-
-        id_mask = self._data["ID"] == node_number
-        lc_mask = self._data["LOAD_CASE"] == load_case
-
-        if (id_mask & lc_mask).eq(False).all():
-            err_msg = f"Node {node_number} not found in load case {load_case}!"
-            raise LookupError(err_msg)
-
-        return self._data.loc[lc_mask & id_mask, ("URX", "URY", "URZ", "URB")].copy(deep=True)  # type: ignore
-
-    def get_values(self, load_case: int) -> DataFrame:
-        """Return the results for the given ``load_case``.
-
-        Parameters
-        ----------
-        ``load_case``: int
-            Load case number
-
-        Raises
-        ------
-        LookupError
-            If the given ``load_case`` is not found.
-        """
-        if load_case not in self._loaded_lc:
-            raise LookupError(f"Load case {load_case} not found!")
-
-        lc_mask = self._data["LOAD_CASE"] == load_case
-        return self._data.loc[lc_mask].copy(deep=True)
+        try:
+            return self._data.at[(node_id, load_case), quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Node result entry not found for element id {node_id}, load "
+                f"case {load_case}, and quantity {quantity}!"
+            ) from e
 
     def is_loaded(self, load_case: int) -> bool:
-        """Return `True` if the results have been loaded for the given ``load_case``.
+        """Return `True` if the results have been loaded for the given
+        ``load_case``.
         """
         return load_case in self._loaded_lc
 
-    def load(self, load_case: int) -> None:
-        """Load the nodal results for the given ``load_case``.
+    def load(self, load_cases: int | list[int]) -> None:
+        """Retrieve nodal results for the given ``load_cases``. If a load case
+        is not found, a warning is raised only if ``echo_level > 0``.
+
+        Parameters
+        ----------
+        load_cases : int | list[int]
+            load case numbers
         """
-        if self._dll.key_exist(24, load_case):
-            node = CN_DISP()
-            rec_length = c_int(sizeof(node))
-            return_value = c_int(0)
+        if isinstance(load_cases, int):
+            load_cases = [load_cases]
+        else:
+            load_cases = list(set(load_cases))  # remove duplicated entries
 
-            self.clear(load_case)
+        # load data
+        temp_list: list[dict[str, float | int]] = []
+        for load_case in load_cases:
+            if self._dll.key_exist(24, load_case):
+                self.clear(load_case)
+                temp_list.extend(self._load(load_case))
 
-            temp_container: list[dict[str, Any]] = []
-            count = 0
-            while return_value.value < 2:
-                node = CN_DISP()
-                return_value.value = self._dll.get(
-                    1,
-                    24,
-                    load_case,
-                    byref(node),
-                    byref(rec_length),
-                    0 if count == 0 else 1
-                )
+        # set indices for fast lookup
+        temp_df = (
+            DataFrame(temp_list)
+            .set_index(["ID", "LOAD_CASE"], drop=False)
+        )
 
-                rec_length = c_int(sizeof(node))
-                count += 1
+        # merge data
+        if self._data.empty:
+            self._data = temp_df
+        else:
+            self._data = concat([self._data, temp_df])
+        self._loaded_lc.update(load_cases)
 
-                if return_value.value >= 2:
-                    break
+    def _load(self, load_case: int) -> list[dict[str, float | int]]:
+        """Retrieve key ``24/load_case`` using SOFiSTiK dll.
+        """
+        node = CN_DISP()
+        record_length = c_int(sizeof(node))
+        return_value = c_int(0)
 
-                temp_container.append(
+        self.clear(load_case)
+
+        data: list[dict[str, float | int]] = []
+        first_call = True
+        while return_value.value < 2:
+            return_value.value = self._dll.get(
+                1,
+                24,
+                load_case,
+                byref(node),
+                byref(record_length),
+                0 if first_call else 1
+            )
+
+            record_length = c_int(sizeof(node))
+            first_call = False
+            if return_value.value >= 2:
+                break
+
+            if node.m_nr > 0:
+                data.append(
                     {
-                        "LOAD_CASE":load_case,
+                        "LOAD_CASE": load_case,
                         "ID": node.m_nr,
                         "UX": node.m_ux,
                         "UY": node.m_uy,
@@ -284,15 +236,9 @@ class _NodeResult:
                     }
                 )
 
-            # remove max min
-            del temp_container[0:2]
+            # NOTE: CN_DISP may not populate all fields (e.g., nodal reaction
+            # forces) on every call, so a new instance must be created each
+            # iteration to avoid carrying over stale values.
+            node = CN_DISP()
 
-            if self._data.empty:
-                self._data = DataFrame(temp_container)
-            else:
-                self._data = concat(
-                    [self._data, DataFrame(temp_container)],
-                    ignore_index=True
-                )
-
-            self._loaded_lc.add(load_case)
+        return data
