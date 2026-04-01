@@ -11,6 +11,7 @@ from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
 from . _internals.node import _Node
 from . _internals.node_data import _NodeData
+from . _internals.node_load import NodeLoad
 from . _internals.node_residual import _NodeResidual
 from . _internals.node_result import _NodeResult
 from . _internals.plate_data import _PlateData
@@ -41,6 +42,7 @@ __all__ = [
     "_LoadCases",
     "_Node",
     "_NodeData",
+    "NodeLoad",
     "_NodeResidual",
     "_NodeResult",
     "_PlateData",

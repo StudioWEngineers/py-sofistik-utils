@@ -42,6 +42,7 @@ associated public API.
     _LoadCases
     _Node
     _NodeData
+    NodeLoad
     _NodeResult
     _NodeResidual
     _PlateData
