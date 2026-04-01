@@ -29,6 +29,7 @@ associated public API.
     :toctree: ../_autosummary_cdb
     :template: class-template.rst
 
+    Beam
     _BeamData
     _BeamLoad
     _BeamResults

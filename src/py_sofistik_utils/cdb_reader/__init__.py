@@ -1,3 +1,4 @@
+from . _internals.beam import Beam
 from . _internals.beam_data import _BeamData
 from . _internals.beam_load import _BeamLoad
 from . _internals.beam_results import _BeamResults
@@ -28,6 +29,7 @@ from . reader import SOFiSTiKCDBReader
 
 __all__ = [
     "SOFiSTiKCDBReader",
+    "Beam",
     "_BeamData",
     "_BeamLoad",
     "_BeamResults",
