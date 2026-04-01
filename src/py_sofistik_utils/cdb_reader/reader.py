@@ -72,7 +72,7 @@ class SOFiSTiKCDBReader:
         self.grp_lc_data = _GroupLCData(self._dll)
         self.sec_grp_lc_data = _SecondaryGroupLCData(self._dll)
 
-        self.nodes = _Node(self._dll)
+        self.node = _Node(self._dll)
 
         self.plate_data = _PlateData(self._dll)
 
@@ -94,8 +94,8 @@ class SOFiSTiKCDBReader:
         self.grp_data.clear()
         self.grp_lc_data.clear_all()
         self.sec_grp_lc_data.clear_all()
-        self.nodes.data.clear()
-        self.nodes.results.clear_all()
+        self.node.data.clear()
+        self.node.results.clear_all()
         self.spring.data.clear()
         self.spring.result.clear_all()
         #self.load_case.clear_all()
@@ -109,7 +109,7 @@ class SOFiSTiKCDBReader:
         self.grp_data.clear()
         self.grp_lc_data.clear_all()
         self.sec_grp_lc_data.clear_all()
-        self.nodes.data.clear()
+        self.node.data.clear()
         self.spring.data.clear()
         #self.load_case.clear_all()
         #self.properties.clear_all_values()
@@ -119,7 +119,7 @@ class SOFiSTiKCDBReader:
         """
         #self.beam_res.clear_all_forces()
         self.cable.result.clear_all()
-        self.nodes.results.clear_all()
+        self.node.results.clear_all()
         self.spring.result.clear_all()
         #self.load_case.clear_all()
 
