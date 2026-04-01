@@ -17,15 +17,15 @@ class NodeLoad:
     Data are stored in a :class:`pandas.DataFrame` having the following
     columns:
 
-        * ``LOAD_CASE``: load combination number
-        * ``ID``: node number
-        * ``PX``: X component of the nodal load (force)
-        * ``PY``: Y component of the nodal load (force)
-        * ``PZ``: Z component of the nodal load (force)
-        * ``MX``: X component of the nodal load (moment)
-        * ``MY``: Y component of the nodal load (moment)
-        * ``MZ``: Z component of the nodal load (moment)
-        * ``MB``: warping moment
+    * ``LOAD_CASE``: load combination number
+    * ``ID``: node number
+    * ``PX``: X component of the nodal load (force)
+    * ``PY``: Y component of the nodal load (force)
+    * ``PZ``: Z component of the nodal load (force)
+    * ``MX``: X component of the nodal load (moment)
+    * ``MY``: Y component of the nodal load (moment)
+    * ``MZ``: Z component of the nodal load (moment)
+    * ``MB``: warping of the nodal load (moment)
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
