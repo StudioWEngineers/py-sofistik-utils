@@ -43,6 +43,9 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
                 "CP": [1.0, 0.0],
                 "CT": [2.5, 0.0],
                 "CM": [0.0, 1.5],
+                "DX": [0.9950371980667114, 0.20000000298023224],
+                "DY": [0.0, 0.30000001192092896],
+                "DZ": [-0.09950372576713562, 1.0]
             }
         ).set_index("ELEM_ID", drop=False)
 
@@ -69,6 +72,21 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
         with self.subTest(msg="CM"):
             self.assertEqual(self.cdb.spring.data.get(2020, "CM"), 1.5)
 
+        with self.subTest(msg="DX"):
+            self.assertEqual(
+                self.cdb.spring.data.get(1001, "DX"),
+                0.9950371980667114
+            )
+
+        with self.subTest(msg="DY"):
+            self.assertEqual(
+                self.cdb.spring.data.get(2020, "DY"),
+                0.30000001192092896
+            )
+
+        with self.subTest(msg="DZ"):
+            self.assertEqual(self.cdb.spring.data.get(2020, "DZ"), 1.0)
+
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
                 self.cdb.spring.data.get(505, "N3")
@@ -77,8 +95,6 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
             self.assertEqual(self.cdb.spring.data.get(2021, "CM", 9), 9)
 
     def test_get_after_clear(self) -> None:
-        """Test for the `get` method after a `clear` call.
-        """
         self.cdb.spring.data.clear()
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
@@ -89,8 +105,6 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
             self.test_get()
 
     def test_has_stiffness(self) -> None:
-        """Test for the `has_stiffness` method.
-        """
         with self.subTest(msg="Positive check"):
             self.assertTrue(self.cdb.spring.data.has_stiffness(1001, "CP"))
 

@@ -27,6 +27,9 @@ class _SpringData:
         * ``CP``: axial stiffness
         * ``CT``: lateral stiffness
         * ``CM``: rotational stiffness
+        * ``DX``: normal direction, X-component
+        * ``DY``: normal direction, Y-component
+        * ``DZ``: normal direction, Z-component
 
         The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
         fast lookups via the `get` method. The index column is not dropped from
@@ -38,7 +41,6 @@ class _SpringData:
             particular:
 
             * material or work law number
-            * normal direction
             * reference area
             * prestress
             * slip
@@ -65,7 +67,10 @@ class _SpringData:
                 "N2",
                 "CP",
                 "CT",
-                "CM"
+                "CM",
+                "DX",
+                "DY",
+                "DZ"
             ]
         )
         self._dll = dll
@@ -110,6 +115,9 @@ class _SpringData:
             - ``"CP"``
             - ``"CT"``
             - ``"CM"``
+            - ``"DX"``
+            - ``"DY"``
+            - ``"DZ"``
 
         default : float or int or None, default None
             Value to return if the requested quantity is not found
@@ -197,7 +205,10 @@ class _SpringData:
                         "N2":       spring.m_node[1],
                         "CP":       spring.m_cp,
                         "CT":       spring.m_cq,
-                        "CM":       spring.m_cm
+                        "CM":       spring.m_cm,
+                        "DX":       spring.m_t[0],
+                        "DY":       spring.m_t[1],
+                        "DZ":       spring.m_t[2]
                     }
                 )
 
