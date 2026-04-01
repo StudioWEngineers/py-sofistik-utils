@@ -5,6 +5,7 @@ from pandas import concat, DataFrame
 
 # local library specific imports
 from . node_data import _NodeData
+from . node_load import NodeLoad
 from . node_residual import _NodeResidual
 from . node_result import _NodeResult
 from . sofistik_dll import SofDll
@@ -26,15 +27,16 @@ class _Node:
         """The initializer of the ``Nodes`` class.
         """
         self.data = _NodeData(dll)
+        self.loads = NodeLoad(dll)
         self.residuals = _NodeResidual(dll)
         self.results = _NodeResult(dll)
 
         self._calculated_lc: set[int] = set()
-        self._data = DataFrame(columns = ["LOAD_CASE", "ID", "X", "Y", "Z"])
+        self._data = DataFrame(columns=["LOAD_CASE", "ID", "X", "Y", "Z"])
 
     def calculate_deflected_configuration(self, load_case: int) -> None:
-        """Calculate the nodal coordinates in deflected configuration for the given
-        ``load_case``.
+        """Calculate the nodal coordinates in deflected configuration for the
+        given ``load_case``.
         """
         if not self.data.is_loaded():
             self.data.load()
