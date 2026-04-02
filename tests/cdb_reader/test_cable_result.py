@@ -26,7 +26,6 @@ _COLUMNS = [
     "TOTAL_STRAIN",
     "EFFECTIVE_STIFFNESS",
 ]
-
 _DATA = [
     (1000, 10, 101, 1.72499418258667,   1.7248634099960327, 4.0439590520691127e-05, 1.0, 1.0000000031710769e-30, 0.8181666135787964),
     (1001, 10, 101, 31.723800659179688, 31.72079849243164,  8.366186521016061e-04,  1.0, 1.0000000031710769e-30, 0.9982974529266357),
@@ -144,8 +143,6 @@ class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
             )
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        """Test for the `load` method with duplicated entries.
-        """
         self.cdb.cable.result.clear_all()
         self.cdb.cable.result.load(self.load_cases + [1000])
         self.assertEqual(
