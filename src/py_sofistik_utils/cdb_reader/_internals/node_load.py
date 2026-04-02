@@ -118,9 +118,9 @@ class NodeLoad:
         LookupError
             If the requested load is not found and ``default`` is None.
         """
+        value = self._data.loc[(node_id, load_case), quantity]
         try:
-            return self._data.at[
-                (node_id, load_case), quantity]  # type: ignore
+            return value if isinstance(value, (int, float)) else value.sum()
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
@@ -159,14 +159,14 @@ class NodeLoad:
         # set indices for fast lookup
         temp_df = (
             DataFrame(temp_list)
-            .set_index(["ID", "LOAD_CASE"], drop=False)
+            .set_index(["ID", "LOAD_CASE"], drop=False).sort_index()
         )
 
         # merge data
         if self._data.empty:
             self._data = temp_df
         else:
-            self._data = concat([self._data, temp_df])
+            self._data = concat([self._data, temp_df]).sort_index()
         self._loaded_lc.update(load_cases)
 
     def _load(self, load_case: int) -> list[dict[str, float | int]]:
