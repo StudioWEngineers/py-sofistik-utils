@@ -32,7 +32,7 @@ associated public API.
     Beam
     _BeamData
     _BeamLoad
-    _BeamResults
+    BeamResults
     Cables
     CableData
     CableLoad
