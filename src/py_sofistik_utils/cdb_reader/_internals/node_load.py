@@ -113,6 +113,12 @@ class NodeLoad:
             The requested value if found. If not found, returns ``default``
             when it is not None.
 
+        Notes
+        -----
+        If there are multiple entries for the same node and load case, this
+        method returns the sum of all corresponding values. To access the
+        individual entries without aggregation, use the `data` method.
+
         Raises
         ------
         LookupError
@@ -120,7 +126,7 @@ class NodeLoad:
         """
         value = self._data.loc[(node_id, load_case), quantity]
         try:
-            return value if isinstance(value, (int, float)) else value.sum()
+            return value if isinstance(value, (int, float)) else value.sum()  # type: ignore
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
