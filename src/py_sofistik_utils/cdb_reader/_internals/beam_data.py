@@ -260,8 +260,6 @@ class _BeamData:
                     }
                 )
 
-            self._data = DataFrame(conv_data)
-
             # assigning groups
             group_data = _GroupData(self._dll)
             group_data.load()
