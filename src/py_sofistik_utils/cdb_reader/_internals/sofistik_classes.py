@@ -311,6 +311,21 @@ class CNODE(Structure):           # 20/00  Nodes
 
 
 # pylint: disable=C0103
+class CNODE_L(Structure):          # 23/LC:*  Nodal_loads
+    _fields_ = [
+        ('m_nr', c_int),          #        node-number
+        ('m_typ', c_int),         #        type of load
+        ('m_px', c_float),        # [1190] single force X-component
+        ('m_py', c_float),        # [1190] single force Y-component
+        ('m_pz', c_float),        # [1190] single force Z-component
+        ('m_mx', c_float),        # [1194] single moment X-component
+        ('m_my', c_float),        # [1194] single moment Y-component
+        ('m_mz', c_float),        # [1194] single moment Z-component
+        ('m_mb', c_float)         # [1195] warping moment
+    ]
+
+
+# pylint: disable=C0103
 class CN_DISP(Structure):         # 24/LC:+  Displacements and support forces of nodes
     """This class stores information on the nodal displacements and support forces.
     """
