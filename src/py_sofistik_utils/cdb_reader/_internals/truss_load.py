@@ -198,7 +198,7 @@ class _TrussLoad:
         self._echo_level = echo_level
 
     def _load(self, load_case: int) -> list[dict[str, float | int | str]]:
-        """
+        """Retrieve key ``151/load_case`` using SOFiSTiK dll.
         """
         trus = CTRUS_LOA()
         record_length = c_int(sizeof(trus))
