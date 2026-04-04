@@ -10,10 +10,7 @@ SOFiSTiK cdb file and serialize its content.
 # third party library imports
 
 # local library specific imports
-from . _internals.beam_data import _BeamData
-from . _internals.beam_load import _BeamLoad
-from . _internals.beam_results import _BeamResults
-from . _internals.beam_stresses import _BeamStress
+from . _internals.beam import Beam
 from . _internals.cable import Cables
 from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
@@ -31,11 +28,8 @@ class SOFiSTiKCDBReader:
     """The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only
     access to a SOFiSTiK cdb file and serialize its content.
     """
-    beam_geo: _BeamData
-    beam_load: _BeamLoad
-    beam_res: _BeamResults
+    beams: Beam
     cable: Cables
-    beam_stress: _BeamStress
     grp_data: _GroupData
     grp_lc_data: _GroupLCData
     load_case: _LoadCases
@@ -61,10 +55,7 @@ class SOFiSTiKCDBReader:
 
         self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
 
-        self.beam_res = _BeamResults(self._dll)
-        self.beam_geo = _BeamData(self._dll)
-        self.beam_load = _BeamLoad(self._dll)
-        self.beam_stress = _BeamStress(self._dll)
+        self.beams = Beam(self._dll)
 
         self.cable = Cables(self._dll)
 
