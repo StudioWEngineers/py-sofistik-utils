@@ -162,3 +162,11 @@ class SOFiSTiKCDBReaderBeamDataTestSuite(TestCase):
         self.cdb.beams.data.load()
         with self.subTest(msg="Check indexes management"):
             self.test_get()
+
+    def test_is_loaded(self) -> None:
+        with self.subTest(msg="After load"):
+            self. assertTrue(self.cdb.beams.data.is_loaded())
+
+        self.cdb.beams.data.clear()
+        with self.subTest(msg="After clear"):
+            self. assertFalse(self.cdb.beams.data.is_loaded())
