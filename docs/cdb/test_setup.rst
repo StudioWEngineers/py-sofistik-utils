@@ -89,6 +89,7 @@ the temporary environment variable approach, open an MSYS2 MINGW64 shell, naviga
 
     tests/beam_data
     tests/beam_result
+    tests/beam_strain_energy
     tests/cable_data
     tests/cable_load
     tests/cable_result
