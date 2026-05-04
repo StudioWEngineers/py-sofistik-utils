@@ -37,6 +37,7 @@ associated public API.
     CableData
     CableLoad
     CableResult
+    CrossSectionalData
     _BeamStress
     _GroupData
     _GroupLCData
@@ -47,7 +48,6 @@ associated public API.
     _NodeResult
     _NodeResidual
     _PlateData
-    _PropertyData
     _SecondaryGroupLCData
     _Spring
     _SpringData
