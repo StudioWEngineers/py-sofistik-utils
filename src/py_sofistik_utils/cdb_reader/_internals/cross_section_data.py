@@ -92,10 +92,10 @@ class CrossSectionalData:
         self._loaded_p.clear()
 
     def get(
-            self,
-            section_id: int,
-            quantity: str,
-            default: float | int | None = None
+        self,
+        section_id: int,
+        quantity: str,
+        default: float | int | None = None
     ) -> float | int:
         """Retrieve the requested nodal load.
 
