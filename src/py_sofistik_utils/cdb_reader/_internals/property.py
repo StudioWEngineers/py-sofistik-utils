@@ -1,258 +1,234 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any
 
 # third party library imports
 from pandas import concat, DataFrame
 
 # local library specific imports
+from . sofistik_classes import CSECT
 from . sofistik_dll import SofDll
-from . sofistik_classes import CSECT, CSECT_ADD
 
 
-class _PropertyData:
+class CrossSectionalData:
     """
     This class provides abstractions to load and access information about
-    the cross-sectional values, contained in keys ``9/PROP:0`` (total section) of the CDB
-    file. Refer to SOFiHELP - CDBase for further information on this key.
+    the cross-sectional values, contained in keys ``9/PROP:0`` (total section)
+    of the CDB file. Refer to SOFiHELP - CDBase for further information on this
+    key.
 
-    Data are stored in a :class:`pandas.DataFrame` having the following columns:
+    Data are stored in a :class:`pandas.DataFrame` having the following
+    columns:
 
     * ``ID``: property number
+    * ``MNO``: material ID of the section
     * ``A``: cross-sectional gross area
-    * ``AV_Y``: shear area Y
-    * ``AV_Z``: shear area Z
-    * ``J``: torsional moment of inertia
-    * ``I_YY``: moment of inertia YY
-    * ``I_ZZ``: moment of inertia ZZ
-    * ``W_EL_YY``: elastic section modulus YY
-    * ``W_EL_ZZ``: elastic section modulus ZZ
-    * ``E``: elastic modulus
-    * ``G``: shear modulus
-    * ``SW``: nominal weight (of the material)
+    * ``AY``: shear area Y
+    * ``AZ``: shear area Z
+    * ``IT``: torsional moment of inertia
+    * ``IY``: moment of inertia YY
+    * ``IZ``: moment of inertia ZZ
+    * ``EM``: elastic modulus
+    * ``GM``: shear modulus
+    * ``SW``: nominal weight (of the material, in kN/m3)
+
+    The ``DataFrame`` uses a MultiIndex with level ``ID`` to enable fast
+    lookups via the `get` method. The index column is not dropped from
+    the ``DataFrame``.
+
+    .. note::
+
+        Not all available quantities are retrieved and stored. In
+        particular:
+
+        * ``MRF``: material ID of the reinforcement
+        * ``IYZ``: moment of inertia Y-Z
+        * ``YS``: coordinate of elastic centroid
+        * ``ZS``: coordinate of elastic centroid
+        * ``YSC``: coordinate of shear centre
+        * ``ZSC``: coordinate of shear centre
+
+        are currently not included.
+
+        This is a deliberate design choice and may be changed in the future
+        without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_PropertyData`` class.
-        """
-        self._data = DataFrame(
-            columns = [
+        self._data_total = DataFrame(
+            columns=[
                 "ID",
+                "MNO",
                 "A",
-                "AV_Y",
-                "AV_Z",
-                "J",
-                "I_YY",
-                "I_ZZ",
-                "W_EL_YY",
-                "W_EL_ZZ",
-                "E", "G",
+                "AY",
+                "AZ",
+                "IT",
+                "IY",
+                "IZ",
+                "EM",
+                "GM",
                 "SW"
             ]
         )
         self._dll = dll
-        self._loaded_prop: set[int] = set()
+        self._loaded_p: set[int] = set()
 
-    def clear(self, property_number: int) -> None:
-        """Clear values for the given ``property_number``.
+    def clear(self, section_id: int) -> None:
+        """Clear the loaded data for the given ``section_id``.
         """
-        if property_number not in self._loaded_prop:
+        if section_id not in self._loaded_p:
             return
 
-        self._data = self._data.drop(self._data[self._data.ID == property_number].index)
-        self._loaded_prop.remove(property_number)
+        self._data_total = self._data_total[
+            self._data_total.index.get_level_values("ID") != section_id
+        ]
+        self._loaded_p.remove(section_id)
 
     def clear_all(self) -> None:
-        """Clear values for all the properties.
+        """Clear the loaded data for all the properties.
         """
-        self._data = self._data[0:0]
-        self._loaded_prop.clear()
+        if not self._loaded_p:
+            return
 
-    def get_area(self, property_number: int) -> float:
-        """Return the cross-sectional gross area for the given ``property_number``.
+        self._data_total = self._data_total[0:0]
+        self._loaded_p.clear()
+
+    def get(
+            self,
+            section_id: int,
+            quantity: str,
+            default: float | int | None = None
+    ) -> float | int:
+        """Retrieve the requested nodal load.
 
         Parameters
         ----------
-        ``property_number``: int
-            The property number
+        section_id : int
+            The id of the cross-section
+        quantity : str
+            Quantity to retrieve. Must be one of:
+
+            - ``MNO``
+            - ``A``
+            - ``AY``
+            - ``AZ``
+            - ``IT``
+            - ``IY``
+            - ``IZ``
+            - ``EM``
+            - ``GM``
+            - ``SW``
+
+        default : float or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float
+            The requested value if found. If not found, returns ``default``
+            when it is not None.
 
         Raises
         ------
         LookupError
-            If the given ``property_number`` is not found.
+            If the requested data is not found and ``default`` is None.
         """
-        if property_number not in self._loaded_prop:
-            raise LookupError(f"Property number {property_number} not found!")
+        try:
+            return self._data_total.loc[section_id, quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Data entry not found for property id {section_id} and "
+                f"quantity {quantity}!"
+            ) from e
 
-        p_mask = self._data["ID"] == property_number
-        return self._data.loc[p_mask, ("A")].item()  #type: ignore
-
-    def get_elastic_section_modulus_yy(self, property_number: int) -> float:
-        """Return the elastic section modulus YY for the given ``property_number``.
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing all the loaded
+        properties.
 
         Parameters
         ----------
-        ``property_number``: int
-            The property number
-
-        Raises
-        ------
-        LookupError
-            If the given ``property_number`` is not found.
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
-        if property_number not in self._loaded_prop:
-            raise LookupError(f"Property number {property_number} not found!")
+        return self._data_total.copy(deep=deep)
 
-        p_mask = self._data["ID"] == property_number
-        return self._data.loc[p_mask, ("W_EL_YY")].item()  #type: ignore
-
-    def get_elastic_section_modulus_zz(self, property_number: int) -> float:
-        """Return the elastic section modulus ZZ for the given ``property_number``.
-
-        Parameters
-        ----------
-        ``property_number``: int
-            The property number
-
-        Raises
-        ------
-        LookupError
-            If the given ``property_number`` is not found.
+    def is_loaded(self, section_id: int) -> bool:
+        """Return `True` if the ``section_id`` has been loaded.
         """
-        if property_number not in self._loaded_prop:
-            raise LookupError(f"Property number {property_number} not found!")
+        return section_id in self._loaded_p
 
-        p_mask = self._data["ID"] == property_number
-        return self._data.loc[p_mask, ("W_EL_ZZ")].item()  #type: ignore
-
-    def get_second_moment_of_area_yy(self, property_number: int) -> float:
-        """Return the cross-sectional moment of area YY for the given ``property_number``.
-
-        Parameters
-        ----------
-        ``property_number``: int
-            The property number
-
-        Raises
-        ------
-        LookupError
-            If the given ``property_number`` is not found.
+    def load(self, section_id: int | list[int]) -> None:
+        """Load cross-sectional values for the given ``section_id``.
         """
-        if property_number not in self._loaded_prop:
-            raise LookupError(f"Property number {property_number} not found!")
+        if isinstance(section_id, int):
+            section_id = [section_id]
+        else:
+            section_id = list(set(section_id))
 
-        p_mask = self._data["ID"] == property_number
-        return self._data.loc[p_mask, ("I_YY")].item()  #type: ignore
+        # load data
+        temp_list: list[dict[str, float | int]] = []
+        for p in section_id:
+            if self._dll.key_exist(9, p):
+                self.clear(p)
+                temp_list.extend(self._load(p))
 
-    def get_second_moment_of_area_zz(self, property_number: int) -> float:
-        """Return the cross-sectional moment of area ZZ for the given ``property_number``.
+        # set indices for fast lookup
+        temp_df = (
+            DataFrame(temp_list)
+            .set_index(["ID"], drop=False).sort_index()
+        )
 
-        Parameters
-        ----------
-        ``property_number``: int
-            The property number
+        # merge data
+        if self._data_total.empty:
+            self._data_total = temp_df
+        else:
+            self._data_total = concat([self._data_total, temp_df]).sort_index()
+        self._loaded_p.update(section_id)
 
-        Raises
-        ------
-        LookupError
-            If the given ``property_number`` is not found.
+    def _load(self, section_id: int) -> list[dict[str, float | int]]:
+        """Retrieve key ``9/section_id:0`` using SOFiSTiK dll.
         """
-        if property_number not in self._loaded_prop:
-            raise LookupError(f"Property number {property_number} not found!")
+        prop = CSECT()
+        rec_length = c_int(sizeof(prop))
+        return_value = c_int(0)
 
-        p_mask = self._data["ID"] == property_number
-        return self._data.loc[p_mask, ("I_ZZ")].item()  #type: ignore
-
-    def get_values(self, property_number: int) -> DataFrame:
-        """Return all the sectional values for the given ``property_number``.
-        """
-        if property_number not in self._loaded_prop:
-            raise LookupError(f"Property number {property_number} not found!")
-
-        p_mask = self._data["ID"] == property_number
-        return self._data.loc[p_mask].copy(deep=True)
-
-    def load(self, property_number: int) -> None:
-        """Load sectional values for the given ``property_number``.
-        """
-        if self._dll.key_exist(9, property_number):
-            prop = CSECT()
-            rec_length = c_int(sizeof(prop))
-            return_value = c_int(0)
-
-            prop_add = CSECT_ADD()
-            rec_length_add = c_int(sizeof(prop_add))
-            return_value_add = c_int(0)
-
-            self.clear(property_number)
-
-            temp_container: list[Any] = [0 for _ in range(12)]
-            count = 0
-            while return_value.value < 2:
-                return_value.value = self._dll.get(
-                    1,
-                    9,
-                    property_number,
-                    byref(prop),
-                    byref(rec_length),
-                    0 if count == 0 else 1
-                )
-
-                if return_value.value >= 2:
-                    break
-
-                if prop.m_id == 0:
-                    temp_container[0] = property_number
-                    temp_container[1] = prop.m_a
-                    temp_container[2] = prop.m_ay
-                    temp_container[3] = prop.m_az
-                    temp_container[4] = prop.m_it
-                    temp_container[5] = prop.m_iy
-                    temp_container[6] = prop.m_iz
-                    temp_container[9] = prop.m_em
-                    temp_container[10] = prop.m_gm
-                    temp_container[11] = prop.m_gam
-
-                else:
-                    return_value_add.value = self._dll.get(
-                        1,
-                        9,
-                        property_number,
-                        byref(prop_add),
-                        byref(rec_length_add),
-                        -1
-                    )
-
-                    y_max = max(abs(prop_add.m_ymin), prop_add.m_ymax)
-                    z_max = max(abs(prop_add.m_zmin), prop_add.m_zmax)
-
-                #TODO: temporary workaround
-                if count >= 1:
-                    break
-                count += 1
-                rec_length = c_int(sizeof(prop))
-
-            data = DataFrame(
-                [
-                    {
-                        "ID": property_number,
-                        "A": temp_container[1],
-                        "AV_Y": temp_container[2],
-                        "AV_Z": temp_container[3],
-                        "J": temp_container[4],
-                        "I_YY": temp_container[5],
-                        "I_ZZ": temp_container[6],
-                        "W_EL_YY": temp_container[5] / y_max,
-                        "W_EL_ZZ": temp_container[6] / z_max,
-                        "E": temp_container[9],
-                        "G": temp_container[10],
-                        "SW": temp_container[11]
-                    }
-                ]
+        data: list[dict[str, float | int]] = []
+        first_call = True
+        while return_value.value < 2:
+            return_value.value = self._dll.get(
+                1,
+                9,
+                section_id,
+                byref(prop),
+                byref(rec_length),
+                0 if first_call else 1
             )
 
-            if self._data.empty:
-                self._data = data
-            else:
-                self._data = concat([self._data, data], ignore_index=True)
+            rec_length = c_int(sizeof(prop))
+            first_call = False
+            if return_value.value >= 2:
+                break
 
-            self._loaded_prop.add(property_number)
+            if prop.m_id != 0:
+                continue
+
+            data.append(
+                {
+                    "ID": section_id,
+                    "MNO": prop.m_mno,
+                    "A": prop.m_a,
+                    "AY": prop.m_ay,
+                    "AZ": prop.m_az,
+                    "IT": prop.m_it,
+                    "IY": prop.m_iy,
+                    "IZ": prop.m_iz,
+                    "EM": prop.m_em,
+                    "GM": prop.m_gm,
+                    "SW": prop.m_gam
+                }
+            )
+
+        return data
