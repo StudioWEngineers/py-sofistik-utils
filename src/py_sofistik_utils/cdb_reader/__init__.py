@@ -7,6 +7,7 @@ from . _internals.cable import Cables
 from . _internals.cable_data import CableData
 from . _internals.cable_load import CableLoad
 from . _internals.cable_result import CableResult
+from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
@@ -16,7 +17,6 @@ from . _internals.node_load import NodeLoad
 from . _internals.node_residual import _NodeResidual
 from . _internals.node_result import _NodeResult
 from . _internals.plate_data import _PlateData
-from . _internals.property import _PropertyData
 from . _internals.sec_group_lc_data import _SecondaryGroupLCData
 from . _internals.spring import _Spring
 from . _internals.spring_data import _SpringData
@@ -39,6 +39,7 @@ __all__ = [
     "CableData",
     "CableLoad",
     "CableResult",
+    "CrossSectionalData",
     "_GroupData",
     "_GroupLCData",
     "_LoadCases",
@@ -48,7 +49,6 @@ __all__ = [
     "_NodeResidual",
     "_NodeResult",
     "_PlateData",
-    "_PropertyData",
     "_SecondaryGroupLCData",
     "_Spring",
     "_SpringData",

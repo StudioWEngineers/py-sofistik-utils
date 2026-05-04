@@ -417,37 +417,6 @@ class CSECT(Structure):           # 9/NR:0  SectionalValues (total section)
     ]
 
 
-# pylint: disable=C0103
-class CSECT_ADD(Structure):       # 9/NR:4  SectionalValuesShear , Temperature
-    _fields_ = [
-        ('m_id', c_int),
-        ('m_stype', c_int),
-        ('m_mrf', c_int),         #        Materialnumber of Stirup-Reinforcement
-        ('m_at', c_float),        # [ 107] Elongationcoefficient for Temperature
-        ('m_ymin', c_float),      # [1011] Minimum Ordinate of section to center ys
-        ('m_ymax', c_float),      # [1011] Maximum Ordinate of section to center ys
-        ('m_zmin', c_float),      # [1011] Minimum Ordinate of section to center zs
-        ('m_zmax', c_float),      # [1011] Maximum Ordinate of section to center zs
-        ('m_tmin', c_float),      # [1011] minimum thickness of plates
-        ('m_tmax', c_float),      # [1011] maximum thickness of plates
-        ('m_wt', c_float),        # [1018] maximum tau for primary Torsion Mtp=1
-        ('m_wvy', c_float),       # [1017] maximum tau for Shear Vy=1
-        ('m_wvz', c_float),       # [1017] maximum tau for Shear Vz=1
-        ('m_wt2', c_float),       # [1018] maximum tau for secondary Torsion Mt2=1
-        ('m_ak', c_float),        # [1012] kernel area for Torsion (Bredt)
-        ('m_ayz', c_float),       # [1012] Shear deviation area
-        ('m_ab', c_float),        # [1012] pure concrete area
-        ('m_levy', c_float),      # [1011] minimum lever for cracked shear Vy
-        ('m_levz', c_float),      # [1011] minimum lever for cracked shear Vz
-        ('m_elvy', c_float),      # [  17] elastic shear flux for Vy = Sy-max/Iz
-        ('m_elvz', c_float),      # [  17] elastic shear flux for Vz = Sz-max/Iy
-        ('m_ymine', c_float),     # [1011] Minimum Ordinate of effective section
-        ('m_ymaxe', c_float),     # [1011] Maximum Ordinate of effective section
-        ('m_zmine', c_float),     # [1011] Minimum Ordinate of effective section
-        ('m_zmaxe', c_float)      # [1011] Maximum Ordinate of effective section
-    ]
-
-
 class CSPRI(Structure):           # 170/00  Spring-elements
     """This class stores information on spring elements.
     """

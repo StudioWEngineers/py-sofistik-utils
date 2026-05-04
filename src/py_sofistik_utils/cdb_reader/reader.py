@@ -12,12 +12,12 @@ SOFiSTiK cdb file and serialize its content.
 # local library specific imports
 from . _internals.beam import Beam
 from . _internals.cable import Cables
+from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
 from . _internals.node import _Node
 from . _internals.plate_data import _PlateData
-from . _internals.property import _PropertyData
 from . _internals.sec_group_lc_data import _SecondaryGroupLCData
 from . _internals.spring import _Spring
 from . _internals.sofistik_dll import SofDll
@@ -35,7 +35,7 @@ class SOFiSTiKCDBReader:
     load_case: _LoadCases
     node: _Node
     plate_data: _PlateData
-    properties: _PropertyData
+    cross_section: CrossSectionalData
     sec_grp_lc_data: _SecondaryGroupLCData
     spring: _Spring
     truss: _Truss
@@ -70,7 +70,7 @@ class SOFiSTiKCDBReader:
         self.spring = _Spring(self._dll)
 
         self.load_case = _LoadCases(self._dll)
-        self.properties = _PropertyData(self._dll)
+        self.cross_section = CrossSectionalData(self._dll)
 
         self.truss = _Truss(self._dll)
 
