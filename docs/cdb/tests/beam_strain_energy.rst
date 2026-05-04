@@ -69,7 +69,7 @@ Version: 1
     END
 
 Part II
-""""""
+"""""""
 
 Expected CDB file name: ``BEAM_STRAIN_ENERGY_WITH_DIV.cdb``
 
