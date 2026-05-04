@@ -8,7 +8,7 @@ from . beam_data import _BeamData
 from . beam_load import _BeamLoad
 from . beam_results import BeamResults
 from . beam_stresses import _BeamStress
-from . property import _PropertyData
+from . cross_section_data import CrossSectionalData
 from . sofistik_dll import SofDll
 
 
@@ -60,13 +60,12 @@ class Beam:
             self.data.load()
 
         # Load properties for all unique PROP_END_1/2
-        prop_nmb = (
+        prop_nmb: list[int] = list(
             set(self.data.data()["PROP_END_1"].unique()) |
             set(self.data.data()["PROP_END_2"].unique())
         )
-        properties = _PropertyData(self._dll)
-        for prop in prop_nmb:
-            properties.load(int(prop))
+        properties = CrossSectionalData(self._dll)
+        properties.load(prop_nmb)
 
         # Load results for all load cases
         self.results.load(load_cases)
@@ -83,16 +82,17 @@ class Beam:
         base_data["LENGTH"] = base_data["ELEM_ID"].map({_: self.data.get(_) for _ in elem_ids}).fillna(1.0)
 
         for prop in prop_nmb:
-            base_data.loc[base_data["PROP_END_1"] == prop, "A"] = properties.get_area(prop)
-            base_data.loc[base_data["PROP_END_1"] == prop, "IYY"] = properties.get_second_moment_of_area_yy(prop)
-            base_data.loc[base_data["PROP_END_1"] == prop, "IZZ"] = properties.get_second_moment_of_area_zz(prop)
-            base_data.loc[base_data["PROP_END_2"] == prop, "A"] = properties.get_area(prop)
-            base_data.loc[base_data["PROP_END_2"] == prop, "IYY"] = properties.get_second_moment_of_area_yy(prop)
-            base_data.loc[base_data["PROP_END_2"] == prop, "IZZ"] = properties.get_second_moment_of_area_zz(prop)
+            base_data.loc[base_data["PROP_END_1"] == prop, "A"] = properties.get(prop, "A")
+            base_data.loc[base_data["PROP_END_1"] == prop, "IYY"] = properties.get(prop, "IY")
+            base_data.loc[base_data["PROP_END_1"] == prop, "IZZ"] = properties.get(prop, "IZ")
+            base_data.loc[base_data["PROP_END_1"] == prop, "E"] = properties.get(prop, "EM")
+            base_data.loc[base_data["PROP_END_2"] == prop, "A"] = properties.get(prop, "A")
+            base_data.loc[base_data["PROP_END_2"] == prop, "IYY"] = properties.get(prop, "IY")
+            base_data.loc[base_data["PROP_END_2"] == prop, "IZZ"] = properties.get(prop, "IZ")
+            base_data.loc[base_data["PROP_END_2"] == prop, "E"] = properties.get(prop, "EM")
 
         # Calculate strain energy (vectorized)
-        E = 210000000  # kN/m²
-        base_data["U"] = (1 / (2 * E)) * (
+        base_data["U"] = (1 / (2 * base_data["E"])) * (
             base_data["N"] ** 2 / base_data["A"] +
             base_data["MY"] ** 2 / base_data["IYY"] +
             base_data["MZ"] ** 2 / base_data["IZZ"]
