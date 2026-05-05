@@ -23,12 +23,18 @@ class _SpringResult:
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
-        * ``FORCE`` axial force
-        * ``TRANSVERSAL_FORCE``: transversal force
-        * ``MOMENT``: axial moment
-        * ``DISPLACEMENT``: axial displacement
-        * ``TRANSVERSAL_DISPLACEMENT``: transversal displacement
-        * ``ROTATION``: axial rotation
+        * ``P`` axial force
+        * ``PT``: transversal force
+        * ``PTX``: force in global X-direction
+        * ``PTY``: force in global Y-direction
+        * ``PTZ``: force in global Z-direction
+        * ``M``: axial moment
+        * ``V``: axial displacement
+        * ``VT``: transversal displacement
+        * ``VTX``: displacement in global X-direction
+        * ``VTY``: displacement in global Y-direction
+        * ``VTZ``: displacement in global Z-direction
+        * ``PHI``: axial rotation
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
         ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
@@ -39,9 +45,6 @@ class _SpringResult:
             Not all available quantities are retrieved and stored. In
             particular:
 
-            * the three components along the global X, Y and Z axes for:
-                - spring force
-                - spring displacement
             * nonlinear effects
             * all quantities available if a workload has beed defined
 
@@ -54,12 +57,18 @@ class _SpringResult:
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
-                "FORCE",
-                "TRANSVERSAL_FORCE",
-                "MOMENT",
-                "DISPLACEMENT",
-                "TRANSVERSAL_DISPLACEMENT",
-                "ROTATION"
+                "P",
+                "PT",
+                "PTX",
+                "PTY",
+                "PTZ",
+                "M",
+                "V",
+                "VT",
+                "VTX",
+                "VTY",
+                "VTZ",
+                "PHI"
             ]
         )
         self._dll = dll
@@ -101,7 +110,7 @@ class _SpringResult:
             self,
             element_id: int,
             load_case: int,
-            quantity: str = "FORCE",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested cable result.
@@ -112,15 +121,21 @@ class _SpringResult:
             Cable element number
         load_case : int
             Load case number
-        quantity : str, default "FORCE"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
-            - ``FORCE``
-            - ``TRANSVERSAL_FORCE``
-            - ``MOMENT``
-            - ``DISPLACEMENT``
-            - ``TRANSVERSAL_DISPLACEMENT``
-            - ``ROTATION``
+            - ``P``
+            - ``PT``
+            - ``PTX``
+            - ``PTY``
+            - ``PTZ``
+            - ``M``
+            - ``V``
+            - ``VT``
+            - ``VTX``
+            - ``VTY``
+            - ``VTZ``
+            - ``PHI``
 
         default : float or None, default None
             Value to return if the requested quantity is not found
@@ -235,12 +250,18 @@ class _SpringResult:
                         "LOAD_CASE": load_case,
                         "GROUP": 0,
                         "ELEM_ID": spri_res.m_nr,
-                        "FORCE": spri_res.m_p,
-                        "TRANSVERSAL_FORCE": spri_res.m_pt,
-                        "MOMENT": spri_res.m_m,
-                        "DISPLACEMENT": spri_res.m_v,
-                        "TRANSVERSAL_DISPLACEMENT": spri_res.m_vt,
-                        "ROTATION": spri_res.m_phi
+                        "P": spri_res.m_p,
+                        "PT": spri_res.m_pt,
+                        "PTX": spri_res.m_ptx,
+                        "PTY": spri_res.m_pty,
+                        "PTZ": spri_res.m_ptz,
+                        "M": spri_res.m_m,
+                        "V": spri_res.m_v,
+                        "VT": spri_res.m_vt,
+                        "VTX": spri_res.m_vtx,
+                        "VTY": spri_res.m_vty,
+                        "VTZ": spri_res.m_vtz,
+                        "PHI": spri_res.m_phi
                     }
                 )
 

@@ -19,17 +19,50 @@ _COLUMNS = [
     "LOAD_CASE",
     "GROUP",
     "ELEM_ID",
-    "FORCE",
-    "TRANSVERSAL_FORCE",
-    "MOMENT",
-    "DISPLACEMENT",
-    "TRANSVERSAL_DISPLACEMENT",
-    "ROTATION",
+    "P",
+    "PT",
+    "PTX",
+    "PTY",
+    "PTZ",
+    "M",
+    "V",
+    "VT",
+    "VTX",
+    "VTY",
+    "VTZ",
+    "PHI",
 ]
-
 _DATA = [
-    (1000, 10, 102, 9.0, 0.0, 1.0000000031710769e-29, 0.09000000357627869, 0.07000000029802322, 0.0),
-    (1000, 11, 113, 1.0000000031710769e-29, 1.4142135381698608, 1.0000000031710769e-29, 0.11313708126544952, 0.01414213515818119, 0.0),
+    [
+        1000, 10, 102,
+        9.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0000000031710769e-29,
+        0.09000000357627869,
+        0.07000000029802322,
+        -0.07000000029802322,
+        0.0,
+        0.0,
+        0.0,
+    ],
+    [
+        1000, 11, 113,
+        1.0000000031710769e-29,
+        1.4142135381698608,
+        -1.0,
+        -1.0,
+        0.0,
+        1.0000000031710769e-29,
+        0.11313708126544952,
+        0.01414213515818119,
+        -0.009999999776482582,
+        -0.009999999776482582,
+        0.0,
+        0.0,
+    ],
 ]
 
 
@@ -68,35 +101,32 @@ class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
 
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):
-            self.assertEqual(self.cdb.spring.result.get(102, 1000, "FORCE"), 9)
+            self.assertEqual(self.cdb.spring.result.get(102, 1000, "P"), 9)
 
         with self.subTest(msg="Transversal force"):
-            self.assertEqual(
-                self.cdb.spring.result.get(102, 1000, "TRANSVERSAL_FORCE"),
-                0
-            )
+            self.assertEqual(self.cdb.spring.result.get(102, 1000, "PT"), 0)
 
         with self.subTest(msg="Moment"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "MOMENT"),
+                self.cdb.spring.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
 
         with self.subTest(msg="Displacement"):
             self.assertEqual(
-                self.cdb.spring.result.get(102, 1000, "DISPLACEMENT"),
+                self.cdb.spring.result.get(102, 1000, "V"),
                 0.09000000357627869
             )
 
         with self.subTest(msg="Transversal displacement"):
             self.assertEqual(
-                self.cdb.spring.result.get(102, 1000, "TRANSVERSAL_DISPLACEMENT"),
+                self.cdb.spring.result.get(102, 1000, "VT"),
                 0.07000000029802322
             )
 
         with self.subTest(msg="Rotation"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "ROTATION"),
+                self.cdb.spring.result.get(113, 1000, "PHI"),
                 0
             )
 
@@ -114,12 +144,12 @@ class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
         self.cdb.spring.result.clear(1000)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.spring.result.get(113, 1000, "MOMENT")
+                self.cdb.spring.result.get(113, 1000, "M")
 
         self.cdb.spring.result.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "MOMENT"),
+                self.cdb.spring.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
 
@@ -127,12 +157,12 @@ class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
         self.cdb.spring.result.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.spring.result.get(113, 1000, "MOMENT")
+                self.cdb.spring.result.get(113, 1000, "M")
 
         self.cdb.spring.result.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "MOMENT"),
+                self.cdb.spring.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
 
@@ -140,6 +170,6 @@ class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
         self.cdb.spring.result.clear_all()
         self.cdb.spring.result.load([1000] + [1000])
         self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "MOMENT"),
+                self.cdb.spring.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
