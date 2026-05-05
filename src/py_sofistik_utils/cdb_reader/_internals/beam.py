@@ -65,7 +65,7 @@ class Beam:
             set(self.data.data()["PROP_END_2"].unique())
         )
         properties = CrossSectionalData(self._dll)
-        properties.load(prop_nmb)
+        properties.load([int(_) for _ in prop_nmb])
 
         # Load results for all load cases
         self.results.load(load_cases)
