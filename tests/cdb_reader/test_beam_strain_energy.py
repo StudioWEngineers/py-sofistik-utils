@@ -18,15 +18,15 @@ _COLUMNS = ["ELEM_ID", "GROUP", "LOAD_CASE", "U"]
 _DATA = [
     [101, 10, 1000, 0.34917488541448244],
     [102, 10, 1000, 1.2396276374589636],
-    [101, 10, 1001, 0.02940052665116039],
+    [101, 10, 1001, 0.029400526651160386],
     [102, 10, 1001, 0.0],
-    [101, 10, 1002, 0.3785754120656429],
+    [101, 10, 1002, 0.3785754120656428],
     [102, 10, 1002, 1.2396276374589636]
 ]
 _DATA_DIV = [
     [101, 10, 1000, 0.3846355348887977],
     [102, 10, 1000, 0.8608525260131692],
-    [101, 10, 1001, 0.02940052665116039],
+    [101, 10, 1001, 0.029400526651160386],
     [102, 10, 1001, 0.0],
     [101, 10, 1002, 0.41403606153995803],
     [102, 10, 1002, 0.8608525260131692]
@@ -73,7 +73,7 @@ class SOFiSTiKCDBReaderBeamStrainEnergyTestSuite(TestCase):
         with self.subTest(msg="Existing entry"):
             self.assertEqual(
                 self.cdb.beams.get_element_strain_energy(1002, 101),
-                0.3785754120656429
+                0.3785754120656428
             )
 
         with self.subTest(msg="Non existing entry with default"):
@@ -113,7 +113,7 @@ class SOFiSTiKCDBReaderBeamStrainEnergyTestSuite(TestCase):
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
                 self.cdb.beams.get_element_strain_energy(1001, 101),
-                0.02940052665116039
+                0.029400526651160386
             )
 
 
@@ -197,5 +197,5 @@ class SOFiSTiKCDBReaderBeamStrainEnergyWithDIVTestSuite(TestCase):
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
                 self.cdb.beams.get_element_strain_energy(1001, 101),
-                0.02940052665116039
+                0.029400526651160386
             )

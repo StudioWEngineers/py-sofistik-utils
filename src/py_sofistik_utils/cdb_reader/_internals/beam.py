@@ -91,11 +91,9 @@ class Beam:
             data.loc[data["PROP_END_2"] == p, "IZ"] = properties.get(p, "IZ")
             data.loc[data["PROP_END_2"] == p, "EM"] = properties.get(p, "EM")
 
-        # Calculate strain energy (vectorized)
-        data["U"] = (1 / (2 * data["EM"])) * (
-            data["N"] ** 2 / data["A"] +
-            data["MY"] ** 2 / data["IY"] +
-            data["MZ"] ** 2 / data["IZ"]
+        # Calculate strain energy
+        data["U"] = data.eval(
+            "(N ** 2 / A + MY ** 2 / IY + MZ ** 2 / IZ) / (2 * EM)"
         )
 
         # Calculate segment lengths (next_POS - current_POS)
