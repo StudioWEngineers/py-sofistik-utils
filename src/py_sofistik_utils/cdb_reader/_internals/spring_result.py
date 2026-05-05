@@ -54,12 +54,12 @@ class _SpringResult:
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
-                "FORCE",
-                "TRANSVERSAL_FORCE",
-                "MOMENT",
-                "DISPLACEMENT",
-                "TRANSVERSAL_DISPLACEMENT",
-                "ROTATION"
+                "P",
+                "PT",
+                "M",
+                "V",
+                "VT",
+                "PHI"
             ]
         )
         self._dll = dll
@@ -115,12 +115,12 @@ class _SpringResult:
         quantity : str, default "FORCE"
             Quantity to retrieve. Must be one of:
 
-            - ``FORCE``
-            - ``TRANSVERSAL_FORCE``
-            - ``MOMENT``
-            - ``DISPLACEMENT``
-            - ``TRANSVERSAL_DISPLACEMENT``
-            - ``ROTATION``
+            - ``P``
+            - ``PT``
+            - ``M``
+            - ``V``
+            - ``VT``
+            - ``PHI``
 
         default : float or None, default None
             Value to return if the requested quantity is not found
@@ -235,12 +235,12 @@ class _SpringResult:
                         "LOAD_CASE": load_case,
                         "GROUP": 0,
                         "ELEM_ID": spri_res.m_nr,
-                        "FORCE": spri_res.m_p,
-                        "TRANSVERSAL_FORCE": spri_res.m_pt,
-                        "MOMENT": spri_res.m_m,
-                        "DISPLACEMENT": spri_res.m_v,
-                        "TRANSVERSAL_DISPLACEMENT": spri_res.m_vt,
-                        "ROTATION": spri_res.m_phi
+                        "P": spri_res.m_p,
+                        "PT": spri_res.m_pt,
+                        "M": spri_res.m_m,
+                        "V": spri_res.m_v,
+                        "VT": spri_res.m_vt,
+                        "PHI": spri_res.m_phi
                     }
                 )
 
