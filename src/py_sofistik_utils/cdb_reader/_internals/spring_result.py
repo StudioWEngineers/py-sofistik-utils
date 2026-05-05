@@ -23,12 +23,12 @@ class _SpringResult:
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
-        * ``FORCE`` axial force
-        * ``TRANSVERSAL_FORCE``: transversal force
-        * ``MOMENT``: axial moment
-        * ``DISPLACEMENT``: axial displacement
-        * ``TRANSVERSAL_DISPLACEMENT``: transversal displacement
-        * ``ROTATION``: axial rotation
+        * ``P`` axial force
+        * ``PT``: transversal force
+        * ``M``: axial moment
+        * ``V``: axial displacement
+        * ``VT``: transversal displacement
+        * ``PHI``: axial rotation
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
         ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
