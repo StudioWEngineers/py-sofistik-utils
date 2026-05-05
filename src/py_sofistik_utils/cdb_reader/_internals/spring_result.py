@@ -25,15 +25,15 @@ class _SpringResult:
         * ``ELEM_ID`` element number
         * ``P`` axial force
         * ``PT``: transversal force
-        * ``PTX``: force in global X-direction
-        * ``PTY``: force in global Y-direction
-        * ``PTZ``: force in global Z-direction
+        * ``PTX``: transversal force in global X-direction
+        * ``PTY``: transversal force in global Y-direction
+        * ``PTZ``: transversal force in global Z-direction
         * ``M``: axial moment
         * ``V``: axial displacement
         * ``VT``: transversal displacement
-        * ``VTX``: displacement in global X-direction
-        * ``VTY``: displacement in global Y-direction
-        * ``VTZ``: displacement in global Z-direction
+        * ``VTX``: transversal displacement in global X-direction
+        * ``VTY``: transversal displacement in global Y-direction
+        * ``VTZ``: transversal displacement in global Z-direction
         * ``PHI``: axial rotation
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
