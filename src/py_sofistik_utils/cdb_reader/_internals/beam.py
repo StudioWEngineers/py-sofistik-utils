@@ -102,14 +102,13 @@ class Beam:
             "(N ** 2 / A + MY ** 2 / IY + MZ ** 2 / IZ) / (2 * EM)"
         )
 
-        # Calculate segment lengths (next_POS - current_POS)
+        # Calculate segment lengths
         data = data.sort_values(["LOAD_CASE", "ELEM_ID", "POS"])
-        data["SEGMENT_LENGTH"] = data.groupby(["LOAD_CASE", "ELEM_ID"])["POS"].diff(-1).abs().fillna(0)
-
-        # Calculate U for the next section (shifted U values)
-        data["U_NEXT"] = data.groupby(["LOAD_CASE", "ELEM_ID"])["U"].shift(-1).fillna(0)
+        grouped = data.groupby(["LOAD_CASE", "ELEM_ID"])
+        data["SEGMENT_LENGTH"] = grouped["POS"].diff(-1).abs().fillna(0)
 
         # Calculate strain energy per segment: (U1 + U2) * L_seg / 2
+        data["U_NEXT"] = grouped["U"].shift(-1).fillna(0)
         data["U_SEGMENT"] = (data["U"] + data["U_NEXT"]) * data["SEGMENT_LENGTH"] / 2
 
         # Sum strain energy across all segments for each (LOAD_CASE, ELEM_ID)
