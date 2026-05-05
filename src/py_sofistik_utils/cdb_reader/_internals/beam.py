@@ -72,7 +72,7 @@ class Beam:
 
         # Initialize base_data with zeros for required columns
         base_data = self.results.data().reset_index(drop=True)
-        required_columns = ["LENGTH", "PROP_END_1", "PROP_END_2", "E", "A", "IYY", "IZZ", "U"]
+        required_columns = ["LENGTH", "PROP_END_1", "PROP_END_2", "EM", "A", "IY", "IZ", "U"]
         base_data[required_columns] = 0.0
 
         # Assign PROP_END_1/2 and LENGTH using vectorized operations
@@ -83,19 +83,19 @@ class Beam:
 
         for prop in prop_nmb:
             base_data.loc[base_data["PROP_END_1"] == prop, "A"] = properties.get(prop, "A")
-            base_data.loc[base_data["PROP_END_1"] == prop, "IYY"] = properties.get(prop, "IY")
-            base_data.loc[base_data["PROP_END_1"] == prop, "IZZ"] = properties.get(prop, "IZ")
-            base_data.loc[base_data["PROP_END_1"] == prop, "E"] = properties.get(prop, "EM")
+            base_data.loc[base_data["PROP_END_1"] == prop, "IY"] = properties.get(prop, "IY")
+            base_data.loc[base_data["PROP_END_1"] == prop, "IZ"] = properties.get(prop, "IZ")
+            base_data.loc[base_data["PROP_END_1"] == prop, "EM"] = properties.get(prop, "EM")
             base_data.loc[base_data["PROP_END_2"] == prop, "A"] = properties.get(prop, "A")
-            base_data.loc[base_data["PROP_END_2"] == prop, "IYY"] = properties.get(prop, "IY")
-            base_data.loc[base_data["PROP_END_2"] == prop, "IZZ"] = properties.get(prop, "IZ")
-            base_data.loc[base_data["PROP_END_2"] == prop, "E"] = properties.get(prop, "EM")
+            base_data.loc[base_data["PROP_END_2"] == prop, "IY"] = properties.get(prop, "IY")
+            base_data.loc[base_data["PROP_END_2"] == prop, "IZ"] = properties.get(prop, "IZ")
+            base_data.loc[base_data["PROP_END_2"] == prop, "EM"] = properties.get(prop, "EM")
 
         # Calculate strain energy (vectorized)
-        base_data["U"] = (1 / (2 * base_data["E"])) * (
+        base_data["U"] = (1 / (2 * base_data["EM"])) * (
             base_data["N"] ** 2 / base_data["A"] +
-            base_data["MY"] ** 2 / base_data["IYY"] +
-            base_data["MZ"] ** 2 / base_data["IZZ"]
+            base_data["MY"] ** 2 / base_data["IY"] +
+            base_data["MZ"] ** 2 / base_data["IZ"]
         )
 
         # Calculate segment lengths (next_POS - current_POS)
