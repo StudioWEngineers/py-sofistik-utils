@@ -59,7 +59,7 @@ class Beam:
         if not self.data.is_loaded():
             self.data.load()
 
-        # Load properties for all unique PROP_END_1/2
+        # Load properties
         prop_nmb = list(
             set(self.data.data()["PROP_END_1"].unique()) |
             set(self.data.data()["PROP_END_2"].unique())
@@ -67,19 +67,31 @@ class Beam:
         properties = CrossSectionalData(self._dll)
         properties.load([int(_) for _ in prop_nmb])
 
-        # Load results for all load cases
+        # Load results
         self.results.load(load_cases)
 
-        # Initialize data with zeros for required columns
+        # Initialize data
         data = self.results.data().reset_index(drop=True)
-        required_columns = ["LENGTH", "PROP_END_1", "PROP_END_2", "EM", "A", "IY", "IZ", "U"]
+        required_columns = [
+            "LENGTH", "PROP_END_1", "PROP_END_2", "EM", "A", "IY", "IZ", "U"
+        ]
         data[required_columns] = 0.0
 
-        # Assign PROP_END_1/2 and LENGTH using vectorized operations
-        elem_ids = data["ELEM_ID"].unique()
-        data["PROP_END_1"] = data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_1") for _ in elem_ids}).fillna(1).astype(int)
-        data["PROP_END_2"] = data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_2") for _ in elem_ids}).fillna(1).astype(int)
-        data["LENGTH"] = data["ELEM_ID"].map({_: self.data.get(_) for _ in elem_ids}).fillna(1.0)
+        # Assign PROP_END_1/2 and LENGTH
+        ids = data["ELEM_ID"].unique()
+        data["PROP_END_1"] = (
+            data["ELEM_ID"].map(
+                {_: self.data.get(_, "PROP_END_1") for _ in ids}
+            ).fillna(1).astype(int)
+        )
+        data["PROP_END_2"] = (
+            data["ELEM_ID"].map(
+                {_: self.data.get(_, "PROP_END_2") for _ in ids}
+            ).fillna(1).astype(int)
+        )
+        data["LENGTH"] = (
+            data["ELEM_ID"].map({_: self.data.get(_) for _ in ids}).fillna(1.0)
+        )
 
         # Precompute property mappings
         prop_mappings = {
@@ -109,7 +121,9 @@ class Beam:
 
         # Calculate strain energy per segment: (U1 + U2) * L_seg / 2
         data["U_NEXT"] = grouped["U"].shift(-1).fillna(0)
-        data["U_SEGMENT"] = (data["U"] + data["U_NEXT"]) * data["SEGMENT_LENGTH"] / 2
+        data["U_SEGMENT"] = (
+            (data["U"] + data["U_NEXT"]) * data["SEGMENT_LENGTH"] / 2
+        )
 
         # Sum strain energy across all segments for each (LOAD_CASE, ELEM_ID)
         result = data.groupby(["LOAD_CASE", "ELEM_ID"]).agg({
@@ -117,7 +131,7 @@ class Beam:
             "GROUP": "first"
         }).rename(columns={"U_SEGMENT": "U"}).reset_index()
 
-        # Reorder columns to ['ELEM_ID', 'GROUP', 'LOAD_CASE', 'U']
+        # Reorder columns
         result = result[["ELEM_ID", "GROUP", "LOAD_CASE", "U"]]
 
         # Set multi-index for fast lookups
