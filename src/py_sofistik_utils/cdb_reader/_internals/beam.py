@@ -70,48 +70,48 @@ class Beam:
         # Load results for all load cases
         self.results.load(load_cases)
 
-        # Initialize base_data with zeros for required columns
-        base_data = self.results.data().reset_index(drop=True)
+        # Initialize data with zeros for required columns
+        data = self.results.data().reset_index(drop=True)
         required_columns = ["LENGTH", "PROP_END_1", "PROP_END_2", "EM", "A", "IY", "IZ", "U"]
-        base_data[required_columns] = 0.0
+        data[required_columns] = 0.0
 
         # Assign PROP_END_1/2 and LENGTH using vectorized operations
-        elem_ids = base_data["ELEM_ID"].unique()
-        base_data["PROP_END_1"] = base_data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_1") for _ in elem_ids}).fillna(1).astype(int)
-        base_data["PROP_END_2"] = base_data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_2") for _ in elem_ids}).fillna(1).astype(int)
-        base_data["LENGTH"] = base_data["ELEM_ID"].map({_: self.data.get(_) for _ in elem_ids}).fillna(1.0)
+        elem_ids = data["ELEM_ID"].unique()
+        data["PROP_END_1"] = data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_1") for _ in elem_ids}).fillna(1).astype(int)
+        data["PROP_END_2"] = data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_2") for _ in elem_ids}).fillna(1).astype(int)
+        data["LENGTH"] = data["ELEM_ID"].map({_: self.data.get(_) for _ in elem_ids}).fillna(1.0)
 
-        for prop in prop_nmb:
-            base_data.loc[base_data["PROP_END_1"] == prop, "A"] = properties.get(prop, "A")
-            base_data.loc[base_data["PROP_END_1"] == prop, "IY"] = properties.get(prop, "IY")
-            base_data.loc[base_data["PROP_END_1"] == prop, "IZ"] = properties.get(prop, "IZ")
-            base_data.loc[base_data["PROP_END_1"] == prop, "EM"] = properties.get(prop, "EM")
-            base_data.loc[base_data["PROP_END_2"] == prop, "A"] = properties.get(prop, "A")
-            base_data.loc[base_data["PROP_END_2"] == prop, "IY"] = properties.get(prop, "IY")
-            base_data.loc[base_data["PROP_END_2"] == prop, "IZ"] = properties.get(prop, "IZ")
-            base_data.loc[base_data["PROP_END_2"] == prop, "EM"] = properties.get(prop, "EM")
+        for p in prop_nmb:
+            data.loc[data["PROP_END_1"] == p, "A"] = properties.get(p, "A")
+            data.loc[data["PROP_END_1"] == p, "IY"] = properties.get(p, "IY")
+            data.loc[data["PROP_END_1"] == p, "IZ"] = properties.get(p, "IZ")
+            data.loc[data["PROP_END_1"] == p, "EM"] = properties.get(p, "EM")
+            data.loc[data["PROP_END_2"] == p, "A"] = properties.get(p, "A")
+            data.loc[data["PROP_END_2"] == p, "IY"] = properties.get(p, "IY")
+            data.loc[data["PROP_END_2"] == p, "IZ"] = properties.get(p, "IZ")
+            data.loc[data["PROP_END_2"] == p, "EM"] = properties.get(p, "EM")
 
         # Calculate strain energy (vectorized)
-        base_data["U"] = (1 / (2 * base_data["EM"])) * (
-            base_data["N"] ** 2 / base_data["A"] +
-            base_data["MY"] ** 2 / base_data["IY"] +
-            base_data["MZ"] ** 2 / base_data["IZ"]
+        data["U"] = (1 / (2 * data["EM"])) * (
+            data["N"] ** 2 / data["A"] +
+            data["MY"] ** 2 / data["IY"] +
+            data["MZ"] ** 2 / data["IZ"]
         )
 
         # Calculate segment lengths (next_POS - current_POS)
-        base_data = base_data.sort_values(["LOAD_CASE", "ELEM_ID", "POS"])
-        base_data["SEGMENT_LENGTH"] = base_data.groupby(["LOAD_CASE", "ELEM_ID"])["POS"].diff(-1).abs().fillna(0)
+        data = data.sort_values(["LOAD_CASE", "ELEM_ID", "POS"])
+        data["SEGMENT_LENGTH"] = data.groupby(["LOAD_CASE", "ELEM_ID"])["POS"].diff(-1).abs().fillna(0)
 
         # Calculate U for the next section (shifted U values)
-        base_data["U_NEXT"] = base_data.groupby(["LOAD_CASE", "ELEM_ID"])["U"].shift(-1).fillna(0)
+        data["U_NEXT"] = data.groupby(["LOAD_CASE", "ELEM_ID"])["U"].shift(-1).fillna(0)
 
         # Calculate strain energy per segment: (U1 + U2) * L_seg / 2
-        base_data["U_SEGMENT"] = (base_data["U"] + base_data["U_NEXT"]) * base_data["SEGMENT_LENGTH"] / 2
+        data["U_SEGMENT"] = (data["U"] + data["U_NEXT"]) * data["SEGMENT_LENGTH"] / 2
 
         # Sum strain energy across all segments for each (LOAD_CASE, ELEM_ID)
-        result = base_data.groupby(["LOAD_CASE", "ELEM_ID"]).agg({
+        result = data.groupby(["LOAD_CASE", "ELEM_ID"]).agg({
             "U_SEGMENT": "sum",
-            "GROUP": "first"  # Assuming GROUP is the same for all segments of an ELEM_ID
+            "GROUP": "first"
         }).rename(columns={"U_SEGMENT": "U"}).reset_index()
 
         # Reorder columns to ['ELEM_ID', 'GROUP', 'LOAD_CASE', 'U']
