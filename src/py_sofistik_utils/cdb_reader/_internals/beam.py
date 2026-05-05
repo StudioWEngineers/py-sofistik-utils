@@ -60,7 +60,7 @@ class Beam:
             self.data.load()
 
         # Load properties for all unique PROP_END_1/2
-        prop_nmb: list[int] = list(
+        prop_nmb = list(
             set(self.data.data()["PROP_END_1"].unique()) |
             set(self.data.data()["PROP_END_2"].unique())
         )
@@ -81,15 +81,21 @@ class Beam:
         data["PROP_END_2"] = data["ELEM_ID"].map({_: self.data.get(_, "PROP_END_2") for _ in elem_ids}).fillna(1).astype(int)
         data["LENGTH"] = data["ELEM_ID"].map({_: self.data.get(_) for _ in elem_ids}).fillna(1.0)
 
-        for p in prop_nmb:
-            data.loc[data["PROP_END_1"] == p, "A"] = properties.get(p, "A")
-            data.loc[data["PROP_END_1"] == p, "IY"] = properties.get(p, "IY")
-            data.loc[data["PROP_END_1"] == p, "IZ"] = properties.get(p, "IZ")
-            data.loc[data["PROP_END_1"] == p, "EM"] = properties.get(p, "EM")
-            data.loc[data["PROP_END_2"] == p, "A"] = properties.get(p, "A")
-            data.loc[data["PROP_END_2"] == p, "IY"] = properties.get(p, "IY")
-            data.loc[data["PROP_END_2"] == p, "IZ"] = properties.get(p, "IZ")
-            data.loc[data["PROP_END_2"] == p, "EM"] = properties.get(p, "EM")
+        # Precompute property mappings
+        prop_mappings = {
+            "A": {_: properties.get(_, "A") for _ in prop_nmb},
+            "IY": {_: properties.get(_, "IY") for _ in prop_nmb},
+            "IZ": {_: properties.get(_, "IZ") for _ in prop_nmb},
+            "EM": {_: properties.get(_, "EM") for _ in prop_nmb},
+        }
+
+        # Assign properties
+        for quantity in ["A", "IY", "IZ", "EM"]:
+            data[quantity] = data["PROP_END_1"].map(prop_mappings[quantity])
+            mask_end_2 = data["POS_REL"] == 1
+            data.loc[mask_end_2, quantity] = (
+                data.loc[mask_end_2, "PROP_END_2"].map(prop_mappings[quantity])
+            )
 
         # Calculate strain energy
         data["U"] = data.eval(
