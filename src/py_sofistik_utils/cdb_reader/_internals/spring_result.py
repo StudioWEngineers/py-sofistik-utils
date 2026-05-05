@@ -25,9 +25,15 @@ class _SpringResult:
         * ``ELEM_ID`` element number
         * ``P`` axial force
         * ``PT``: transversal force
+        * ``PTX``: force in global X-direction
+        * ``PTY``: force in global Y-direction
+        * ``PTZ``: force in global Z-direction
         * ``M``: axial moment
         * ``V``: axial displacement
         * ``VT``: transversal displacement
+        * ``VTX``: displacement in global X-direction
+        * ``VTY``: displacement in global Y-direction
+        * ``VTZ``: displacement in global Z-direction
         * ``PHI``: axial rotation
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
@@ -39,9 +45,6 @@ class _SpringResult:
             Not all available quantities are retrieved and stored. In
             particular:
 
-            * the three components along the global X, Y and Z axes for:
-                - spring force
-                - spring displacement
             * nonlinear effects
             * all quantities available if a workload has beed defined
 
@@ -56,9 +59,15 @@ class _SpringResult:
                 "ELEM_ID",
                 "P",
                 "PT",
+                "PTX",
+                "PTY",
+                "PTZ",
                 "M",
                 "V",
                 "VT",
+                "VTX",
+                "VTY",
+                "VTZ",
                 "PHI"
             ]
         )
@@ -117,9 +126,15 @@ class _SpringResult:
 
             - ``P``
             - ``PT``
+            - ``PTX``
+            - ``PTY``
+            - ``PTZ``
             - ``M``
             - ``V``
             - ``VT``
+            - ``VTX``
+            - ``VTY``
+            - ``VTZ``
             - ``PHI``
 
         default : float or None, default None
@@ -237,9 +252,15 @@ class _SpringResult:
                         "ELEM_ID": spri_res.m_nr,
                         "P": spri_res.m_p,
                         "PT": spri_res.m_pt,
+                        "PTX": spri_res.m_ptx,
+                        "PTY": spri_res.m_pty,
+                        "PTZ": spri_res.m_ptz,
                         "M": spri_res.m_m,
                         "V": spri_res.m_v,
                         "VT": spri_res.m_vt,
+                        "VTX": spri_res.m_vtx,
+                        "VTY": spri_res.m_vty,
+                        "VTZ": spri_res.m_vtz,
                         "PHI": spri_res.m_phi
                     }
                 )
