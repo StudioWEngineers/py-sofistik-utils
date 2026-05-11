@@ -25,7 +25,7 @@ class _BeamData:
         * ``ELEM_ID``: beam number
         * ``N1``: start node
         * ``N2``: end node
-        * ``LENGTH``: length
+        * ``LENGTH``: length [m]
         * ``T_00``: transformation matrix
         * ``T_01``: transformation matrix
         * ``T_02``: transformation matrix
@@ -93,20 +93,6 @@ class _BeamData:
         self._data = self._data[0:0]
         self._is_loaded = False
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key
-        ``100/00``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def get(
             self,
             element_id: int,
@@ -167,6 +153,19 @@ class _BeamData:
         """Return ``True`` if beam data have been loaded, ``False`` otherwise.
         """
         return self._is_loaded
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``100/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self) -> None:
         """Retrieve all beam data. If the key does not exist or it is empty, a

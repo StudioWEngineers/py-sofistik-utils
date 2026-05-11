@@ -65,25 +65,12 @@ class _TrussData:
         """
         self._data = self._data[0:0]
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key ``150/00``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the calling
-            object's data and indices. Modifications to the data or indices of the
-            copy will not be reflected in the original object (refer to
-            :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def get(
             self,
             element_id: int,
             quantity: str = "L0",
             default: float | int | None = None
-        ) -> float | int:
+    ) -> float | int:
         """Retrieve the requested truss quantity.
 
         Parameters
@@ -122,6 +109,19 @@ class _TrussData:
                 f"Truss data entry not found for element id {element_id}, "
                 f"and quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key ``150/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the calling
+            object's data and indices. Modifications to the data or indices of the
+            copy will not be reflected in the original object (refer to
+            :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self) -> None:
         """Retrieve all truss data. If the key does not exist or it is empty, a warning is

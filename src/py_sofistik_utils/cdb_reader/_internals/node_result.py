@@ -77,20 +77,6 @@ class _NodeResult:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys
-        ``24/LC``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def get(
             self,
             node_id: int,
@@ -147,6 +133,20 @@ class _NodeResult:
                 f"Node result entry not found for element id {node_id}, load "
                 f"case {load_case}, and quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``24/LC``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def is_loaded(self, load_case: int) -> bool:
         """Return `True` if the results have been loaded for the given

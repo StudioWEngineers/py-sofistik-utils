@@ -19,13 +19,13 @@ class NodeLoad:
 
     * ``LOAD_CASE``: load combination number
     * ``ID``: node number
-    * ``PX``: X component of the nodal load (force)
-    * ``PY``: Y component of the nodal load (force)
-    * ``PZ``: Z component of the nodal load (force)
-    * ``MX``: X component of the nodal load (moment)
-    * ``MY``: Y component of the nodal load (moment)
-    * ``MZ``: Z component of the nodal load (moment)
-    * ``MB``: warping of the nodal load (moment)
+    * ``PX``: X component of the nodal load (force, [kN])
+    * ``PY``: Y component of the nodal load (force, [kN])
+    * ``PZ``: Z component of the nodal load (force, [kN])
+    * ``MX``: X component of the nodal load (moment, [kN/m])
+    * ``MY``: Y component of the nodal load (moment, [kN/m])
+    * ``MZ``: Z component of the nodal load (moment, [kN/m])
+    * ``MB``: warping of the nodal load (moment, [kN/m])
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
@@ -63,20 +63,6 @@ class NodeLoad:
 
         self._data = self._data[0:0]
         self._loaded_lc.clear()
-
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys
-        ``23/LC``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
 
     def get(
             self,
@@ -117,7 +103,7 @@ class NodeLoad:
         -----
         If there are multiple entries for the same node and load case, this
         method returns the sum of all corresponding values. To access the
-        individual entries without aggregation, use the `data` method.
+        individual entries without aggregation, use the `get_data` method.
 
         Raises
         ------
@@ -134,6 +120,20 @@ class NodeLoad:
                 f"Node load entry not found for element id {node_id}, load "
                 f"case {load_case}, and quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``23/LC``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def is_loaded(self, load_case: int) -> bool:
         """Return `True` if the loads have been loaded for the given

@@ -23,12 +23,18 @@ class _SpringResult:
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
-        * ``FORCE`` axial force
-        * ``TRANSVERSAL_FORCE``: transversal force
-        * ``MOMENT``: axial moment
-        * ``DISPLACEMENT``: axial displacement
-        * ``TRANSVERSAL_DISPLACEMENT``: transversal displacement
-        * ``ROTATION``: axial rotation
+        * ``P`` axial force
+        * ``PT``: transversal force
+        * ``PTX``: transversal force in global X-direction
+        * ``PTY``: transversal force in global Y-direction
+        * ``PTZ``: transversal force in global Z-direction
+        * ``M``: axial moment
+        * ``V``: axial displacement
+        * ``VT``: transversal displacement
+        * ``VTX``: transversal displacement in global X-direction
+        * ``VTY``: transversal displacement in global Y-direction
+        * ``VTZ``: transversal displacement in global Z-direction
+        * ``PHI``: axial rotation
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
         ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
@@ -39,9 +45,6 @@ class _SpringResult:
             Not all available quantities are retrieved and stored. In
             particular:
 
-            * the three components along the global X, Y and Z axes for:
-                - spring force
-                - spring displacement
             * nonlinear effects
             * all quantities available if a workload has beed defined
 
@@ -54,12 +57,18 @@ class _SpringResult:
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
-                "FORCE",
-                "TRANSVERSAL_FORCE",
-                "MOMENT",
-                "DISPLACEMENT",
-                "TRANSVERSAL_DISPLACEMENT",
-                "ROTATION"
+                "P",
+                "PT",
+                "PTX",
+                "PTY",
+                "PTZ",
+                "M",
+                "V",
+                "VT",
+                "VTX",
+                "VTY",
+                "VTZ",
+                "PHI"
             ]
         )
         self._dll = dll
@@ -83,25 +92,11 @@ class _SpringResult:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys
-        ``170/LC``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def get(
             self,
             element_id: int,
             load_case: int,
-            quantity: str = "FORCE",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested cable result.
@@ -112,15 +107,21 @@ class _SpringResult:
             Cable element number
         load_case : int
             Load case number
-        quantity : str, default "FORCE"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
-            - ``FORCE``
-            - ``TRANSVERSAL_FORCE``
-            - ``MOMENT``
-            - ``DISPLACEMENT``
-            - ``TRANSVERSAL_DISPLACEMENT``
-            - ``ROTATION``
+            - ``P``
+            - ``PT``
+            - ``PTX``
+            - ``PTY``
+            - ``PTZ``
+            - ``M``
+            - ``V``
+            - ``VT``
+            - ``VTX``
+            - ``VTY``
+            - ``VTZ``
+            - ``PHI``
 
         default : float or None, default None
             Value to return if the requested quantity is not found
@@ -148,6 +149,20 @@ class _SpringResult:
                 f"Spring result entry not found for element id {element_id}, "
                 f"load case {load_case}, and quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``170/LC``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self, load_cases: int | list[int]) -> None:
         """Retrieve spring results for the given ``load_cases``. If a load case
@@ -235,12 +250,18 @@ class _SpringResult:
                         "LOAD_CASE": load_case,
                         "GROUP": 0,
                         "ELEM_ID": spri_res.m_nr,
-                        "FORCE": spri_res.m_p,
-                        "TRANSVERSAL_FORCE": spri_res.m_pt,
-                        "MOMENT": spri_res.m_m,
-                        "DISPLACEMENT": spri_res.m_v,
-                        "TRANSVERSAL_DISPLACEMENT": spri_res.m_vt,
-                        "ROTATION": spri_res.m_phi
+                        "P": spri_res.m_p,
+                        "PT": spri_res.m_pt,
+                        "PTX": spri_res.m_ptx,
+                        "PTY": spri_res.m_pty,
+                        "PTZ": spri_res.m_ptz,
+                        "M": spri_res.m_m,
+                        "V": spri_res.m_v,
+                        "VT": spri_res.m_vt,
+                        "VTX": spri_res.m_vtx,
+                        "VTY": spri_res.m_vty,
+                        "VTZ": spri_res.m_vtz,
+                        "PHI": spri_res.m_phi
                     }
                 )
 

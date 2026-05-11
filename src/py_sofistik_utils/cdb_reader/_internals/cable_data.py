@@ -24,7 +24,7 @@ class CableData:
         * ``ELEM_ID`` element number
         * ``N1`` id of the first node
         * ``N2``: id of the second node
-        * ``L0``: initial length
+        * ``L0``: initial length [m]
         * ``PROPERTY``: property number (cross-section)
 
         The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
@@ -66,20 +66,6 @@ class CableData:
         """Clear all the loaded data.
         """
         self._data = self._data[0:0]
-
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key
-        ``160/00``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
 
     def get(
             self,
@@ -124,6 +110,20 @@ class CableData:
                 f"Cable data entry not found for element id {element_id}, "
                 f"and quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``160/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self) -> None:
         """Retrieve all cable data. If the key does not exist or it is empty, a

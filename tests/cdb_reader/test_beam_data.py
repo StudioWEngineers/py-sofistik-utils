@@ -108,7 +108,7 @@ class SOFiSTiKCDBReaderBeamDataTestSuite(TestCase):
         # The chosen tolerance is stricter than pandas default and reflects the
         # maximum relative error observed in practice, ensuring stable and
         # reproducible comparisons.
-        assert_frame_equal(data, self.cdb.beams.data.data(), rtol=1E-7)
+        assert_frame_equal(data, self.cdb.beams.data.get_data(), rtol=1E-7)
 
     def test_get(self) -> None:
         with self.subTest(msg="Existing entry - length"):

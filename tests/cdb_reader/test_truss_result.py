@@ -52,7 +52,7 @@ class SOFiSTiKCDBReaderTrussResultTestSuite(TestCase):
             DataFrame(_DATA, columns=_COLUMNS)
             .set_index(["ELEM_ID", "LOAD_CASE"], drop=False)
         )
-        assert_frame_equal(data, self.cdb.truss.result.data(), rtol=1E-10)
+        assert_frame_equal(data, self.cdb.truss.result.get_data(), rtol=1E-10)
 
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):

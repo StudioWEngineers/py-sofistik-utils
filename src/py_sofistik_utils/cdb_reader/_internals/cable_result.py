@@ -23,12 +23,12 @@ class CableResult:
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
-        * ``AXIAL_FORCE`` axial force
-        * ``AVG_AXIAL_FORCE``: average axial force
-        * ``AXIAL_DISPLACEMENT``: axial displacement
-        * ``RELAXED_LENGTH``: relaxed cable length
-        * ``TOTAL_STRAIN``: total strain
-        * ``EFFECTIVE_STIFFNESS``: effective stiffness
+        * ``AXIAL_FORCE`` axial force [kN]
+        * ``AVG_AXIAL_FORCE``: average axial force [kN]
+        * ``AXIAL_DISPLACEMENT``: axial displacement [m]
+        * ``RELAXED_LENGTH``: relaxed cable length [m]
+        * ``TOTAL_STRAIN``: total strain [-]
+        * ``EFFECTIVE_STIFFNESS``: effective stiffness [kN/m]
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
         ``LOAD_CASE`` (in this specific order) to enable fast lookups via the
@@ -82,20 +82,6 @@ class CableResult:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys
-        ``162/LC``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def get(
             self,
             element_id: int,
@@ -147,6 +133,20 @@ class CableResult:
                 f"Cable result entry not found for element id {element_id}, "
                 f"load case {load_case}, and quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``162/LC``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self, load_cases: int | list[int]) -> None:
         """Retrieve cable results for the given ``load_cases``. If a load case

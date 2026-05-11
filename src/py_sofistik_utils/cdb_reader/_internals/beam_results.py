@@ -25,17 +25,17 @@ class BeamResults:
     * ```LOAD_CASE```: the load case number
     * ``GROUP``: the beam group number
     * ``ELEM_ID``: the beam number
-    * ``POS``: position of the output station along the beam
+    * ``POS``: position of the output station along the beam [m]
     * ``POS_REL``: relative position of the output station along the beam
       (0 to 1)
-    * ``N``: axial force
-    * ``VY``: shear force Y
-    * ``VZ``: shear force Z
-    * ``MT``: torsional moment
-    * ``MY``: bending moment around Y
-    * ``MZ``: bending moment around Z
-    * ``MB``: warping moment
-    * ``MT2``: second torsional moment
+    * ``N``: axial force [kN]
+    * ``VY``: shear force Y [kN]
+    * ``VZ``: shear force Z [kN]
+    * ``MT``: torsional moment [kNm]
+    * ``MY``: bending moment around Y [kNm]
+    * ``MZ``: bending moment around Z [kNm]
+    * ``MB``: warping moment [kNm]
+    * ``MT2``: second torsional moment [kNm]
 
     The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``, ``LOAD_CASE``
     and ``STATION`` (in this specific order) to enable fast lookups via the
@@ -98,20 +98,6 @@ class BeamResults:
         self._data = self._data[0:0]
         self._loaded_lc.clear()
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded keys
-        ``102/LC``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def get(
             self,
             element_id: int,
@@ -169,6 +155,20 @@ class BeamResults:
                 f"load case {load_case}, position {position} and quantity "
                 f"{quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded keys
+        ``102/LC``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self, load_cases: int | list[int]) -> None:
         """Retrieve beam results for the given ``load_cases``. If a load case

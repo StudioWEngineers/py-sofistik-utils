@@ -65,20 +65,6 @@ class _NodeData:
             self._data = self._data[0:0]
             self._is_loaded = False
 
-    def data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key
-        ``20/00``.
-
-        Parameters
-        ----------
-        deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the
-            calling object's data and indices. Modifications to the data or
-            indices of the copy will not be reflected in the original object
-            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
-        """
-        return self._data.copy(deep=deep)
-
     def drop_unused_nodes(self) -> None:
         """Remove all the unused nodes.
         """
@@ -128,6 +114,20 @@ class _NodeData:
                 f"Node data entry not found for node id {node_id}, and "
                 f"quantity {quantity}!"
             ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``20/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def is_loaded(self) -> bool:
         """Return ``True`` if the nodal data have been loaded from the cdb.
