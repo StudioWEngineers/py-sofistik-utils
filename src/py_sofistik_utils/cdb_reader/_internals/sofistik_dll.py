@@ -83,6 +83,7 @@ class SofDll():
         self.load_dll()
 
         self.get = self._dll.sof_cdb_get
+        self.to_string = self._dll.sof_lib_ps2cs
 
     def key_exist(self, kwh: int, kwl: int) -> bool:
         """Return `True` if the key exists and contains data, `False` otherwise.
