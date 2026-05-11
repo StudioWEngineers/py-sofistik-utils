@@ -19,13 +19,13 @@ class NodeLoad:
 
     * ``LOAD_CASE``: load combination number
     * ``ID``: node number
-    * ``PX``: X component of the nodal load (force)
-    * ``PY``: Y component of the nodal load (force)
-    * ``PZ``: Z component of the nodal load (force)
-    * ``MX``: X component of the nodal load (moment)
-    * ``MY``: Y component of the nodal load (moment)
-    * ``MZ``: Z component of the nodal load (moment)
-    * ``MB``: warping of the nodal load (moment)
+    * ``PX``: X component of the nodal load (force, [kN])
+    * ``PY``: Y component of the nodal load (force, [kN])
+    * ``PZ``: Z component of the nodal load (force, [kN])
+    * ``MX``: X component of the nodal load (moment, [kN/m])
+    * ``MY``: Y component of the nodal load (moment, [kN/m])
+    * ``MZ``: Z component of the nodal load (moment, [kN/m])
+    * ``MB``: warping of the nodal load (moment, [kN/m])
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(

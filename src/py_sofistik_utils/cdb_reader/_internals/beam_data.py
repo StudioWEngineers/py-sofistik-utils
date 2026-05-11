@@ -25,7 +25,7 @@ class _BeamData:
         * ``ELEM_ID``: beam number
         * ``N1``: start node
         * ``N2``: end node
-        * ``LENGTH``: length
+        * ``LENGTH``: length [m]
         * ``T_00``: transformation matrix
         * ``T_01``: transformation matrix
         * ``T_02``: transformation matrix

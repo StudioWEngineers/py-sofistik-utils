@@ -31,6 +31,20 @@ access truss data.
         initial_length = reader.truss_data.get(100, "L0")
         # ...
 
+Units of Measurement
+--------------------
+
+All quantities retrieved from a SOFiSTiK CDB file are stored without
+conversion. Therefore, they should be interpreted in their native units,
+summarized below for convenience:
+
+* Forces (internal forces, reactions, loads, etc.) are expressed in *kN*
+* Moments (internal moments, reactions, loads, etc.) are expressed in *kNm*
+* Displacements (nodal displacements, imposed loads, etc.) are expressed in *m*
+* Rotations (nodal rotations, etc.) are expressed in *radians*
+
+For additional details, refer to the SOFiSTiK documentation.
+
 Notes
 -----
 

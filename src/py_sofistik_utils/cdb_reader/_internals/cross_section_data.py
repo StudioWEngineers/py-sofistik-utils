@@ -21,15 +21,15 @@ class CrossSectionalData:
 
     * ``ID``: property number
     * ``MNO``: material ID of the section
-    * ``A``: cross-sectional gross area
-    * ``AY``: shear area Y
-    * ``AZ``: shear area Z
-    * ``IT``: torsional moment of inertia
-    * ``IY``: moment of inertia YY
-    * ``IZ``: moment of inertia ZZ
-    * ``EM``: elastic modulus
-    * ``GM``: shear modulus
-    * ``SW``: nominal weight (of the material, in kN/m3)
+    * ``A``: cross-sectional gross area [m\\ :sup:`2`]
+    * ``AY``: shear area Y [m\\ :sup:`2`]
+    * ``AZ``: shear area Z [m\\ :sup:`2`]
+    * ``IT``: torsional moment of inertia [m\\ :sup:`2`]
+    * ``IY``: moment of inertia YY [m\\ :sup:`4`]
+    * ``IZ``: moment of inertia ZZ [m\\ :sup:`4`]
+    * ``EM``: elastic modulus [kNm\\ :sup:`-2`]
+    * ``GM``: shear modulus [kNm\\ :sup:`-2`]
+    * ``SW``: nominal weight of the material [kNm\\ :sup:`-3`]
 
     The ``DataFrame`` uses a MultiIndex with level ``ID`` to enable fast
     lookups via the `get` method. The index column is not dropped from

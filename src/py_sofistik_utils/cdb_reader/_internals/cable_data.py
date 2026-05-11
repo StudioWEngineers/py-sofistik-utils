@@ -24,7 +24,7 @@ class CableData:
         * ``ELEM_ID`` element number
         * ``N1`` id of the first node
         * ``N2``: id of the second node
-        * ``L0``: initial length
+        * ``L0``: initial length [m]
         * ``PROPERTY``: property number (cross-section)
 
         The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable

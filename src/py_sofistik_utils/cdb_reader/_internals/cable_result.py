@@ -23,12 +23,12 @@ class CableResult:
         * ``LOAD_CASE`` load case number
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
-        * ``AXIAL_FORCE`` axial force
-        * ``AVG_AXIAL_FORCE``: average axial force
-        * ``AXIAL_DISPLACEMENT``: axial displacement
-        * ``RELAXED_LENGTH``: relaxed cable length
-        * ``TOTAL_STRAIN``: total strain
-        * ``EFFECTIVE_STIFFNESS``: effective stiffness
+        * ``AXIAL_FORCE`` axial force [kN]
+        * ``AVG_AXIAL_FORCE``: average axial force [kN]
+        * ``AXIAL_DISPLACEMENT``: axial displacement [m]
+        * ``RELAXED_LENGTH``: relaxed cable length [m]
+        * ``TOTAL_STRAIN``: total strain [-]
+        * ``EFFECTIVE_STIFFNESS``: effective stiffness [kN/m]
 
         The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID`` and
         ``LOAD_CASE`` (in this specific order) to enable fast lookups via the

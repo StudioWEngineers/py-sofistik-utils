@@ -25,17 +25,17 @@ class BeamResults:
     * ```LOAD_CASE```: the load case number
     * ``GROUP``: the beam group number
     * ``ELEM_ID``: the beam number
-    * ``POS``: position of the output station along the beam
+    * ``POS``: position of the output station along the beam [m]
     * ``POS_REL``: relative position of the output station along the beam
       (0 to 1)
-    * ``N``: axial force
-    * ``VY``: shear force Y
-    * ``VZ``: shear force Z
-    * ``MT``: torsional moment
-    * ``MY``: bending moment around Y
-    * ``MZ``: bending moment around Z
-    * ``MB``: warping moment
-    * ``MT2``: second torsional moment
+    * ``N``: axial force [kN]
+    * ``VY``: shear force Y [kN]
+    * ``VZ``: shear force Z [kN]
+    * ``MT``: torsional moment [kNm]
+    * ``MY``: bending moment around Y [kNm]
+    * ``MZ``: bending moment around Z [kNm]
+    * ``MB``: warping moment [kNm]
+    * ``MT2``: second torsional moment [kNm]
 
     The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``, ``LOAD_CASE``
     and ``STATION`` (in this specific order) to enable fast lookups via the
