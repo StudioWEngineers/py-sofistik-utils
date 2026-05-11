@@ -103,7 +103,7 @@ class NodeLoad:
         -----
         If there are multiple entries for the same node and load case, this
         method returns the sum of all corresponding values. To access the
-        individual entries without aggregation, use the `data` method.
+        individual entries without aggregation, use the `get_data` method.
 
         Raises
         ------
