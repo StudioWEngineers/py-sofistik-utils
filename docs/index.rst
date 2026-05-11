@@ -54,6 +54,12 @@ for the terms and conditions of use.
     usage
 
 .. toctree::
+    :caption: CDB Reader
+    :hidden:
+
+    cdb/post_processing
+
+.. toctree::
     :caption: Testing
     :maxdepth: 1
     :hidden:
