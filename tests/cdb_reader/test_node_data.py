@@ -54,12 +54,12 @@ class SOFiSTiKCDBReaderNodeDataTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.cdb.node.data.data(), self.data)
+        assert_frame_equal(self.cdb.node.data.get_data(), self.data)
 
     def test_drop_unused_nodes(self) -> None:
         self.cdb.node.data.drop_unused_nodes()
         assert_frame_equal(
-            self.cdb.node.data.data(),
+            self.cdb.node.data.get_data(),
             self.data.loc[self.data.IS_USED, :]
         )
 
@@ -135,12 +135,12 @@ class SOFiSTiKCDBReaderEnhancedNodeDataTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.cdb.node.data.data(), self.data)
+        assert_frame_equal(self.cdb.node.data.get_data(), self.data)
 
     def test_drop_not_used_nodes(self) -> None:
         self.cdb.node.data.drop_unused_nodes()
         assert_frame_equal(
-            self.cdb.node.data.data(),
+            self.cdb.node.data.get_data(),
             self.data.loc[self.data.IS_USED, :]
         )
 

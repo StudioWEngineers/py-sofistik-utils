@@ -74,7 +74,7 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
         # tolerance rtol=1e-7 is stricter than pandas default and reflects the
         # maximum relative error observed in practice, ensuring stable and
         # reproducible comparisons.
-        assert_frame_equal(data, self.cdb.truss.load.data(), rtol=1E-7)
+        assert_frame_equal(data, self.cdb.truss.load.get_data(), rtol=1E-7)
 
     def test_get(self) -> None:
         with self.subTest(msg="Existing entry"):

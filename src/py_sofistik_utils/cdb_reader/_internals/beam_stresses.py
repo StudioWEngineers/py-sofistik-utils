@@ -8,7 +8,6 @@ from pandas import concat, DataFrame
 from . group_lc_data import _GroupLCData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_STR
-from . sofistik_utilities import long_to_str
 
 
 class _BeamStress:
@@ -18,7 +17,7 @@ class _BeamStress:
         """The initializer of the ``_BeamStress`` class.
         """
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "LOAD_CASE",
                 "GROUP",
                 "ELEM_ID",
@@ -53,7 +52,7 @@ class _BeamStress:
     def get_data(self) -> DataFrame:
         """Return a deep copy of all the beam_stress results.
         """
-        return self._data.copy(deep = True)
+        return self._data.copy(deep=True)
 
     def load(self, load_case: int) -> None:
         """Load the results for the given ``load_case`` number.

@@ -99,7 +99,7 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.data, self.cdb.node.residuals.data())
+        assert_frame_equal(self.data, self.cdb.node.residuals.get_data())
 
     def test_get_displacements(self) -> None:
         for load_case in self.lcs:

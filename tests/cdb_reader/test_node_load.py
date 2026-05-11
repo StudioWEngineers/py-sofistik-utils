@@ -45,7 +45,7 @@ class SOFiSTiKCDBReaderNodeLoadTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.cdb.node.loads.data(), self.data)
+        assert_frame_equal(self.cdb.node.loads.get_data(), self.data)
 
     def test_get(self) -> None:
         with self.subTest(msg="single entry"):
