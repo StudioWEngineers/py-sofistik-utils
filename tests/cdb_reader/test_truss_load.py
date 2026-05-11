@@ -28,6 +28,7 @@ _DATA = [
         (7,  500, 5009, "PZP", -7.0,   -7.0),
         (11, 500, 5009, "VX",  +11.0,  +11.0),
         (3,  501, 5011, "PYY", -3.0,   -3.0),
+        (4,  501, 5011, "PZZ", -1.0,   -1.0),
         (4,  501, 5011, "PZZ", -4.0,   -4.0),
         (5,  501, 5011, "PXP", +5.0,   +5.0),
         (9,  501, 5011, "WX",  +0.009, +0.009),
@@ -79,6 +80,13 @@ class SOFiSTiKCDBReaderTrussLoadTestSuite(TestCase):
     def test_get(self) -> None:
         with self.subTest(msg="Existing entry"):
             self.assertEqual(self.cdb.truss.load.get(5009, 7, "PZP", "PA"), -7)
+
+        with self.subTest(msg="Multiple entries"):
+            self.assertEqual(self.cdb.truss.load.get(5011, 4, "PZZ", "PA"), -5)
+
+        with self.subTest(msg="Non existing entry"):
+            with self.assertRaises(LookupError):
+                self.cdb.truss.load.get(3, 25, "PF")
 
         with self.subTest(msg="Non existing entry with default"):
             self.assertEqual(

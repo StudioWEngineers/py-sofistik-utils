@@ -7,7 +7,7 @@ Expected CDB file name: ``TRUSS_LOAD.cdb``
 
 Runs with: SOFiSTiK 2025
 
-Version: 1
+Version: 2
 
 .. code-block:: text
 
@@ -19,7 +19,7 @@ Version: 1
     END
 
     +PROG SOFIMSHA
-    HEAD GEOMETRY REV-1-SOF-2025
+    HEAD GEOMETRY REV-2-SOF-2025
         SYST 3D GDIV 10 GDIR NEGZ
 
         LET#COUNT 1
@@ -49,6 +49,7 @@ Version: 1
             TRUS GRP 501 TYPE PYY -3.0
         LC 4 TITL 'LC-4-PZZ'
             TRUS 5011 TYPE PZZ -4.0
+            TRUS 5011 TYPE PZZ -1.0
         LC 5 TITL 'LC-5-PXP'
             TRUS GRP 501 TYPE PXP +5.0
         LC 6 TITL 'LC-6-PYP'
