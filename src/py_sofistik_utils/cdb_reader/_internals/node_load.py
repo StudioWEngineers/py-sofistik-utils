@@ -110,9 +110,13 @@ class NodeLoad:
         LookupError
             If the requested load is not found and ``default`` is None.
         """
-        value = self._data.loc[(node_id, load_case), quantity]
         try:
-            return value if isinstance(value, (int, float)) else value.sum()  # type: ignore
+            value = self._data.loc[(node_id, load_case), quantity]
+            return (
+                value
+                if isinstance(value, (int, float))
+                else value.sum()  # type: ignore
+            )
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default

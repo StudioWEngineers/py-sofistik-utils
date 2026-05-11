@@ -54,6 +54,13 @@ class SOFiSTiKCDBReaderNodeLoadTestSuite(TestCase):
         with self.subTest(msg="multiple entry"):
             self.assertEqual(self.cdb.node.loads.get(2, 20, "PY"), -3.5)
 
+        with self.subTest(msg="Non existing entry"):
+            with self.assertRaises(LookupError):
+                self.cdb.node.loads.get(3, 25, "PF")
+
+        with self.subTest(msg="Non existing entry with default"):
+            self.assertEqual(self.cdb.node.loads.get(3, 25, "PF", -1), -1)
+
     def test_get_after_clear(self) -> None:
         self.cdb.node.loads.clear(10)
         with self.subTest(msg="Check clear method"):
