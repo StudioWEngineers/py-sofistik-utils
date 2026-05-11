@@ -225,8 +225,5 @@ class _SpringData:
                 right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
                 temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
 
-            # set indices for fast lookup
-            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
-
-            # merge data
-            self._data = temp_df
+            # set indices for fast lookup and merge data
+            self._data = temp_df.set_index(["ELEM_ID"], drop=False)

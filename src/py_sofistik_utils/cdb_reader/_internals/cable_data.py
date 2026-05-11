@@ -177,8 +177,5 @@ class CableData:
                 right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
                 df.loc[df.index[left:right], "GROUP"] = grp
 
-            # set indices for fast lookup
-            df = df.set_index(["ELEM_ID"], drop=False)
-
-            # merge data
-            self._data = df
+            # set indices for fast lookup and merge data
+            self._data = df.set_index(["ELEM_ID"], drop=False)
