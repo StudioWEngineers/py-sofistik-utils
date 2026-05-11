@@ -132,8 +132,6 @@ class _TrussData:
             record_length = c_int(sizeof(truss))
             return_value = c_int(0)
 
-            self.clear()
-
             data: list[dict[str, float | int]] = []
             first_call = True
             while return_value.value < 2:
@@ -182,7 +180,4 @@ class _TrussData:
             temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
 
             # merge data
-            if self._data.empty:
-                self._data = temp_df
-            else:
-                self._data = concat([self._data, temp_df])
+            self._data = temp_df

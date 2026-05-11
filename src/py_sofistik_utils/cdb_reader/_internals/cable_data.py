@@ -134,8 +134,6 @@ class CableData:
             record_length = c_int(sizeof(cabl))
             return_value = c_int(0)
 
-            self.clear()
-
             data: list[dict[str, float | int]] = []
             first_call = True
             while return_value.value < 2:
@@ -183,7 +181,4 @@ class CableData:
             df = df.set_index(["ELEM_ID"], drop=False)
 
             # merge data
-            if self._data.empty:
-                self._data = df
-            else:
-                self._data = concat([self._data, df])
+            self._data = df
