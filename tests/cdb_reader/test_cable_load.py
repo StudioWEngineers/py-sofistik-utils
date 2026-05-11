@@ -21,10 +21,11 @@ _DATA = [
     (1,  500, 5001, "PG",  +1.0,   -1.0),
     (2,  500, 5001, "PXX", +2.0,   +2.0),
     (6,  500, 5001, "PYP", -6.0,   -6.0),
-    (8,  500, 5001, "EX",  -0.008, -0.008),
+    (8,  500, 5001, "EX", -0.00800000037997961, -0.00800000037997961),
     (11, 500, 5001, "VX",  +11.0,  +11.0),
     (2,  500, 5009, "PXX", +2.0,   +2.0),
     (6,  500, 5009, "PYP", -6.0,   -6.0),
+    (7,  500, 5009, "PZP", -2.0,   -2.0),
     (7,  500, 5009, "PZP", -7.0,   -7.0),
     (11, 500, 5009, "VX",  +11.0,  +11.0),
     (3,  501, 5011, "PYY", -3.0,   -3.0),
@@ -35,7 +36,7 @@ _DATA = [
     (11, 501, 5011, "VX",  +11.0,  +11.0),
     (3,  501, 5014, "PYY", -3.0,   -3.0),
     (5,  501, 5014, "PXP", +5.0,   +5.0),
-    (8,  501, 5014, "EX",  -0.008, -0.008),
+    (8,  501, 5014, "EX",  -0.00800000037997961, -0.00800000037997961),
     (9,  501, 5014, "WX",  +0.009, +0.009),
     (10, 501, 5014, "DT",  -10.0,  -10.0),
     (11, 501, 5014, "VX",  +11.0,  +11.0)
@@ -77,7 +78,17 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
 
     def test_get(self) -> None:
         with self.subTest(msg="Existing entry"):
-            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7)
+            self.assertEqual(
+                self.cdb.cable.load.get(5001, 8, "EX", "PA"),
+                -0.00800000037997961
+            )
+
+        with self.subTest(msg="Multiple entries"):
+            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -9)
+
+        with self.subTest(msg="Non existing entry"):
+            with self.assertRaises(LookupError):
+                self.cdb.cable.load.get(3, 25, "PF")
 
         with self.subTest(msg="Non existing entry with default"):
             self.assertEqual(
@@ -103,9 +114,9 @@ class SOFiSTiKCDBReaderCableLoadTestSuite(TestCase):
 
         self.cdb.cable.load.load(self.load_cases)
         with self.subTest(msg="Check indexes management"):
-            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7)
+            self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -9)
 
     def test_load_with_duplicated_load_cases(self) -> None:
         self.cdb.cable.load.clear_all()
         self.cdb.cable.load.load(self.load_cases + [10])
-        self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -7.0)
+        self.assertEqual(self.cdb.cable.load.get(5009, 7, "PZP", "PA"), -9.0)

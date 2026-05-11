@@ -141,16 +141,24 @@ class CableLoad:
             The requested load if found. Otherwise, returns ``default`` when it
             is not None.
 
+        Notes
+        -----
+        If there are multiple entries for the same node and load case, this
+        method returns the sum of all corresponding values. To access the
+        individual entries without aggregation, use the `get_data` method.
+
         Raises
         ------
         LookupError
             If the requested load is not found and ``default`` is None.
         """
         try:
-            return self._data.at[
-                (element_id, load_case, load_type),
-                point
-            ]  # type: ignore
+            value = self._data.loc[(element_id, load_case, load_type), point]
+            return (
+                value
+                if isinstance(value, (int, float))
+                else value.sum()  # type: ignore
+            )
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
