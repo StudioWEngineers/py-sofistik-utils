@@ -230,6 +230,7 @@ class CableLoad:
             self._data = df
         else:
             self._data = concat([self._data, df])
+            self._data.sort_index(inplace=True)
         self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:

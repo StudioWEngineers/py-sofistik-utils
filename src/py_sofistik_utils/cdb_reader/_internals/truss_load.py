@@ -199,6 +199,7 @@ class _TrussLoad:
             self._data = temp_df
         else:
             self._data = concat([self._data, temp_df])
+            self._data.sort_index(inplace=True)
         self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:
