@@ -34,7 +34,7 @@ class SOFiSTiKCDBReader:
     grp_lc_data: _GroupLCData
     load_case: _LoadCases
     node: _Node
-    quad: Quads
+    quads: Quads
     cross_section: CrossSectionalData
     sec_grp_lc_data: _SecondaryGroupLCData
     spring: _Spring
