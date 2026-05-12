@@ -112,7 +112,10 @@ class SOFiSTiKCDBReaderBeamDataTestSuite(TestCase):
 
     def test_get(self) -> None:
         with self.subTest(msg="Existing entry - length"):
-            self.assertEqual(self.cdb.beams.data.get(202), 5.024937629699707)
+            self.assertEqual(
+                self.cdb.beams.data.get(202, "LENGTH"),
+                5.024937629699707
+            )
 
         with self.subTest(msg="Existing entry - N1"):
             self.assertEqual(self.cdb.beams.data.get(202, "N1"), 2)
@@ -157,7 +160,7 @@ class SOFiSTiKCDBReaderBeamDataTestSuite(TestCase):
         self.cdb.beams.data.clear()
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.beams.data.get(202)
+                self.cdb.beams.data.get(202, "LENGTH")
 
         self.cdb.beams.data.load()
         with self.subTest(msg="Check indexes management"):

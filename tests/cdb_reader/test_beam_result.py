@@ -75,7 +75,7 @@ class SOFiSTiKCDBReaderBeamResultTestSuite(TestCase):
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):
             self.assertEqual(
-                self.cdb.beams.results.get(202, 1001, 0.40),
+                self.cdb.beams.results.get(202, 1001, 0.40, "N"),
                 97.24059295654297
             )
 

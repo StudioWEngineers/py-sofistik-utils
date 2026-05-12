@@ -94,7 +94,7 @@ class _BeamData:
     def get(
             self,
             element_id: int,
-            quantity: str = "LENGTH",
+            quantity: str,
             default: float | int | None = None
     ) -> float | int | str:
         """Retrieve the requested beam quantity.
@@ -103,7 +103,7 @@ class _BeamData:
         ----------
         element_id : int
             Beam element number
-        quantity : str, default "LENGTH"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"N1"``

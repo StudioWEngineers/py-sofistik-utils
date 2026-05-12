@@ -68,7 +68,7 @@ class NodeLoad:
             self,
             node_id: int,
             load_case: int,
-            quantity: str = "PZ",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested nodal load.
@@ -79,7 +79,7 @@ class NodeLoad:
             Node number
         load_case : int
             Load case number
-        quantity : str, default "PZ"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``PX``

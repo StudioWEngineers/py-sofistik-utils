@@ -88,7 +88,7 @@ class _NodeResidual:
             self,
             node_id: int,
             load_case: int,
-            quantity: str = "UX",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested nodal result.
@@ -99,7 +99,7 @@ class _NodeResidual:
             Node number
         load_case : int
             Load case number
-        quantity : str, default "UX"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``UX``

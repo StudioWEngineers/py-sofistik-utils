@@ -84,7 +84,7 @@ class _SpringData:
     def get(
             self,
             element_id: int,
-            quantity: str = "CP",
+            quantity: str,
             default: float | int | None = None
     ) -> float | int:
         """Retrieve the requested spring quantity.
@@ -93,7 +93,7 @@ class _SpringData:
         ----------
         element_id : int
             Spring element number
-        quantity : str, default "CP"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"N1"``

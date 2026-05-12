@@ -86,7 +86,7 @@ class CableResult:
             self,
             element_id: int,
             load_case: int,
-            quantity: str = "AXIAL_FORCE",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested cable result.
@@ -97,7 +97,7 @@ class CableResult:
             Cable element number
         load_case : int
             Load case number
-        quantity : str, default "AXIAL_FORCE"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"AXIAL_FORCE"``

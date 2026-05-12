@@ -70,7 +70,7 @@ class CableData:
     def get(
             self,
             element_id: int,
-            quantity: str = "L0",
+            quantity: str,
             default: float | int | None = None
     ) -> float | int:
         """Retrieve the requested cable quantity.
@@ -79,7 +79,7 @@ class CableData:
         ----------
         element_id : int
             Cable element number
-        quantity : str, default "L0"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"N1"``

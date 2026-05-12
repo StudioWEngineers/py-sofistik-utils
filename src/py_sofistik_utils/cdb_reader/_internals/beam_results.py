@@ -103,7 +103,7 @@ class BeamResults:
             element_id: int,
             load_case: int,
             position: float,
-            quantity: str = "N",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested beam result.
@@ -116,7 +116,7 @@ class BeamResults:
             Load case number
         position : float
             Relative position of the output station along the beam (0 to 1)
-        quantity : str, default "N"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``N``
@@ -208,7 +208,9 @@ class BeamResults:
         # calculating adimensional length
         beam_data = _BeamData(self._dll)
         beam_data.load()
-        elem_to_factor = {_: beam_data.get(_) for _ in df["ELEM_ID"].unique()}
+        elem_to_factor = {
+            _: beam_data.get(_, "LENGTH") for _ in df["ELEM_ID"].unique()
+        }
         factors = df["ELEM_ID"].map(elem_to_factor).fillna(1.0).astype(float)
         df["POS_REL"] = (df["POS_REL"] / factors).round(2)
 
