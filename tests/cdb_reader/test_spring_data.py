@@ -25,7 +25,7 @@ class SOFiSTiKCDBReaderSpringDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "SPRING_DATA",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.spring.data.load()

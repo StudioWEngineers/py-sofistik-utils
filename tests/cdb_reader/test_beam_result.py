@@ -51,7 +51,7 @@ class SOFiSTiKCDBReaderBeamResultTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "BEAM_RESULTS",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.beams.results.load(self.load_cases)

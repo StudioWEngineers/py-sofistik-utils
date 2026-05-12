@@ -39,7 +39,7 @@ class SOFiSTiKCDBReaderTrussResultTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "TRUSS_RESULT",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.truss.result.load(1000)

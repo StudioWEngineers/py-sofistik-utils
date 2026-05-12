@@ -25,7 +25,7 @@ class SOFiSTiKCDBReaderCableDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "CABLE_DATA",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.cable.data.load()

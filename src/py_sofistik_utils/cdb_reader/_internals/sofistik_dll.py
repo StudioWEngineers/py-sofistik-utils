@@ -1,15 +1,6 @@
-"""
-SofDll
-------
-
-The `_SofDll` class load the SOFiSTiK dll `sof_cdb_w-202X.dll` and store as member
-variables some of the function provided by SOFiSTiK to read and write cdb files.
-
-Writing to a cdb is currently not supported.
-"""
 # standard library imports
-from ctypes import CDLL, cdll
 import os
+from ctypes import CDLL, cdll
 from pathlib import Path
 from typing import Callable
 
@@ -20,15 +11,21 @@ from . sofistik_utilities import decode_cdb_status
 
 
 class SofDll():
-    """The `_SofDll` class load the SOFiSTiK dll `sof_cdb_w-202X.dll` and store as member
-    variables some of the function provided by SOFiSTiK to read cdb files.
+    """This class loads the SOFiSTiK DLL `sof_cdb_w-202X.dll` and stores, as
+    member variables, selected functions provided by SOFiSTiK for reading CDB
+    files.
     """
-    def __init__(self, dll_folder: str, echo_level: int = 0, version: int = 2023) -> None:
-        """The initializer of the `SofDll` class.
-        """
-        self._dll: CDLL
+    def __init__(
+            self,
+            dll_folder: str,
+            echo_level: int = 0,
+            version: int | str = 2023
+    ) -> None:
         self.get: Callable[..., int]
+        self.key_exist: Callable[..., bool]
+        self.to_string: Callable[..., str]
 
+        self._dll: CDLL
         self._echo_level = echo_level
         self._path: str = dll_folder if self._check_folder(dll_folder) else ""
         self._version: str = self._check_version(version)
@@ -36,41 +33,11 @@ class SofDll():
     def close(self) -> None:
         """Close the CDB database.
         """
-        self._dll.sof_cdb_close(0)
-
-        if self._dll.sof_cdb_status(1) == 0:
+        self._dll.sof_cdb_close(0)  # 0 to close all files
+        if self._dll.sof_cdb_status(1) != 0:
+            raise RuntimeError("Unknown error while closing cdb file!")
+        if self._echo_level > 0:
             print("CDB file has been successfully closed.")
-            return
-
-        raise RuntimeError("Unknown error while closing cdb file!")
-
-    def load_dll(self) -> bool:
-        """Checks if all the required required SOFiSTiK dynamic libraries are present and
-        loads the main SOFiSTiK dll.
-        Returns `True` on success.
-        """
-        if not self._check_folder(self._path):
-            raise RuntimeError()
-            return False
-
-        if not self._check_files(self._path, ["libmmd.dll", "libifcoremd.dll"]):
-            raise RuntimeError()
-            return False
-
-        if not self._check_files(self._path, [self._version]):
-            raise RuntimeError()
-            return False
-        print("\n")
-        try:
-            with os.add_dll_directory(self._path):
-                print("Library loaded successfully!")
-                self._dll = cdll.LoadLibrary(self._version)
-
-        except: # OSError as e:
-            print(f"Failed to load library: {1}")
-            raise RuntimeError
-
-        return True
 
     def get_echo_level(self) -> int:
         """Return the `echo_level` of this instance of `SofDll`.
@@ -78,58 +45,52 @@ class SofDll():
         return self._echo_level
 
     def initialize(self) -> None:
+        """Load the SOFiSTiK dll.
         """
-        """
-        self.load_dll()
+        if not self._check_folder(self._path):
+            raise RuntimeError(
+                f"The provided {self._path} is not a valid directory!"
+            )
+
+        if not self._check_files(
+            self._path,
+            ["libmmd.dll", "libifcoremd.dll"]
+        ):
+            raise RuntimeError("libmmd.dll or libifcoremd.dll not found!")
+
+        if not self._check_files(self._path, [self._version]):
+            raise RuntimeError(f"{self._version} not found!")
+
+        try:
+            with os.add_dll_directory(self._path):
+                self._dll = cdll.LoadLibrary(self._version)
+        except Exception as e:
+            print(f"Failed to load {self._version} in {self._path}!")
+            raise RuntimeError() from e
 
         self.get = self._dll.sof_cdb_get
+        self.key_exist = self._dll.sof_cdb_kexist
         self.to_string = self._dll.sof_lib_ps2cs
 
-    def key_exist(self, kwh: int, kwl: int) -> bool:
-        """Return `True` if the key exists and contains data, `False` otherwise.
-        """
-        match self._dll.sof_cdb_kexist(kwh, kwl):
-            case 0:
-                if self._echo_level > 0:
-                    print(f"Key {kwh}/{kwl} does not exist!")
-                return False
-
-            case 1:
-                if self._echo_level > 0:
-                    print(f"Key {kwh}/{kwl} exists, but it's empty!")
-                return False
-
-            case 2:
-                return True
-
-            case _:
-                if self._echo_level > 0:
-                    print(f"Unknown error in checking existance of key {kwh}/{kwl}!")
-                return False
-
-    def open_cdb(self, file_full_name: str, mode: int = 93) -> None:
-        """Open the cdb file give its full name.
-
-        Parameters
-        ----------
-        file_full_name: str
-            Absolute path to the cdb file.
-        mode: int, optional and default to 93
-            Read only access with mode = 93.
+    def open_cdb(self, file_full_name: str) -> None:
+        """Open the cdb file in read-only mode.
         """
         if not os.path.isfile(file_full_name):
-            raise RuntimeError(f"\"{file_full_name}\" is NOT an existing regular file!")
+            raise RuntimeError(
+                f"\"{file_full_name}\" is NOT an existing regular file!"
+            )
 
-        self._dll.sof_cdb_init(file_full_name.encode("UTF-8"), mode)
+        self._dll.sof_cdb_init(file_full_name.encode("UTF-8"), 93)
 
         if self._dll.sof_cdb_status(1) > 0:
             if self._echo_level > 0:
                 print(f"CDB \"{file_full_name}\" successfully opened.")
                 print(decode_cdb_status(self._dll.sof_cdb_status(1)))
-
             return
 
-        raise RuntimeError(f"Unknown error while opening \"{file_full_name}\"!")
+        raise RuntimeError(
+            f"Unknown error while opening \"{file_full_name}\"!"
+        )
 
     def set_echo_level(self, echo_level: int) -> None:
         """Set the `echo_level` for this instance of `SofDll`.
@@ -138,7 +99,7 @@ class SofDll():
 
     @staticmethod
     def _check_files(path_to_dll: str, files: list[str]) -> bool:
-        """Returns `True` if all the listed files are found in the provided folder.
+        """Returns `True` if all the given files are found in `path_to_dll`.
         """
         return all((Path(path_to_dll) / _).is_file() for _ in files)
 
@@ -149,10 +110,15 @@ class SofDll():
         return Path(path_to_dll).is_dir()
 
     @staticmethod
-    def _check_version(version: int) -> str:
-        """Return the name of the SOFiSTiK dll to be loaded given the software version.
+    def _check_version(version: int | str) -> str:
+        """Return the name of the SOFiSTiK dll to be loaded, given the version.
         """
-        if version in [2022, 2023, 2024, 2025]:
+        if isinstance(version, int):
+            version = str(version)
+
+        if version in ["2022", "2023", "2024", "2025"]:
             return f"sof_cdb_w-{version}.dll"
 
-        raise RuntimeError("Supported SOFiSTiK versions: 2022, 2023, 2024 and 2025!")
+        raise RuntimeError(
+            "Supported SOFiSTiK versions: 2022, 2023, 2024 and 2025!"
+        )

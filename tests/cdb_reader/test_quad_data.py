@@ -25,7 +25,7 @@ class SOFiSTiKCDBReaderQuadDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "QUAD_DATA",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.quads.data.load()

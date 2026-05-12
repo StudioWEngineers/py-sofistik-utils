@@ -67,7 +67,7 @@ class SOFiSTiKCDBReaderCrossSectionTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "CROSS-SECTION",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.cross_section.load([1, 2, 3])

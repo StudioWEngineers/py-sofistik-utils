@@ -27,7 +27,7 @@ class SOFiSTiKCDBReaderNodeDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "NODE_DATA",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.node.data.load()
@@ -115,7 +115,7 @@ class SOFiSTiKCDBReaderEnhancedNodeDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "NODE_DATA_NON_CONTIGUOUS_AND_FREE",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.node.data.load()

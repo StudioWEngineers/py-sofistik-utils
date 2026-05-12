@@ -89,7 +89,7 @@ class SOFiSTiKCDBReaderBeamDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "BEAM_DATA",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.beams.data.load()

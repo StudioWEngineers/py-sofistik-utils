@@ -85,7 +85,7 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "NODE_RESIDUAL",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.node.residuals.load(self.lcs)

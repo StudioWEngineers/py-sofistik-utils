@@ -121,7 +121,7 @@ class SOFiSTiKCDBReaderNodeResultsTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "NODE_RESULTS",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.node.results.load(self.lcs)

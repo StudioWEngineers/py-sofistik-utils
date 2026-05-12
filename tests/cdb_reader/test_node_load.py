@@ -25,7 +25,7 @@ class SOFiSTiKCDBReaderNodeLoadTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "NODE_LOADS",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.node.loads.load([10, 20])

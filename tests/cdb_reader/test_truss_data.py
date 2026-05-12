@@ -25,7 +25,7 @@ class SOFiSTiKCDBReaderTrussDataTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "TRUSS_DATA",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
         self.cdb.initialize()
         self.cdb.truss.data.load()

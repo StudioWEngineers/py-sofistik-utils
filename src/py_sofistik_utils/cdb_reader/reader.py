@@ -136,7 +136,7 @@ class SOFiSTiKCDBReader:
         """
         if not self.is_open:
             self._dll.initialize()
-            self._dll.open_cdb(self.full_name, 93)
+            self._dll.open_cdb(self.full_name)
             self.is_open = True
 
     def set_echo_level(self, new_echo_level: int) -> None:
