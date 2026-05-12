@@ -10,19 +10,50 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CQUAD
 
 
-class _PlateData:
-    """
-    This class provides methods and data structure to:
+class QuadData:
+    """This class provides methods and a data structure to:
 
-    * read-only access to the cdb file (only to key ``200/00``);
-    * store these information in a convenient format;
-    * access these information.
+        * access keys ``200/00`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
+
+        * ``GROUP`` element group
+        * ``ELEM_ID`` element number
+        * ``N1`` id of the first node
+        * ``N2``: id of the second node
+        * ``N3``: id of the second node
+        * ``N4``: id of the second node
+        * ``MNO``: material number
+        * ``NRA``: type of element
+
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
+        fast lookups via the `get` method. The index column is not dropped from
+        the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In
+            particular:
+
+            * thickness
+            * Jacobi Determinant
+            * thickness
+            * bedding factor
+            * tangential bedding factor
+            * transformation matrix
+            * reinforcement material number
+
+            are currently not included.
+
+            This is a deliberate design choice and may be changed in the future
+            without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_PlateData`` class.
-        """
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "GROUP",
                 "ELEM_ID",
                 "N1",
@@ -34,26 +65,83 @@ class _PlateData:
             ]
         )
         self._dll = dll
-        self._is_loaded = False
 
     def clear(self) -> None:
-        """Clear the data set for all the quad elements.
+        """Clear all the loaded data.
         """
         self._data = self._data[0:0]
-        self._is_loaded = False
+
+    def get(
+            self,
+            element_id: int,
+            quantity: str,
+            default: float | int | None = None
+    ) -> float | int:
+        """Retrieve the requested quad quantity.
+
+        Parameters
+        ----------
+        element_id : int
+            Cable element number
+        quantity : str
+            Quantity to retrieve. Must be one of:
+
+            - ``"N1"``
+            - ``"N2"``
+            - ``"N3"``
+            - ``"N4"``
+            - ``"MNO"``
+            - ``"NRA"``
+
+        default : float or int or None, default None
+            Value to return if the requested quantity is not found
+
+        Returns
+        -------
+        value : float or int
+            The requested quantity if found. Otherwise, returns ``default``
+            when it is not None.
+
+        Raises
+        ------
+        LookupError
+            If the requested quantity is not found and ``default`` is None.
+        """
+        try:
+            return self._data.at[element_id, quantity]  # type: ignore
+        except (KeyError, ValueError) as e:
+            if default is not None:
+                return default
+            raise LookupError(
+                f"Quad data entry not found for element id {element_id}, "
+                f"and quantity {quantity}!"
+            ) from e
+
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``200/00``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
 
     def load(self) -> None:
-        """Load data set for all the quad elements.
+        """Retrieve all quad data. If the key does not exist or it is empty, a
+        warning is raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(200, 0):
             quad = CQUAD()
             rec_length = c_int(sizeof(quad))
             return_value = c_int(0)
 
-            self.clear()
-
-            temp_container: list[list[int]] = []
-            count = 0
+            data: list[dict[str, float | int]] = []
+            first_call = True
             while return_value.value < 2:
                 return_value.value = self._dll.get(
                     1,
@@ -61,114 +149,40 @@ class _PlateData:
                     0,
                     byref(quad),
                     byref(rec_length),
-                    0 if count == 0 else 1
+                    0 if first_call else 1
                 )
 
+                rec_length = c_int(sizeof(quad))
+                first_call = False
                 if return_value.value >= 2:
                     break
 
-                if quad.m_nr != 0:
-                    temp_list: list[int] = [0 for _ in range(8)]
-                    temp_list[0] = 0
-                    temp_list[1] = quad.m_nr
-                    for i in range(0, 4):
-                        temp_list[i + 2] = quad.m_node[i]
-                    temp_list[6] = quad.m_mat
-                    temp_list[7] = quad.m_nra
+                data.append(
+                    {
+                        "GROUP":    0,
+                        "ELEM_ID":  quad.m_nr,
+                        "N1":       quad.m_node[0],
+                        "N2":       quad.m_node[1],
+                        "N3":       quad.m_node[2],
+                        "N4":       quad.m_node[3],
+                        "MNO":      quad.m_mat,
+                        "NRA":      quad.m_nra
+                    }
+                )
 
-                    temp_container.append(temp_list)
-
-                rec_length = c_int(sizeof(quad))
-                count += 1
-
-            # preparing data for conversion to a pandas DataFrame
-            conv_data: list[dict[str, int]] = []
-            for item in temp_container:
-                conv_data.append({"GROUP"   : item[0],
-                                  "ELEM_ID" : item[1],
-                                  "N1"      : item[2],
-                                  "N2"      : item[3],
-                                  "N3"      : item[4],
-                                  "N4"      : item[5],
-                                  "MNO"     : item[6],
-                                  "NRA"     : item[7],
-                                  })
-
-            self._data = DataFrame(conv_data)
-            self._is_loaded = True
+            df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = df["ELEM_ID"]
 
             # assigning groups
             group_data = _GroupData(self._dll)
             group_data.load()
 
-            for grp, quad_range in group_data.iterator_quad():
-                self._data.loc[self._data.ELEM_ID.isin(quad_range), "GROUP"] = grp
+            for grp, grp_range in group_data.iterator_quad():
+                if grp_range.stop == 0:
+                    continue
+                left = elem_ids.searchsorted(grp_range.start, side="left")
+                right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
+                df.loc[df.index[left:right], "GROUP"] = grp
 
-    def get_connectivity(self) -> DataFrame:
-        """Return the plate connectivity for all the plate elements.
-        The first column represents the element IDs.
-        """
-        return self._data.iloc[:, 1:6].copy(deep=True)
-
-    def get_element_connectivity(self, plate_nmb: int) -> DataFrame:
-        """Return the plate connectivity for the given ``plate_nmb``.
-        The first value represents the element ID.
-
-        Parameters
-        ----------
-        ``plate_nmb``: int
-            The plate number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``plate_nmb`` is not found.
-        """
-        mask = self._data["ELEM_ID"] == plate_nmb
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Element number {plate_nmb} not found!")
-
-        return self._data.iloc[:, 1:6][mask].copy(deep=True)
-
-    def get_group_connectivity(self, group_number: int|list[int]) -> DataFrame:
-        """Return the plate connectivity for the given ``grp_nmb``.
-        The first column represents the element IDs.
-
-        Parameters
-        ----------
-        ``grp_nmb``: int | list[int]
-            The plate group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``grp_nmb`` is not found. In case a `list` of groups is passed, the
-            error is raised of none of the groups is found.
-        """
-        if isinstance(group_number, int):
-            grp_mask = self._data["GROUP"] == group_number
-        else:
-            grp_mask = self._data.GROUP.isin(group_number)
-
-        if grp_mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        return self._data.iloc[:, 1:6][grp_mask].copy(deep=True)
-
-    def get_material(self) -> DataFrame:
-        """Return the plate material for all the plate elements.
-        The first column represents the element IDs.
-        """
-        return self._data[["ELEM_ID", "MNO"]].copy(deep=True)
-
-    def get_nra(self) -> DataFrame:
-        """Return the plate NRA for all the plate elements.
-        The first column represents the element IDs.
-        """
-        return self._data[["ELEM_ID", "NRA"]].copy(deep=True)
-
-    def is_loaded(self) -> bool:
-        """Return `True` if the plate data have been loaded from the cdb.
-        """
-        return self._is_loaded
+            # set indices for fast lookup and merge data
+            self._data = df.set_index(["ELEM_ID"], drop=False)
