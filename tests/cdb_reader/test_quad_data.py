@@ -27,7 +27,7 @@ class SOFiSTiKCDBReaderQuadDataTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
+        self.cdb.open()
         self.cdb.quads.data.load()
 
     def tearDown(self) -> None:

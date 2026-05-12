@@ -27,8 +27,8 @@ class SOFiSTiKCDBReaderNodeLoadTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.node.loads.load([10, 20])
+        self.cdb.open()
+        self.cdb.nodes.loads.load([10, 20])
 
         self.data = DataFrame(
             [
@@ -45,43 +45,43 @@ class SOFiSTiKCDBReaderNodeLoadTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.cdb.node.loads.get_data(), self.data)
+        assert_frame_equal(self.cdb.nodes.loads.get_data(), self.data)
 
     def test_get(self) -> None:
         with self.subTest(msg="single entry"):
-            self.assertEqual(self.cdb.node.loads.get(3, 10, "PX"), 1)
+            self.assertEqual(self.cdb.nodes.loads.get(3, 10, "PX"), 1)
 
         with self.subTest(msg="multiple entry"):
-            self.assertEqual(self.cdb.node.loads.get(2, 20, "PY"), -3.5)
+            self.assertEqual(self.cdb.nodes.loads.get(2, 20, "PY"), -3.5)
 
         with self.subTest(msg="Non existing entry"):
             with self.assertRaises(LookupError):
-                self.cdb.node.loads.get(3, 25, "PF")
+                self.cdb.nodes.loads.get(3, 25, "PF")
 
         with self.subTest(msg="Non existing entry with default"):
-            self.assertEqual(self.cdb.node.loads.get(3, 25, "PF", -1), -1)
+            self.assertEqual(self.cdb.nodes.loads.get(3, 25, "PF", -1), -1)
 
     def test_get_after_clear(self) -> None:
-        self.cdb.node.loads.clear(10)
+        self.cdb.nodes.loads.clear(10)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.node.loads.get(3, 10, "PX")
+                self.cdb.nodes.loads.get(3, 10, "PX")
 
-        self.cdb.node.loads.load(10)
+        self.cdb.nodes.loads.load(10)
         with self.subTest(msg="Check indexes management"):
-            self.assertEqual(self.cdb.node.loads.get(2, 20, "PY"), -3.5)
+            self.assertEqual(self.cdb.nodes.loads.get(2, 20, "PY"), -3.5)
 
     def test_get_after_clear_all(self) -> None:
-        self.cdb.node.loads.clear_all()
+        self.cdb.nodes.loads.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.node.loads.get(3, 10, "PX")
+                self.cdb.nodes.loads.get(3, 10, "PX")
 
-        self.cdb.node.loads.load([10, 20])
+        self.cdb.nodes.loads.load([10, 20])
         with self.subTest(msg="Check indexes management"):
-            self.assertEqual(self.cdb.node.loads.get(3, 10, "PX"), 1)
+            self.assertEqual(self.cdb.nodes.loads.get(3, 10, "PX"), 1)
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        self.cdb.node.loads.clear_all()
-        self.cdb.node.loads.load([10, 20] + [10])
-        self.assertEqual(self.cdb.node.loads.get(2, 20, "PY"), -3.5)
+        self.cdb.nodes.loads.clear_all()
+        self.cdb.nodes.loads.load([10, 20] + [10])
+        self.assertEqual(self.cdb.nodes.loads.get(2, 20, "PY"), -3.5)

@@ -1,10 +1,3 @@
-"""
-SOFiSTiKCDBReader
------------------
-
-The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only access to a
-SOFiSTiK cdb file and serialize its content.
-"""
 # standard library imports
 
 # third party library imports
@@ -25,20 +18,24 @@ from . _internals.truss import _Truss
 
 
 class SOFiSTiKCDBReader:
-    """The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only
-    access to a SOFiSTiK cdb file and serialize its content.
+    """The ``SOFiSTiKCDBReader`` class provides efficient, read-only access to
+    SOFiSTiK CDB files together with convenient data structures for fast
+    querying, serialization, and interoperability with tools such as Pandas.
     """
+    # elements
     beams: Beam
-    cable: Cables
-    grp_data: _GroupData
-    grp_lc_data: _GroupLCData
-    load_case: _LoadCases
-    node: _Node
+    cables: Cables
+    nodes: _Node
     quads: Quads
-    cross_section: CrossSectionalData
-    sec_grp_lc_data: _SecondaryGroupLCData
-    spring: _Spring
-    truss: _Truss
+    springs: _Spring
+    trusses: _Truss
+
+    # other cdb data
+    cross_sections: CrossSectionalData
+    group_data: _GroupData
+    group_lc_data: _GroupLCData
+    load_cases: _LoadCases
+    sec_group_lc_data: _SecondaryGroupLCData
 
     def __init__(
             self,
@@ -47,72 +44,26 @@ class SOFiSTiKCDBReader:
             path_to_dlls: str,
             version: int = 2023
     ) -> None:
-        """The initializer of the ``SOFiSTiKCDBReader`` class.
-        """
+        self._dll = SofDll(path_to_dlls, 0, version)
         self._echo_level = 0
+
         self.full_name = path_to_cdb + file_name + ".cdb"
         self.is_open = False
 
-        self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
-
+        # elements
         self.beams = Beam(self._dll)
-
-        self.cable = Cables(self._dll)
-
-        self.grp_data = _GroupData(self._dll)
-        self.grp_lc_data = _GroupLCData(self._dll)
-        self.sec_grp_lc_data = _SecondaryGroupLCData(self._dll)
-
-        self.node = _Node(self._dll)
-
+        self.cables = Cables(self._dll)
+        self.nodes = _Node(self._dll)
         self.quads = Quads(self._dll)
+        self.springs = _Spring(self._dll)
+        self.trusses = _Truss(self._dll)
 
-        self.spring = _Spring(self._dll)
-
-        self.load_case = _LoadCases(self._dll)
-        self.cross_section = CrossSectionalData(self._dll)
-
-        self.truss = _Truss(self._dll)
-
-    def clear(self) -> None:
-        """Clear all the loaded data and results.
-        """
-        #self.beam_res.clear_all_forces()
-        #self.beam_geo.clear_connectivity()
-        self.cable.data.clear()
-        self.cable.load.clear_all()
-        self.cable.result.clear_all()
-        self.grp_data.clear()
-        self.grp_lc_data.clear_all()
-        self.sec_grp_lc_data.clear_all()
-        self.node.data.clear()
-        self.node.results.clear_all()
-        self.spring.data.clear()
-        self.spring.result.clear_all()
-        #self.load_case.clear_all()
-        #self.properties.clear_all_values()
-
-    def clear_data(self) -> None:
-        """Clear all the loaded data.
-        """
-        #self.beam_geo.clear_connectivity()
-        self.cable.data.clear()
-        self.grp_data.clear()
-        self.grp_lc_data.clear_all()
-        self.sec_grp_lc_data.clear_all()
-        self.node.data.clear()
-        self.spring.data.clear()
-        #self.load_case.clear_all()
-        #self.properties.clear_all_values()
-
-    def clear_results(self) -> None:
-        """Clear all the loaded results.
-        """
-        #self.beam_res.clear_all_forces()
-        self.cable.result.clear_all()
-        self.node.results.clear_all()
-        self.spring.result.clear_all()
-        #self.load_case.clear_all()
+        # other cdb data
+        self.cross_sections = CrossSectionalData(self._dll)
+        self.group_data = _GroupData(self._dll)
+        self.group_lc_data = _GroupLCData(self._dll)
+        self.load_cases = _LoadCases(self._dll)
+        self.sec_group_lc_data = _SecondaryGroupLCData(self._dll)
 
     def close(self) -> None:
         """Close the CDB database.
@@ -121,18 +72,13 @@ class SOFiSTiKCDBReader:
         self.is_open = False
 
     def get_echo_level(self) -> int:
-        """return the ``echo_level`` for this instance of ``SOFiSTiKCDBReader``.
+        """Return the ``echo_level`` of this instance of ``SOFiSTiKCDBReader``.
         """
         return self._echo_level
 
-    def initialize(self) -> None:
-        """Open the CDB file.
-        """
-        self.open()
-
     def open(self) -> None:
-        """Open a CDB database always in a read-only mode! This method is supposed to be
-        called before any other call.
+        """Load the required SOFiSTiK dlls and open a CDB database in a
+        read-only mode.
         """
         if not self.is_open:
             self._dll.initialize()
@@ -140,7 +86,7 @@ class SOFiSTiKCDBReader:
             self.is_open = True
 
     def set_echo_level(self, new_echo_level: int) -> None:
-        """Set the ``echo_level`` for this instance of ``SOFiSTiKCDBReader``.
+        """Set the ``echo_level``.
         """
         self._echo_level = new_echo_level
         self._dll.set_echo_level(new_echo_level)

@@ -91,7 +91,7 @@ class SOFiSTiKCDBReaderBeamDataTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
+        self.cdb.open()
         self.cdb.beams.data.load()
 
     def tearDown(self) -> None:

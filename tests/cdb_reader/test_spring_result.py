@@ -80,8 +80,8 @@ class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.spring.result.load(1000)
+        self.cdb.open()
+        self.cdb.springs.result.load(1000)
 
     def tearDown(self) -> None:
         self.cdb.close()
@@ -97,79 +97,79 @@ class SOFiSTiKCDBReaderSpringResultTestSuite(TestCase):
         # The chosen tolerance is stricter than pandas default and reflects the
         # maximum relative error observed in practice, ensuring stable and
         # reproducible comparisons.
-        assert_frame_equal(data, self.cdb.spring.result.get_data(), rtol=1E-7)
+        assert_frame_equal(data, self.cdb.springs.result.get_data(), rtol=1E-7)
 
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):
-            self.assertEqual(self.cdb.spring.result.get(102, 1000, "P"), 9)
+            self.assertEqual(self.cdb.springs.result.get(102, 1000, "P"), 9)
 
         with self.subTest(msg="Transversal force"):
-            self.assertEqual(self.cdb.spring.result.get(102, 1000, "PT"), 0)
+            self.assertEqual(self.cdb.springs.result.get(102, 1000, "PT"), 0)
 
         with self.subTest(msg="Moment"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "M"),
+                self.cdb.springs.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
 
         with self.subTest(msg="Displacement"):
             self.assertEqual(
-                self.cdb.spring.result.get(102, 1000, "V"),
+                self.cdb.springs.result.get(102, 1000, "V"),
                 0.09000000357627869
             )
 
         with self.subTest(msg="Transversal displacement"):
             self.assertEqual(
-                self.cdb.spring.result.get(102, 1000, "VT"),
+                self.cdb.springs.result.get(102, 1000, "VT"),
                 0.07000000029802322
             )
 
         with self.subTest(msg="Rotation"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "PHI"),
+                self.cdb.springs.result.get(113, 1000, "PHI"),
                 0
             )
 
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
-                self.cdb.spring.result.get(102, 1000, "NON-EXISTING")
+                self.cdb.springs.result.get(102, 1000, "NON-EXISTING")
 
         with self.subTest(msg="Non existing entry with default"):
             self.assertEqual(
-                self.cdb.spring.result.get(102, 1000, "NON-EXISTING", 5),
+                self.cdb.springs.result.get(102, 1000, "NON-EXISTING", 5),
                 5
             )
 
     def test_get_after_clear(self) -> None:
-        self.cdb.spring.result.clear(1000)
+        self.cdb.springs.result.clear(1000)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.spring.result.get(113, 1000, "M")
+                self.cdb.springs.result.get(113, 1000, "M")
 
-        self.cdb.spring.result.load(1000)
+        self.cdb.springs.result.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "M"),
+                self.cdb.springs.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
 
     def test_get_after_clear_all(self) -> None:
-        self.cdb.spring.result.clear_all()
+        self.cdb.springs.result.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.spring.result.get(113, 1000, "M")
+                self.cdb.springs.result.get(113, 1000, "M")
 
-        self.cdb.spring.result.load(1000)
+        self.cdb.springs.result.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "M"),
+                self.cdb.springs.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        self.cdb.spring.result.clear_all()
-        self.cdb.spring.result.load([1000] + [1000])
+        self.cdb.springs.result.clear_all()
+        self.cdb.springs.result.load([1000] + [1000])
         self.assertEqual(
-                self.cdb.spring.result.get(113, 1000, "M"),
+                self.cdb.springs.result.get(113, 1000, "M"),
                 1.0000000031710769e-29
             )

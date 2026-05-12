@@ -50,8 +50,8 @@ class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.cable.result.load(self.load_cases)
+        self.cdb.open()
+        self.cdb.cables.result.load(self.load_cases)
 
     def tearDown(self) -> None:
         self.cdb.close()
@@ -67,85 +67,85 @@ class SOFiSTiKCDBReaderCableResultTestSuite(TestCase):
         # The chosen tolerance is stricter than pandas default and reflects the
         # maximum relative error observed in practice, ensuring stable and
         # reproducible comparisons.
-        assert_frame_equal(data, self.cdb.cable.result.get_data(), rtol=1E-7)
+        assert_frame_equal(data, self.cdb.cables.result.get_data(), rtol=1E-7)
 
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):
             self.assertEqual(
-                self.cdb.cable.result.get(102, 1000, "AXIAL_FORCE"),
+                self.cdb.cables.result.get(102, 1000, "AXIAL_FORCE"),
                 1.7247849702835083
             )
 
         with self.subTest(msg="Average axial force"):
             self.assertEqual(
-                self.cdb.cable.result.get(102, 1000, "AVG_AXIAL_FORCE"),
+                self.cdb.cables.result.get(102, 1000, "AVG_AXIAL_FORCE"),
                 1.7247587442398071
             )
 
         with self.subTest(msg="Axial displacement"):
             self.assertEqual(
-                self.cdb.cable.result.get(101, 1001, "AXIAL_DISPLACEMENT"),
+                self.cdb.cables.result.get(101, 1001, "AXIAL_DISPLACEMENT"),
                 8.366186521016061e-04
             )
 
         with self.subTest(msg="Relaxed length"):
             self.assertEqual(
-                self.cdb.cable.result.get(103, 1001, "RELAXED_LENGTH"),
+                self.cdb.cables.result.get(103, 1001, "RELAXED_LENGTH"),
                 1
             )
 
         with self.subTest(msg="Total strain"):
             self.assertEqual(
-                self.cdb.cable.result.get(102, 1001, "TOTAL_STRAIN"),
+                self.cdb.cables.result.get(102, 1001, "TOTAL_STRAIN"),
                 1.0000000031710769e-30
             )
 
         with self.subTest(msg="Effective stiffness"):
             self.assertEqual(
-                self.cdb.cable.result.get(102, 1000, "EFFECTIVE_STIFFNESS"),
+                self.cdb.cables.result.get(102, 1000, "EFFECTIVE_STIFFNESS"),
                 0.8180915713310242
             )
 
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
-                self.cdb.cable.result.get(102, 1000, "NON-EXISTING")
+                self.cdb.cables.result.get(102, 1000, "NON-EXISTING")
 
         with self.subTest(msg="Non existing entry with default"):
             self.assertEqual(
-                self.cdb.cable.result.get(102, 1000, "NON-EXISTING", 5),
+                self.cdb.cables.result.get(102, 1000, "NON-EXISTING", 5),
                 5
             )
 
     def test_get_after_clear(self) -> None:
-        self.cdb.cable.result.clear(1000)
+        self.cdb.cables.result.clear(1000)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.cable.result.get(102, 1000, "AXIAL_FORCE")
+                self.cdb.cables.result.get(102, 1000, "AXIAL_FORCE")
 
-        self.cdb.cable.result.load(1000)
+        self.cdb.cables.result.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.cable.result.get(103, 1000, "RELAXED_LENGTH"),
+                self.cdb.cables.result.get(103, 1000, "RELAXED_LENGTH"),
                 1
             )
 
     def test_get_after_clear_all(self) -> None:
-        self.cdb.cable.result.clear_all()
+        self.cdb.cables.result.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.cable.result.get(102, 1000, "AXIAL_FORCE")
+                self.cdb.cables.result.get(102, 1000, "AXIAL_FORCE")
 
-        self.cdb.cable.result.load(self.load_cases)
+        self.cdb.cables.result.load(self.load_cases)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.cable.result.get(102, 1000, "AXIAL_FORCE"),
+                self.cdb.cables.result.get(102, 1000, "AXIAL_FORCE"),
                 1.7247849702835083
             )
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        self.cdb.cable.result.clear_all()
-        self.cdb.cable.result.load(self.load_cases + [1000])
+        self.cdb.cables.result.clear_all()
+        self.cdb.cables.result.load(self.load_cases + [1000])
         self.assertEqual(
-            self.cdb.cable.result.get(103, 1000, "RELAXED_LENGTH"),
+            self.cdb.cables.result.get(103, 1000, "RELAXED_LENGTH"),
             1
         )

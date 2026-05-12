@@ -29,8 +29,8 @@ class SOFiSTiKCDBReaderNodeDataTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.node.data.load()
+        self.cdb.open()
+        self.cdb.nodes.data.load()
 
         self.data = DataFrame(
             [
@@ -54,12 +54,12 @@ class SOFiSTiKCDBReaderNodeDataTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.cdb.node.data.get_data(), self.data)
+        assert_frame_equal(self.cdb.nodes.data.get_data(), self.data)
 
     def test_drop_unused_nodes(self) -> None:
-        self.cdb.node.data.drop_unused_nodes()
+        self.cdb.nodes.data.drop_unused_nodes()
         assert_frame_equal(
-            self.cdb.node.data.get_data(),
+            self.cdb.nodes.data.get_data(),
             self.data.loc[self.data.IS_USED, :]
         )
 
@@ -67,17 +67,17 @@ class SOFiSTiKCDBReaderNodeDataTestSuite(TestCase):
         for node_id in range(1, 13, 1):
             with self.subTest(row_index=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "KFIX"),
+                    self.cdb.nodes.data.get(node_id, "KFIX"),
                     self.data.KFIX[node_id]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.data.clear()
-        self.cdb.node.data.load()
+        self.cdb.nodes.data.clear()
+        self.cdb.nodes.data.load()
         for node_id in range(1, 13, 1):
             with self.subTest(row_index=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "KFIX"),
+                    self.cdb.nodes.data.get(node_id, "KFIX"),
                     self.data.KFIX[node_id]
                 )
 
@@ -85,22 +85,22 @@ class SOFiSTiKCDBReaderNodeDataTestSuite(TestCase):
         for node_id in range(1, 13, 1):
             with self.subTest(row_index=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "X0"),
+                    self.cdb.nodes.data.get(node_id, "X0"),
                     self.data.X0[node_id]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.data.clear()
-        self.cdb.node.data.load()
+        self.cdb.nodes.data.clear()
+        self.cdb.nodes.data.load()
         for node_id in range(1, 13, 1):
             with self.subTest(row_index=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "Y0"),
+                    self.cdb.nodes.data.get(node_id, "Y0"),
                     self.data.Y0[node_id]
                 )
 
     def test_number_of_nodes(self) -> None:
-        self.assertEqual(self.cdb.node.data.number_of_nodes(), 12)
+        self.assertEqual(self.cdb.nodes.data.number_of_nodes(), 12)
 
 
 @skipUnless(
@@ -117,8 +117,8 @@ class SOFiSTiKCDBReaderEnhancedNodeDataTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             VERSION  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.node.data.load()
+        self.cdb.open()
+        self.cdb.nodes.data.load()
 
         self.data = DataFrame(
             [
@@ -135,12 +135,12 @@ class SOFiSTiKCDBReaderEnhancedNodeDataTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.cdb.node.data.get_data(), self.data)
+        assert_frame_equal(self.cdb.nodes.data.get_data(), self.data)
 
     def test_drop_not_used_nodes(self) -> None:
-        self.cdb.node.data.drop_unused_nodes()
+        self.cdb.nodes.data.drop_unused_nodes()
         assert_frame_equal(
-            self.cdb.node.data.get_data(),
+            self.cdb.nodes.data.get_data(),
             self.data.loc[self.data.IS_USED, :]
         )
 
@@ -148,17 +148,17 @@ class SOFiSTiKCDBReaderEnhancedNodeDataTestSuite(TestCase):
         for node_id in range(1, 10, 2):
             with self.subTest(row_index=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "KFIX"),
+                    self.cdb.nodes.data.get(node_id, "KFIX"),
                     self.data.KFIX[node_id]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.data.clear()
-        self.cdb.node.data.load()
+        self.cdb.nodes.data.clear()
+        self.cdb.nodes.data.load()
         for node_id in range(1, 10, 2):
             with self.subTest(row_index=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "KFIX"),
+                    self.cdb.nodes.data.get(node_id, "KFIX"),
                     self.data.KFIX[node_id]
                 )
 
@@ -166,19 +166,19 @@ class SOFiSTiKCDBReaderEnhancedNodeDataTestSuite(TestCase):
         for node_id in range(1, 10, 2):
             with self.subTest(node_id=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "X0"),
+                    self.cdb.nodes.data.get(node_id, "X0"),
                     self.data.X0[node_id]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.data.clear()
-        self.cdb.node.data.load()
+        self.cdb.nodes.data.clear()
+        self.cdb.nodes.data.load()
         for node_id in range(1, 10, 2):
             with self.subTest(node_id=node_id):
                 self.assertEqual(
-                    self.cdb.node.data.get(node_id, "Y0"),
+                    self.cdb.nodes.data.get(node_id, "Y0"),
                     self.data.Y0[node_id]
                 )
 
     def test_number_of_nodes(self) -> None:
-        self.assertEqual(self.cdb.node.data.number_of_nodes(), 5)
+        self.assertEqual(self.cdb.nodes.data.number_of_nodes(), 5)
