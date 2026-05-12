@@ -47,7 +47,8 @@ associated public API.
     NodeLoad
     _NodeResult
     _NodeResidual
-    _PlateData
+    Quads
+    QuadData
     _SecondaryGroupLCData
     _Spring
     _SpringData

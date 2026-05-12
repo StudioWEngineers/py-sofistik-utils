@@ -17,7 +17,7 @@ from . _internals.group_data import _GroupData
 from . _internals.group_lc_data import _GroupLCData
 from . _internals.load_cases import _LoadCases
 from . _internals.node import _Node
-from . _internals.plate_data import _PlateData
+from . _internals.quad import Quads
 from . _internals.sec_group_lc_data import _SecondaryGroupLCData
 from . _internals.spring import _Spring
 from . _internals.sofistik_dll import SofDll
@@ -34,7 +34,7 @@ class SOFiSTiKCDBReader:
     grp_lc_data: _GroupLCData
     load_case: _LoadCases
     node: _Node
-    plate_data: _PlateData
+    quad: Quads
     cross_section: CrossSectionalData
     sec_grp_lc_data: _SecondaryGroupLCData
     spring: _Spring
@@ -65,7 +65,7 @@ class SOFiSTiKCDBReader:
 
         self.node = _Node(self._dll)
 
-        self.plate_data = _PlateData(self._dll)
+        self.quads = Quads(self._dll)
 
         self.spring = _Spring(self._dll)
 
