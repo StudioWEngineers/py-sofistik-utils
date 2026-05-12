@@ -97,6 +97,7 @@ the temporary environment variable approach, open an MSYS2 MINGW64 shell, naviga
     tests/node_load
     tests/node_residual
     tests/node_result
+    tests/quad_data
     tests/spring_data
     tests/spring_result
     tests/truss_data
