@@ -1,0 +1,69 @@
+BeamStress
+----------
+
+Related test suite: ``test_beam_stress.py``
+
+Expected CDB file name: ``BEAM_STRESS.cdb``
+
+Runs with: SOFiSTiK 2025
+
+Version: 1
+
+.. code-block:: text
+
+    +PROG TEMPLATE
+    HEAD CROSS-SECTIONS GENERATORS
+        #INCLUDE .\INCLUDES\RHS-BUS-SYM-SECTION-GENERATOR.DAT
+    END
+
+    +PROG AQUA
+    HEAD MATERIAL AND SECTIONS
+        NORM EN 199X-200X
+        STEE NO 2 TYPE YC ES 210000.0 GAM 78.5 TITL 'S355'
+        PROF 1 TYPE CHS 100.0 10.0 MNO 2
+        PROF 2 TYPE CHS 160.0 10.0 MNO 2
+        LET#SECTION_NMB 3; LET#MNO 2; LET#HEIGHT 100.0; LET#WIDTH 150.0; LET#WEB_INDENTATION 5.0; LET#FLANGE_THK 10.0; LET#WEB_THK 5.0; LET#TITL 'RHS 100 x 150 x 10 x 5 - 5'
+        #INCLUDE RHS_BUS_SYM_SECTION_GENERATOR
+    END
+
+    +PROG SOFIMSHA
+    HEAD GEOMETRY REV-1-SOF-2025
+    SYST 3D GDIR NEGZ GDIV 10
+        NODE NO 1 X 00.0 Y 0.0 Z +0.0 FIX MX,PX,PY,PZ
+        NODE NO 2 X 05.0 Y 0.0 Z -0.5
+        NODE NO 3 X 10.0 Y 0.0 Z -1.0 FIX PP
+
+        GRP 10 TITL 'BEAM-1'
+            BEAM NO 1 NA 1 NE 2 NCS 1.2
+        GRP 20 TITL 'BEAM-2'
+            BEAM NO 2 NA 2 NE 3 NCS 3 DIV 2
+    END
+
+    +PROG SOFILOAD
+    HEAD LOADS
+        LC 11 TITL 'LOADS ZZ'
+            BEAM 101 TYPE PZZ -3.0
+            BEAM 101 TYPE PXX -1.0
+        LC 12 TITL 'LOADS YY'
+            BEAM 202 TYPE PYY -2.5
+            BEAM 202 TYPE MXX -1.0
+    END
+
+    +PROG ASE
+    HEAD LINEAR ANALYSES
+        SYST PROB LINE
+        LC 1000 DLZ 1.0 TITL 'ANALYSIS'
+            LCC 11 FACT 1.0
+            LCC 12 FACT 1.0
+        END
+    END
+
+    +PROG AQB
+    HEAD STRESS
+        NORM EN 199X-200X
+        BEAM GRP (10 20 10) TYPE BEAM
+
+        LC "1000"
+        COMB GMAX LCST 2000
+        STRE E
+    END
