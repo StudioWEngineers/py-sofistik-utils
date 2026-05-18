@@ -1,6 +1,5 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from struct import pack
 
 # third party library imports
 from pandas import concat, DataFrame
@@ -10,6 +9,7 @@ from . beam_data import _BeamData
 from . group_data import _GroupData
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_STR
+from . sofistik_utilities import long_to_str
 
 
 class _BeamStress:
@@ -259,7 +259,7 @@ class _BeamStress:
                     "ELEM_ID": beam_stress.m_nr,
                     "POS": beam_stress.m_x,
                     "POS_REL": beam_stress.m_x,
-                    "POINT": pack("<I", beam_stress.m_mnr).decode().strip(),
+                    "POINT": long_to_str(beam_stress.m_mnr),
                     "SIGC": beam_stress.m_sigc,
                     "SIGT": beam_stress.m_sigt,
                     "TAU": beam_stress.m_tau,
