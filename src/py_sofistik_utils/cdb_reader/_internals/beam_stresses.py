@@ -100,6 +100,7 @@ class _BeamStress:
             element_id: int,
             load_case: int,
             position: float,
+            point: str,
             quantity: str,
             default: float | None = None
     ) -> float:
@@ -113,6 +114,8 @@ class _BeamStress:
             Load case number
         position : float
             Relative position of the output station along the beam (0 to 1)
+        point : str
+            identifier of the stress point
         quantity : str
             Quantity to retrieve. Must be one of:
 
@@ -139,7 +142,7 @@ class _BeamStress:
         """
         try:
             return self._data.at[
-                (element_id, load_case, position),
+                (element_id, load_case, position, point),
                 quantity
             ]  # type: ignore
         except (KeyError, ValueError) as e:
@@ -147,8 +150,8 @@ class _BeamStress:
                 return default
             raise LookupError(
                 f"Beam stress entry not found for element id {element_id}, "
-                f"load case {load_case}, position {position} and quantity "
-                f"{quantity}!"
+                f"load case {load_case}, position {position}, quantity "
+                f"{quantity} and stress point {point}!"
             ) from e
 
     def get_data(self, deep: bool = True) -> DataFrame:
@@ -210,7 +213,9 @@ class _BeamStress:
         df["POS_REL"] = (df["POS_REL"] / factors).round(2)
 
         # set indices for fast lookup
-        df = df.set_index(["ELEM_ID", "LOAD_CASE", "POS_REL"], drop=False)
+        df = df.set_index(
+            ["ELEM_ID", "LOAD_CASE", "POS_REL", "POINT"], drop=False
+        )
 
         # merge data
         if self._data.empty:
