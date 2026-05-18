@@ -33,12 +33,12 @@ associated public API.
     _BeamData
     _BeamLoad
     BeamResults
+    _BeamStress
     Cables
     CableData
     CableLoad
     CableResult
     CrossSectionalData
-    _BeamStress
     _GroupData
     _GroupLCData
     _LoadCases
