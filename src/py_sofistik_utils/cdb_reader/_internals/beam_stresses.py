@@ -201,18 +201,13 @@ class _BeamStress:
             if return_value.value >= 2:
                 break
 
-            # skip:
-            #   - negative tendon number
-            #   - admissible stresses for that material
-            #   - maximum stresses in cross-section of beams
-            #   - maximum values for solid section material
-            #   - maximum values for tendons
-            #   - maximum values for reinforcements
-            if beam_stress.m_nr <= 0:# or bool(1024 & beam_stress.m_mnr):
+            # skip maximum stresses in cross-section of beams
+            if beam_stress.m_nr <= 0:
                 continue
 
-            #if bool((1024 | 2048) & beam_stress.m_mnr):
-            #    continue
+            # skip admissible stresses for that material
+            if beam_stress.m_mnr - 1024 <= 1024:
+                continue
 
             data.append(
                 {
