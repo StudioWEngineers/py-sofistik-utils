@@ -13,7 +13,50 @@ from . sofistik_classes import CBEAM_STR
 
 
 class _BeamStress:
-    """
+    """This class provides methods and a data structure to:
+
+    * access keys ``105/LC`` of the CDB file;
+    * store the retrieved data in a convenient format;
+    * provide access to the data after the CDB is closed.
+
+    The underlying data structure is a :class:`pandas.DataFrame` with the
+    following columns:
+
+    * ``LOAD_CASE``: the load case number
+    * ``GROUP``: the beam group number
+    * ``ELEM_ID``: the beam number
+    * ``POS``: position of the output station along the beam [m]
+    * ``POS_REL``: relative position of the output station along the beam
+      (0 to 1)
+    * ``POINT``: identifier of the stress point
+    * ``SIGC``: minimum stress [kPa]
+    * ``SIGT``: maximum stress [kPa]
+    * ``TAU``: shear stress [kPa]
+    * ``SIGV``: reference stress [kPa]
+    * ``SI``: main tension stress [kPa]
+    * ``SII``: main compression stress [kPa]
+
+    The ``DataFrame`` uses a MultiIndex with levels ``ELEM_ID``, ``LOAD_CASE``,
+    ``STATION`` and ``POINT`` (in this specific order) to enable fast lookups
+    via the `get` method. The index columns are not dropped from the
+    ``DataFrame``.
+
+    .. note::
+
+        Not all available quantities are retrieved and stored. In
+        particular:
+
+        * admissible stresses for the cross-section's material
+        * maximum stresses in cross-section of beams
+
+        are currently not included. This is a deliberate design choice and
+        may be changed in the future without breaking the existing API.
+
+    .. important::
+
+        The relative output station ``POS_REL`` is rounded to two decimal
+        places to prevent floating-point errors for lookups at the beam end
+        (``POS_REL = 1.0``) or at any other intermediate station.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
