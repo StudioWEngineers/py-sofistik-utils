@@ -1,6 +1,5 @@
 from . _internals.beam import Beam
 from . _internals.beam_data import _BeamData
-from . _internals.beam_load import _BeamLoad
 from . _internals.beam_results import BeamResults
 from . _internals.beam_stresses import _BeamStress
 from . _internals.cable import Cables
@@ -33,7 +32,6 @@ __all__ = [
     "SOFiSTiKCDBReader",
     "Beam",
     "_BeamData",
-    "_BeamLoad",
     "BeamResults",
     "_BeamStress",
     "Cables",

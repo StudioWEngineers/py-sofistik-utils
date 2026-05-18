@@ -31,7 +31,6 @@ associated public API.
 
     Beam
     _BeamData
-    _BeamLoad
     BeamResults
     _BeamStress
     Cables
