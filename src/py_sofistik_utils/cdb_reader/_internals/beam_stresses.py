@@ -264,7 +264,7 @@ class _BeamStress:
                     "ELEM_ID": beam_stress.m_nr,
                     "POS": beam_stress.m_x,
                     "POS_REL": beam_stress.m_x,
-                    "POINT": long_to_str(beam_stress.m_mnr),
+                    "POINT": long_to_str(beam_stress.m_mnr).rstrip(),
                     "SIGC": beam_stress.m_sigc,
                     "SIGT": beam_stress.m_sigt,
                     "TAU": beam_stress.m_tau,
