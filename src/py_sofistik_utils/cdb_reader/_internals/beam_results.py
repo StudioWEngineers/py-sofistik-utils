@@ -46,10 +46,11 @@ class BeamResults:
         Not all available quantities are retrieved and stored. In
         particular:
 
-        * the maximum suspension of cable across axis and its components XXXXXXXXXXXX
-          along the global X, Y and Z axes
-        * vertical suspension of cable in load direction
-        * nonlinear effects
+        * displacements and rotations in local coordinates
+        * twist angle
+        * 3rd torsional moment
+        * axial and transverse beddings
+        * local y and z components of the transverse beddings
 
         are currently not included. This is a deliberate design choice and
         may be changed in the future without breaking the existing API.
