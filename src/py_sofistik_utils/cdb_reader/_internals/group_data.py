@@ -108,6 +108,20 @@ class _GroupData:
 
         return range(min_id, max_id + 1, 1)
 
+    def get_data(self, deep: bool = True) -> DataFrame:
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``11/0``.
+
+        Parameters
+        ----------
+        deep : bool, default True
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
+        """
+        return self._data.copy(deep=deep)
+
     def get_groups(self) -> list[int]:
         """Return a `list` of groups.
         """
