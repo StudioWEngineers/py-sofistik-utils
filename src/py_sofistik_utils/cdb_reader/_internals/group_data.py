@@ -275,88 +275,66 @@ class _GroupData:
             yield (grp, self.get_truss_id_range(grp))
 
     def load(self) -> None:
-        """Load the group data.
+        """Load group data (key 11/0) from the CDB.
         """
         if self._dll.key_exist(11, 0):
-            g_data = CGRP()
-            rec_length = c_int(sizeof(g_data))
+            group = CGRP()
+            rec_length = c_int(sizeof(group))
             return_value = c_int(0)
 
-            self.clear()
-
-            temp_container: list[list[Any]] = []
-            count = 0
+            data: dict[int, dict[str, float | int | str]] = {}
+            first_call = True
             while return_value.value < 2:
                 return_value.value = self._dll.get(
                     1,
                     11,
                     0,
-                    byref(g_data),
+                    byref(group),
                     byref(rec_length),
-                    0 if count == 0 else 1
+                    0 if first_call else 1
                 )
 
-                rec_length = c_int(sizeof(g_data))
-                count += 1
-
+                rec_length = c_int(sizeof(group))
+                first_call = False
                 if return_value.value >= 2:
                     break
 
-                temp_list: list[Any] = [0 for _ in range(17)]
-
-                if g_data.m_typ == 0:
-                    temp_list[0] = g_data.m_ng
-                    g_name = "".join(long_to_str(g_data.m_text[_]) for _ in range(17))
-                    temp_list[1] = g_name.upper()
-                    temp_container.append(temp_list)
+                if group.m_typ == 0:
+                    name = "".join(
+                        long_to_str(group.m_text[_]) for _ in range(17)
+                    ).upper()
+                    data.update(
+                        {
+                            group.m_ng: {
+                                "GROUP":             group.m_ng,
+                                "GROUP_NAME":        name,
+                                "BEAM_MIN_ID":       0,
+                                "BEAM_MAX_ID":       0,
+                                "NUMBER_OF_BEAMS":   0,
+                                "TRUSS_MIN_ID":      0,
+                                "TRUSS_MAX_ID":      0,
+                                "NUMBER_OF_TRUSSES": 0,
+                                "CABLE_MIN_ID":      0,
+                                "CABLE_MAX_ID":      0,
+                                "NUMBER_OF_CABLES":  0,
+                                "SPRING_MIN_ID":     0,
+                                "SPRING_MAX_ID":     0,
+                                "NUMBER_OF_SPRINGS": 0,
+                                "QUAD_MIN_ID":       0,
+                                "QUAD_MAX_ID":       0,
+                                "NUMBER_OF_QUADS":   0
+                            }
+                        }
+                    )
 
                 else:
-                    useful_data = True
-                    match g_data.m_typ:
-                        case 100:
-                            type_index = 2
-                        case 150:
-                            type_index = 5
-                        case 160:
-                            type_index = 8
-                        case 170:
-                            type_index = 11
-                        case 200:
-                            type_index = 14
-                        case _:
-                            useful_data = False
+                    if group.m_typ in self._map.keys():
+                        min_key, max_key, num_key = self._map[group.m_typ]
+                        data[group.m_ng][min_key] = group.m_min
+                        data[group.m_ng][max_key] = group.m_max
+                        data[group.m_ng][num_key] = group.m_num
 
-                    if useful_data:
-                        grp_index = [_[0] for _ in temp_container].index(g_data.m_ng)
-                        temp_container[grp_index][type_index + 0] = g_data.m_min
-                        temp_container[grp_index][type_index + 1] = g_data.m_max
-                        temp_container[grp_index][type_index + 2] = g_data.m_num
-
-            # preparing data for conversion to a pandas DataFrame
-            conv_data: list[dict[str, Any]] = []
-            for item in temp_container:
-                conv_data.append({"GROUP":             item[0],
-                                  "GROUP_NAME":        item[1],
-                                  "BEAM_MIN_ID":       item[2],
-                                  "BEAM_MAX_ID":       item[3],
-                                  "NUMBER_OF_BEAMS":   item[4],
-                                  "TRUSS_MIN_ID":      item[5],
-                                  "TRUSS_MAX_ID":      item[6],
-                                  "NUMBER_OF_TRUSSES": item[7],
-                                  "CABLE_MIN_ID":      item[8],
-                                  "CABLE_MAX_ID":      item[9],
-                                  "NUMBER_OF_CABLES":  item[10],
-                                  "SPRING_MIN_ID":     item[11],
-                                  "SPRING_MAX_ID":     item[12],
-                                  "NUMBER_OF_SPRINGS": item[13],
-                                  "QUAD_MIN_ID":       item[14],
-                                  "QUAD_MAX_ID":       item[15],
-                                  "NUMBER_OF_QUADS":    item[16]})
-
-            if self._data.empty:
-                self._data = DataFrame(conv_data)
-            else:
-                self._data = concat(
-                    [self._data, DataFrame(conv_data)],
-                    ignore_index=True
-                )
+            # set indices for fast lookup
+            self._data = (
+                DataFrame(data.values()).set_index(["GROUP"], drop=False)
+            )
