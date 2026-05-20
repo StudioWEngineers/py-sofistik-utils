@@ -1,13 +1,13 @@
 # standard library imports
 from ctypes import byref, c_int, sizeof
-from typing import Any, Generator
+from typing import Generator
 
 # third party library imports
-from pandas import concat, DataFrame
+from pandas import DataFrame
 
 # local library specific imports
-from . sofistik_dll import SofDll
 from . sofistik_classes import CGRP
+from . sofistik_dll import SofDll
 from . sofistik_utilities import long_to_str
 
 
@@ -19,12 +19,17 @@ class _GroupData:
     * store these data in a convenient format;
     * provide access to these data.
     """
+    _map = {
+        100: ("BEAM_MIN_ID", "BEAM_MAX_ID", "NUMBER_OF_BEAMS"),
+        150: ("TRUSS_MIN_ID", "TRUSS_MAX_ID", "NUMBER_OF_TRUSSES"),
+        160: ("CABLE_MIN_ID", "CABLE_MAX_ID", "NUMBER_OF_CABLES"),
+        170: ("SPRING_MIN_ID", "SPRING_MAX_ID", "NUMBER_OF_SPRINGS"),
+        200: ("QUAD_MIN_ID", "QUAD_MAX_ID", "NUMBER_OF_QUADS"),
+    }
+
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``_GroupData`` class.
-        """
-        self._dll = dll
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "GROUP",
                 "GROUP_NAME",
                 "BEAM_MIN_ID",
@@ -44,9 +49,10 @@ class _GroupData:
                 "NUMBER_OF_QUADS"
             ]
         )
+        self._dll = dll
 
     def clear(self) -> None:
-        """Clear all group data.
+        """Clear all the loaded data.
         """
         self._data = self._data[0:0]
 
