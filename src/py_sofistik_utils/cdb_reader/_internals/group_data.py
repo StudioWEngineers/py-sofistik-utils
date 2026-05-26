@@ -12,12 +12,51 @@ from . sofistik_utilities import long_to_str
 
 
 class _GroupData:
-    """
-    This class provides methods and data structure to:
+    """This class provides methods and a data structure to:
 
-    * access and load the key ``011/00`` of the CDB file;
-    * store these data in a convenient format;
-    * provide access to these data.
+        * access keys ``11/0`` of the CDB file;
+        * store the retrieved data in a convenient format;
+        * provide access to the data after the CDB is closed.
+
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
+
+        * ``GROUP"`` group number
+        * ``GROUP_NAME"`` group nmae
+        * ``BEAM_MIN_ID"`` beam minimum id
+        * ``BEAM_MAX_ID"`` beam maximum id
+        * ``NUMBER_OF_BEAMS"`` number of beams
+        * ``TRUSS_MIN_ID"`` truss minimum id
+        * ``TRUSS_MAX_ID"`` truss maximum id
+        * ``NUMBER_OF_TRUSSES"`` number of trusses
+        * ``CABLE_MIN_ID"`` cable minimum id
+        * ``CABLE_MAX_ID"`` cable maximum id
+        * ``NUMBER_OF_CABLES"`` number of cables
+        * ``SPRING_MIN_ID"`` spring minimum id
+        * ``SPRING_MAX_ID"`` spring maximum id
+        * ``NUMBER_OF_SPRINGS"`` number of springs
+        * ``QUAD_MIN_ID"`` quad minimum id
+        * ``QUAD_MAX_ID"`` quad maximum id
+        * ``NUMBER_OF_QUADS`` number of quads
+
+        The ``DataFrame`` uses a MultiIndex with level ``GROUP``to enable fast
+        lookups via the `get` method. The index columns are not dropped from
+        the ``DataFrame``.
+
+        .. note::
+
+            Not all available quantities are retrieved and stored. In
+            particular:
+
+            * ``INF``: bit-code of the group
+            * ``MNR``: material number of the group
+            * ``MBW``: material reinforcement number of the group
+            * ``IBB`` and ``IBD``: construction stage numbers
+
+            are currently not included.
+
+            This is a deliberate design choice and may be changed in the future
+            without breaking the existing API.
     """
     _map = {
         100: ("BEAM_MIN_ID", "BEAM_MAX_ID", "NUMBER_OF_BEAMS"),
