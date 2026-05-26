@@ -117,46 +117,6 @@ class _GroupData:
 
         return self._data.GROUP.to_list()
 
-    def get_group_name(self, group_number: int) -> str:
-        """Return a string containing the group name, given its number.
-
-        Parameters
-        ----------
-        group_number: int
-            The group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
-        """
-        mask = self._data["GROUP"] == group_number
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        return str(self._data.GROUP_NAME[mask].item())
-
-    def get_group_number(self, group_name: str) -> int:
-        """Return the group number, given its name.
-
-        Parameters
-        ----------
-        group_name: str
-            The group name
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_name`` is not found.
-        """
-        mask = self._data["GROUP_NAME"] == group_name.upper()
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group \"{group_name}\" not found!")
-
-        return int(self._data.GROUP[mask].item())
-
     def get_id_range(self, quantity: str, group_number: int) -> range:
         """Return a `range` starting from the minimum element ID to the maximum
         ID + 1, so that a check like ``max_id in get_id_range("BEAM",
@@ -189,6 +149,46 @@ class _GroupData:
             raise LookupError(
                 f"Range not found for group number {group_number} "
                 f"and quantity {quantity}!"
+            ) from e
+
+    def get_name(self, group_number: int) -> str:
+        """Return a string containing the group name, given its number.
+
+        Parameters
+        ----------
+        group_number: int
+            The group number
+
+        Raises
+        ------
+        LookupError
+            If the given ``group_number`` is not found.
+        """
+        try:
+            return self._data.at[group_number, "GROUP_NAME"]  # type: ignore
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Name not found for group number {group_number}!"
+            ) from e
+
+    def get_number(self, group_name: str) -> int:
+        """Return the group number, given its name.
+
+        Parameters
+        ----------
+        group_name: str
+            The group name
+
+        Raises
+        ------
+        LookupError
+            If the given ``group_name`` is not found.
+        """
+        try:
+            return self._data.index[self._data["GROUP_NAME"] == group_name][0]  # type: ignore
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Group number not found for group name {group_name}!"
             ) from e
 
     def iterator_beam(self) -> Generator[tuple[int, range], None, None]:
