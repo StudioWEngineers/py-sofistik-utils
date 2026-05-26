@@ -5,7 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_classes import CSPRI
 from . sofistik_dll import SofDll
 
@@ -211,7 +211,7 @@ class _SpringData:
                 )
 
             # assigning groups
-            group_data = _GroupData(self._dll)
+            group_data = Groups(self._dll)
             group_data.load()
 
             temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")

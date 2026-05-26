@@ -6,7 +6,7 @@ from pandas import concat, DataFrame
 
 # local library specific imports
 from . beam_data import _BeamData
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_FOR
 
@@ -193,7 +193,7 @@ class BeamResults:
                 data.extend(self._load(load_case))
 
         # assigning groups
-        group_data = _GroupData(self._dll)
+        group_data = Groups(self._dll)
         group_data.load()
 
         df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")

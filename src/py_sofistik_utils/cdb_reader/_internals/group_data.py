@@ -11,7 +11,7 @@ from . sofistik_dll import SofDll
 from . sofistik_utilities import long_to_str
 
 
-class _GroupData:
+class Groups:
     """This class provides methods and a data structure to:
 
         * access keys ``11/0`` of the CDB file;
@@ -39,7 +39,7 @@ class _GroupData:
         * ``QUAD_MAX_ID"`` quad maximum id
         * ``NUMBER_OF_QUADS`` number of quads
 
-        The ``DataFrame`` uses a MultiIndex with level ``GROUP``to enable fast
+        The ``DataFrame`` uses a MultiIndex with level ``GROUP`` to enable fast
         lookups via the `get` method. The index columns are not dropped from
         the ``DataFrame``.
 
@@ -58,7 +58,7 @@ class _GroupData:
             This is a deliberate design choice and may be changed in the future
             without breaking the existing API.
     """
-    _map = {
+    _MAP = {
         100: ("BEAM_MIN_ID", "BEAM_MAX_ID", "NUMBER_OF_BEAMS"),
         150: ("TRUSS_MIN_ID", "TRUSS_MAX_ID", "NUMBER_OF_TRUSSES"),
         160: ("CABLE_MIN_ID", "CABLE_MAX_ID", "NUMBER_OF_CABLES"),
@@ -113,7 +113,7 @@ class _GroupData:
         """Return a `list` of groups.
         """
         if self._data.GROUP.empty:
-            raise RuntimeError("No groups found! Check if load() has been called.")
+            raise RuntimeError("No groups found!")
 
         return self._data.GROUP.to_list()
 
@@ -271,8 +271,8 @@ class _GroupData:
                     )
 
                 else:
-                    if group.m_typ in self._map.keys():
-                        min_key, max_key, num_key = self._map[group.m_typ]
+                    if group.m_typ in self._MAP.keys():
+                        min_key, max_key, num_key = self._MAP[group.m_typ]
                         data[group.m_ng][min_key] = group.m_min
                         data[group.m_ng][max_key] = group.m_max
                         data[group.m_ng][num_key] = group.m_num
