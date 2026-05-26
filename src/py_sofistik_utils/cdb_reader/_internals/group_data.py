@@ -191,35 +191,31 @@ class _GroupData:
                 f"Group number not found for group name {group_name}!"
             ) from e
 
-    def iterator_beam(self) -> Generator[tuple[int, range], None, None]:
-        """Yield a tuple containing the group number and the beam ID range.
-        """
-        for grp in self.get_groups():
-            yield (grp, self.get_id_range("BEAM", grp))
+    def iterator(
+            self,
+            quantity: str
+    ) -> Generator[tuple[int, range], None, None]:
+        """Yield a `tuple` containing the group number and the ``quantity`` ID
+        range for each group defined in the CDB.
 
-    def iterator_cable(self) -> Generator[tuple[int, range], None, None]:
-        """Yield a tuple containing the group number and the cable ID range.
-        """
-        for grp in self.get_groups():
-            yield (grp, self.get_id_range("CABLE", grp))
+        Parameters
+        ----------
+        quantity: str
+            The type of finite element for which the range is requested. Must
+            be one of:
 
-    def iterator_quad(self) -> Generator[tuple[int, range], None, None]:
-        """Yield a tuple containing the group number and the quad ID range.
-        """
-        for grp in self.get_groups():
-            yield (grp, self.get_id_range("QUAD", grp))
+            - ``"BEAM"``
+            - ``"CABLE"``
+            - ``"TRUSS"``
+            - ``"SPRING"``
+            - ``"QUAD"``
 
-    def iterator_spring(self) -> Generator[tuple[int, range], None, None]:
-        """Yield a tuple containing the group number and the spring ID range.
+        See Also
+        --------
+        `get_id_range()`
         """
         for grp in self.get_groups():
-            yield (grp, self.get_id_range("SPRING", grp))
-
-    def iterator_truss(self) -> Generator[tuple[int, range], None, None]:
-        """Yield a tuple containing the group number and the truss ID range.
-        """
-        for grp in self.get_groups():
-            yield (grp, self.get_id_range("TRUSS", grp))
+            yield (grp, self.get_id_range(quantity, grp))
 
     def load(self) -> None:
         """Load group data (key 11/0) from the CDB.

@@ -169,7 +169,7 @@ class CableData:
             df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
             elem_ids = df["ELEM_ID"]
 
-            for grp, grp_range in group_data.iterator_cable():
+            for grp, grp_range in group_data.iterator("CABLE"):
                 if grp_range.stop == 0:
                     continue
 

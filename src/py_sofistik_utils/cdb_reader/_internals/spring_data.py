@@ -217,7 +217,7 @@ class _SpringData:
             temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
             elem_ids = temp_df["ELEM_ID"]
 
-            for grp, grp_range in group_data.iterator_spring():
+            for grp, grp_range in group_data.iterator("SPRING"):
                 if grp_range.stop == 0:
                     continue
 

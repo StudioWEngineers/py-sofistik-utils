@@ -180,7 +180,7 @@ class _TrussLoad:
         temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = temp_df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_truss():
+        for grp, grp_range in group_data.iterator("TRUSS"):
             if grp_range.stop == 0:
                 continue
 

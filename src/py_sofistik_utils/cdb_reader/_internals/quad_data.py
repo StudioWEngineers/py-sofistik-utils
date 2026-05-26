@@ -177,7 +177,7 @@ class QuadData:
             group_data = _GroupData(self._dll)
             group_data.load()
 
-            for grp, grp_range in group_data.iterator_quad():
+            for grp, grp_range in group_data.iterator("QUAD"):
                 if grp_range.stop == 0:
                     continue
                 left = elem_ids.searchsorted(grp_range.start, side="left")

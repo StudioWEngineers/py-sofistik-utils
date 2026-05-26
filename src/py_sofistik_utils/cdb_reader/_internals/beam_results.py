@@ -199,7 +199,7 @@ class BeamResults:
         df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_beam():
+        for grp, grp_range in group_data.iterator("BEAM"):
             if grp_range.stop == 0:
                 continue
             left = elem_ids.searchsorted(grp_range.start, side="left")
