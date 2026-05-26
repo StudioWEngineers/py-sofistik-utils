@@ -56,63 +56,39 @@ class _GroupData:
         """
         self._data = self._data[0:0]
 
-    def get_beam_id_range(self, group_number: int) -> range:
-        """Return a `range` starting from the minimum beam element ID to the maximum ID +
-        1, so that a check like ``max_id in get_beam_id_range(grp_nmb)`` return `True`.
+    def get_id_range(self, quantity: str, group_number: int) -> range:
+        """Return a `range` starting from the minimum element ID to the maximum
+        ID + 1, so that a check like ``max_id in get_id_range("BEAM",
+        group_number)`` returns `True`.
 
-        If no beam elements are present in the given ``group_number`` return ``range(0)``.
-
-        Parameters
-        ----------
-        group_number: int
-            The group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
-        """
-        mask = self._data["GROUP"] == group_number
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        if self._data.NUMBER_OF_BEAMS[mask].item() == 0:
-            return range(0)
-
-        max_id = self._data.BEAM_MAX_ID[mask].item()
-        min_id = self._data.BEAM_MIN_ID[mask].item()
-
-        return range(min_id, max_id + 1, 1)
-
-    def get_cable_id_range(self, group_number: int) -> range:
-        """Return a `range` starting from the minimum cable element ID to the maximum ID +
-        1, so that a check like ``max_id in get_cable_id_range(grp_nmb)`` return `True`.
-
-        If no cable elements are present in the given ``group_number`` return ``range(0)``.
+        If no elements of the requested type are present in the given
+        ``group_number`` returns ``range(0)``.
 
         Parameters
         ----------
+        quantity: str
+            The type of finite element for which the range is requested. Must
+            be one of:
+
+            - ``"BEAM"``
+            - ``"CABLE"``
+            - ``"TRUSS"``
+            - ``"SPRING"``
+            - ``"QUAD"``
+
         group_number: int
             The group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
         """
-        mask = self._data["GROUP"] == group_number
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        if self._data.NUMBER_OF_CABLES[mask].item() == 0:
-            return range(0)
-
-        max_id = self._data.CABLE_MAX_ID[mask].item()
-        min_id = self._data.CABLE_MIN_ID[mask].item()
-
-        return range(min_id, max_id + 1, 1)
+        try:
+            return range(
+                self._data.at[group_number, f"{quantity}_MIN_ID"],  # type: ignore
+                self._data.at[group_number, f"{quantity}_MAX_ID"] + 1  # type: ignore
+            )
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Range not found for group number {group_number} "
+                f"and quantity {quantity}!"
+            ) from e
 
     def get_data(self, deep: bool = True) -> DataFrame:
         """Return the :class:`pandas.DataFrame` containing the loaded key
@@ -176,123 +152,35 @@ class _GroupData:
 
         return int(self._data.GROUP[mask].item())
 
-    def get_quad_id_range(self, group_number: int) -> range:
-        """Return a `range` starting from the minimum quad element ID to the maximum ID
-        + 1, so that a check like ``max_id in get_quad_id_range(grp_nmb)`` return `True`.
-
-        If no quad elements are present in the given ``group_number`` return ``range(0)``.
-
-        Parameters
-        ----------
-        group_number: int
-            The group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
-        """
-        mask = self._data["GROUP"] == group_number
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        if self._data.NUMBER_OF_QUADS[mask].item() == 0:
-            return range(0)
-
-        max_id = self._data.QUAD_MAX_ID[mask].item()
-        min_id = self._data.QUAD_MIN_ID[mask].item()
-
-        return range(min_id, max_id + 1, 1)
-
-    def get_spring_id_range(self, group_number: int) -> range:
-        """Return a `range` starting from the minimum spring element ID to the maximum ID
-        + 1, so that a check like ``max_id in get_spring_id_range(grp_nmb)`` return `True`.
-
-        If no spring elements are present in the given ``group_number`` return ``range(0)``
-        .
-
-        Parameters
-        ----------
-        group_number: int
-            The group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
-        """
-        mask = self._data["GROUP"] == group_number
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        if self._data.NUMBER_OF_SPRINGS[mask].item() == 0:
-            return range(0)
-
-        max_id = self._data.SPRING_MAX_ID[mask].item()
-        min_id = self._data.SPRING_MIN_ID[mask].item()
-
-        return range(min_id, max_id + 1, 1)
-
-    def get_truss_id_range(self, group_number: int) -> range:
-        """Return a `range` starting from the minimum truss element ID to the maximum ID
-        + 1, so that a check like ``max_id in get_truss_id_range(grp_nmb)`` return `True`.
-
-        If no truss elements are present in the given ``group_number`` return ``range(0)``.
-
-        Parameters
-        ----------
-        group_number: int
-            The group number
-
-        Raises
-        ------
-        RuntimeError
-            If the given ``group_number`` is not found.
-        """
-        mask = self._data["GROUP"] == group_number
-
-        if mask.eq(False).all():
-            raise RuntimeError(f"Group {group_number} not found!")
-
-        if self._data.NUMBER_OF_TRUSSES[mask].item() == 0:
-            return range(0)
-
-        max_id = self._data.TRUSS_MAX_ID[mask].item()
-        min_id = self._data.TRUSS_MIN_ID[mask].item()
-
-        return range(min_id, max_id + 1, 1)
-
     def iterator_beam(self) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the beam ID range.
         """
         for grp in self.get_groups():
-            yield (grp, self.get_beam_id_range(grp))
+            yield (grp, self.get_id_range("BEAM", grp))
 
     def iterator_cable(self) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the cable ID range.
         """
         for grp in self.get_groups():
-            yield (grp, self.get_cable_id_range(grp))
+            yield (grp, self.get_id_range("CABLE", grp))
 
     def iterator_quad(self) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the quad ID range.
         """
         for grp in self.get_groups():
-            yield (grp, self.get_quad_id_range(grp))
+            yield (grp, self.get_id_range("QUAD", grp))
 
     def iterator_spring(self) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the spring ID range.
         """
         for grp in self.get_groups():
-            yield (grp, self.get_spring_id_range(grp))
+            yield (grp, self.get_id_range("SPRING", grp))
 
     def iterator_truss(self) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the truss ID range.
         """
         for grp in self.get_groups():
-            yield (grp, self.get_truss_id_range(grp))
+            yield (grp, self.get_id_range("TRUSS", grp))
 
     def load(self) -> None:
         """Load group data (key 11/0) from the CDB.
