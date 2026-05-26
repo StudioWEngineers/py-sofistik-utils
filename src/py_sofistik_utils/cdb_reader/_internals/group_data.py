@@ -95,40 +95,6 @@ class _GroupData:
         """
         self._data = self._data[0:0]
 
-    def get_id_range(self, quantity: str, group_number: int) -> range:
-        """Return a `range` starting from the minimum element ID to the maximum
-        ID + 1, so that a check like ``max_id in get_id_range("BEAM",
-        group_number)`` returns `True`.
-
-        If no elements of the requested type are present in the given
-        ``group_number`` returns ``range(0)``.
-
-        Parameters
-        ----------
-        quantity: str
-            The type of finite element for which the range is requested. Must
-            be one of:
-
-            - ``"BEAM"``
-            - ``"CABLE"``
-            - ``"TRUSS"``
-            - ``"SPRING"``
-            - ``"QUAD"``
-
-        group_number: int
-            The group number
-        """
-        try:
-            return range(
-                self._data.at[group_number, f"{quantity}_MIN_ID"],  # type: ignore
-                self._data.at[group_number, f"{quantity}_MAX_ID"] + 1  # type: ignore
-            )
-        except (KeyError, ValueError) as e:
-            raise LookupError(
-                f"Range not found for group number {group_number} "
-                f"and quantity {quantity}!"
-            ) from e
-
     def get_data(self, deep: bool = True) -> DataFrame:
         """Return the :class:`pandas.DataFrame` containing the loaded key
         ``11/0``.
@@ -190,6 +156,40 @@ class _GroupData:
             raise RuntimeError(f"Group \"{group_name}\" not found!")
 
         return int(self._data.GROUP[mask].item())
+
+    def get_id_range(self, quantity: str, group_number: int) -> range:
+        """Return a `range` starting from the minimum element ID to the maximum
+        ID + 1, so that a check like ``max_id in get_id_range("BEAM",
+        group_number)`` returns `True`.
+
+        If no elements of the requested type are present in the given
+        ``group_number`` returns ``range(0)``.
+
+        Parameters
+        ----------
+        quantity: str
+            The type of finite element for which the range is requested. Must
+            be one of:
+
+            - ``"BEAM"``
+            - ``"CABLE"``
+            - ``"TRUSS"``
+            - ``"SPRING"``
+            - ``"QUAD"``
+
+        group_number: int
+            The group number
+        """
+        try:
+            return range(
+                self._data.at[group_number, f"{quantity}_MIN_ID"],  # type: ignore
+                self._data.at[group_number, f"{quantity}_MAX_ID"] + 1  # type: ignore
+            )
+        except (KeyError, ValueError) as e:
+            raise LookupError(
+                f"Range not found for group number {group_number} "
+                f"and quantity {quantity}!"
+            ) from e
 
     def iterator_beam(self) -> Generator[tuple[int, range], None, None]:
         """Yield a tuple containing the group number and the beam ID range.
