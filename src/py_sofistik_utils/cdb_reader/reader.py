@@ -11,7 +11,7 @@ from . _internals.group_lc_data import GroupsLC
 from . _internals.load_cases import _LoadCases
 from . _internals.node import _Node
 from . _internals.quad import Quads
-from . _internals.sec_group_lc_data import _SecondaryGroupLCData
+from . _internals.sec_group_lc_data import SecondaryGroupsLC
 from . _internals.spring import _Spring
 from . _internals.sofistik_dll import SofDll
 from . _internals.truss import _Truss
@@ -35,7 +35,7 @@ class SOFiSTiKCDBReader:
     groups: Groups
     groups_lc: GroupsLC
     load_cases: _LoadCases
-    sec_group_lc_data: _SecondaryGroupLCData
+    sec_groups_lc: SecondaryGroupsLC
 
     def __init__(
             self,
@@ -63,7 +63,7 @@ class SOFiSTiKCDBReader:
         self.groups = Groups(self._dll)
         self.groups_lc = GroupsLC(self._dll)
         self.load_cases = _LoadCases(self._dll)
-        self.sec_group_lc_data = _SecondaryGroupLCData(self._dll)
+        self.sec_groups_lc = SecondaryGroupsLC(self._dll)
 
     def close(self) -> None:
         """Close the CDB database.

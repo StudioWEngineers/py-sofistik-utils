@@ -48,7 +48,7 @@ associated public API.
     _NodeResidual
     Quads
     QuadData
-    _SecondaryGroupLCData
+    SecondaryGroupsLC
     _Spring
     _SpringData
     _SpringResult

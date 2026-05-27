@@ -17,7 +17,7 @@ from . _internals.node_residual import _NodeResidual
 from . _internals.node_result import _NodeResult
 from . _internals.quad import Quads
 from . _internals.quad_data import QuadData
-from . _internals.sec_group_lc_data import _SecondaryGroupLCData
+from . _internals.sec_group_lc_data import SecondaryGroupsLC
 from . _internals.spring import _Spring
 from . _internals.spring_data import _SpringData
 from . _internals.spring_result import _SpringResult
@@ -49,7 +49,7 @@ __all__ = [
     "_NodeResult",
     "Quads",
     "QuadData",
-    "_SecondaryGroupLCData",
+    "SecondaryGroupsLC",
     "_Spring",
     "_SpringData",
     "_SpringResult",
