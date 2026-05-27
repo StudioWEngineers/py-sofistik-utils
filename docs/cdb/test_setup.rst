@@ -94,6 +94,8 @@ the temporary environment variable approach, open an MSYS2 MINGW64 shell, naviga
     tests/cable_load
     tests/cable_result
     tests/cross_section
+    tests/groups
+    tests/groups_lc
     tests/node_data
     tests/node_load
     tests/node_residual
