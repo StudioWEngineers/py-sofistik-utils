@@ -41,11 +41,11 @@ associated public API.
     Groups
     GroupsLC
     _LoadCases
-    _Node
-    _NodeData
+    Node
+    NodeData
     NodeLoad
-    _NodeResult
-    _NodeResidual
+    NodeResult
+    NodeResidual
     Quads
     QuadData
     SecondaryGroupsLC

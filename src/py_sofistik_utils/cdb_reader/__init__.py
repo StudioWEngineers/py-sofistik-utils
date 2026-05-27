@@ -10,11 +10,11 @@ from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
 from . _internals.group_lc_data import GroupsLC
 from . _internals.load_cases import _LoadCases
-from . _internals.node import _Node
-from . _internals.node_data import _NodeData
+from . _internals.node import Node
+from . _internals.node_data import NodeData
 from . _internals.node_load import NodeLoad
-from . _internals.node_residual import _NodeResidual
-from . _internals.node_result import _NodeResult
+from . _internals.node_residual import NodeResidual
+from . _internals.node_result import NodeResult
 from . _internals.quad import Quads
 from . _internals.quad_data import QuadData
 from . _internals.sec_group_lc_data import SecondaryGroupsLC
@@ -42,11 +42,11 @@ __all__ = [
     "Groups",
     "GroupsLC",
     "_LoadCases",
-    "_Node",
-    "_NodeData",
+    "Node",
+    "NodeData",
     "NodeLoad",
-    "_NodeResidual",
-    "_NodeResult",
+    "NodeResidual",
+    "NodeResult",
     "Quads",
     "QuadData",
     "SecondaryGroupsLC",

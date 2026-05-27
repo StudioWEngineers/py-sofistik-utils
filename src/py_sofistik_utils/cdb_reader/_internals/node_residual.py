@@ -9,7 +9,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISPI
 
 
-class _NodeResidual:
+class NodeResidual:
     """This class provides methods and a data structure to:
 
         * access keys ``170/LC`` of the CDB file;

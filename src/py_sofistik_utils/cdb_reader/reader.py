@@ -9,7 +9,7 @@ from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
 from . _internals.group_lc_data import GroupsLC
 from . _internals.load_cases import _LoadCases
-from . _internals.node import _Node
+from . _internals.node import Node
 from . _internals.quad import Quads
 from . _internals.sec_group_lc_data import SecondaryGroupsLC
 from . _internals.spring import _Spring
@@ -25,7 +25,7 @@ class SOFiSTiKCDBReader:
     # elements
     beams: Beam
     cables: Cables
-    nodes: _Node
+    nodes: Node
     quads: Quads
     springs: _Spring
     trusses: _Truss
@@ -53,7 +53,7 @@ class SOFiSTiKCDBReader:
         # elements
         self.beams = Beam(self._dll)
         self.cables = Cables(self._dll)
-        self.nodes = _Node(self._dll)
+        self.nodes = Node(self._dll)
         self.quads = Quads(self._dll)
         self.springs = _Spring(self._dll)
         self.trusses = _Truss(self._dll)

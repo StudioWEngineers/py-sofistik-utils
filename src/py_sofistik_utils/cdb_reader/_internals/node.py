@@ -4,32 +4,34 @@
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . node_data import _NodeData
+from . node_data import NodeData
 from . node_load import NodeLoad
-from . node_residual import _NodeResidual
-from . node_result import _NodeResult
+from . node_residual import NodeResidual
+from . node_result import NodeResult
 from . sofistik_dll import SofDll
 
 
-class _Node:
+class Node:
     """
-    The ``Nodes`` class is a wrapper that manages informations about nodes through
-    member variables of classes ``NodeData``, ``NodeResiduals`` and ``NodeResults``.
-    It provides easy abstractions for commonly used data manipulations, e.g, calculating
-    nodal coordinates in deflected configuration.
-    """
+    High-level wrapper for node-related data access and operations.
 
-    data: _NodeData
-    residuals: _NodeResidual
-    results: _NodeResult
+    The class aggregates the low-level interfaces ``NodeData``,
+    ``NodeLoad``, ``NodeResidual`` and ``NodeResult`` into a single
+    abstraction. It provides a structured entry point for reading, manipulating
+    and evaluating nodal definitions, applied loads, and analysis results.
+    """
+    data: NodeData
+    loads: NodeLoad
+    residuals: NodeResidual
+    results: NodeResult
 
     def __init__(self, dll: SofDll) -> None:
         """The initializer of the ``Nodes`` class.
         """
-        self.data = _NodeData(dll)
+        self.data = NodeData(dll)
         self.loads = NodeLoad(dll)
-        self.residuals = _NodeResidual(dll)
-        self.results = _NodeResult(dll)
+        self.residuals = NodeResidual(dll)
+        self.results = NodeResult(dll)
 
         self._calculated_lc: set[int] = set()
         self._data = DataFrame(columns=["LOAD_CASE", "ID", "X", "Y", "Z"])
