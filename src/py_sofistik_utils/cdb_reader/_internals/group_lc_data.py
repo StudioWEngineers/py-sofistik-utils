@@ -154,7 +154,7 @@ class GroupsLC:
             if return_value.value >= 2:
                 break
 
-            if group.m_typ != 0:
+            if group.m_typ != 0 or group.m_ng > 999:
                 break
 
             data.update(
