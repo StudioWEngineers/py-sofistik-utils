@@ -40,8 +40,8 @@ class Groups:
         * ``NUMBER_OF_QUADS`` number of quads
 
         The ``DataFrame`` uses a MultiIndex with level ``GROUP`` to enable fast
-        lookups via the `get` method. The index columns are not dropped from
-        the ``DataFrame``.
+        lookups via the `get_id_range`, `get_name` and `get_number` methods.
+        The index columns are not dropped from the ``DataFrame``.
 
         .. note::
 
