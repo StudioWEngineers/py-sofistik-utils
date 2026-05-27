@@ -7,7 +7,7 @@ from . _internals.beam import Beam
 from . _internals.cable import Cables
 from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
-from . _internals.group_lc_data import _GroupLCData
+from . _internals.group_lc_data import GroupsLC
 from . _internals.load_cases import _LoadCases
 from . _internals.node import _Node
 from . _internals.quad import Quads
@@ -33,7 +33,7 @@ class SOFiSTiKCDBReader:
     # other cdb data
     cross_sections: CrossSectionalData
     groups: Groups
-    group_lc_data: _GroupLCData
+    groups_lc: GroupsLC
     load_cases: _LoadCases
     sec_group_lc_data: _SecondaryGroupLCData
 
@@ -61,7 +61,7 @@ class SOFiSTiKCDBReader:
         # other cdb data
         self.cross_sections = CrossSectionalData(self._dll)
         self.groups = Groups(self._dll)
-        self.group_lc_data = _GroupLCData(self._dll)
+        self.groups_lc = GroupsLC(self._dll)
         self.load_cases = _LoadCases(self._dll)
         self.sec_group_lc_data = _SecondaryGroupLCData(self._dll)
 

@@ -39,7 +39,7 @@ associated public API.
     CableResult
     CrossSectionalData
     Groups
-    _GroupLCData
+    GroupsLC
     _LoadCases
     _Node
     _NodeData

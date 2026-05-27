@@ -10,7 +10,7 @@ from . sofistik_classes import CGRP_LC
 from . sofistik_dll import SofDll
 
 
-class _GroupLCData:
+class GroupsLC:
     """This class provides methods and a data structure to:
 
         * access keys ``11/LC`` of the CDB file;

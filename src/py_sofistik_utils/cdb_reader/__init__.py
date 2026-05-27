@@ -8,7 +8,7 @@ from . _internals.cable_load import CableLoad
 from . _internals.cable_result import CableResult
 from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
-from . _internals.group_lc_data import _GroupLCData
+from . _internals.group_lc_data import GroupsLC
 from . _internals.load_cases import _LoadCases
 from . _internals.node import _Node
 from . _internals.node_data import _NodeData
@@ -40,7 +40,7 @@ __all__ = [
     "CableResult",
     "CrossSectionalData",
     "Groups",
-    "_GroupLCData",
+    "GroupsLC",
     "_LoadCases",
     "_Node",
     "_NodeData",
