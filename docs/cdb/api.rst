@@ -38,8 +38,8 @@ associated public API.
     CableLoad
     CableResult
     CrossSectionalData
-    _GroupData
-    _GroupLCData
+    Groups
+    GroupsLC
     _LoadCases
     _Node
     _NodeData
@@ -48,7 +48,7 @@ associated public API.
     _NodeResidual
     Quads
     QuadData
-    _SecondaryGroupLCData
+    SecondaryGroupsLC
     _Spring
     _SpringData
     _SpringResult

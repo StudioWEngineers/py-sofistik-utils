@@ -5,7 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM, CBEAM_SCT
 from . sofistik_utilities import decode_beam_end_release
@@ -261,13 +261,13 @@ class _BeamData:
                 )
 
             # assigning groups
-            group_data = _GroupData(self._dll)
+            group_data = Groups(self._dll)
             group_data.load()
 
             df = DataFrame(conv_data).sort_values("ELEM_ID", kind="mergesort")
             elem_ids = df["ELEM_ID"]
 
-            for grp, grp_range in group_data.iterator_beam():
+            for grp, grp_range in group_data.iterator("BEAM"):
                 if grp_range.stop == 0:
                     continue
                 left = elem_ids.searchsorted(grp_range.start, side="left")

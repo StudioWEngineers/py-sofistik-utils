@@ -5,7 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL_RES
 
@@ -170,13 +170,13 @@ class CableResult:
                 data.extend(self._load(load_case))
 
         # assigning groups
-        group_data = _GroupData(self._dll)
+        group_data = Groups(self._dll)
         group_data.load()
 
         df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_cable():
+        for grp, grp_range in group_data.iterator("CABLE"):
             if grp_range.stop == 0:
                 continue
 
