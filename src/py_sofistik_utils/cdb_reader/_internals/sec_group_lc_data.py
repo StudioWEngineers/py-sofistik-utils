@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_utilities import long_to_str
 
 
-class _SecondaryGroupLCData:
+class SecondaryGroupsLC:
     """This class provides methods and a data structure to:
 
         * access secondary groups info in keys ``11/LC`` of the CDB file;
@@ -73,7 +73,7 @@ class _SecondaryGroupLCData:
             raise RuntimeError(f"Load case {load_case} not loaded!")
 
         lc_mask = self._data["LOAD_CASE"] == load_case
-        active_mask = self._data["IS_ACTIVE"] is True
+        active_mask = self._data["IS_ACTIVE"] == True  # noqa: E712
 
         return self._data.GROUP_NAME[lc_mask & active_mask].to_list()
 
