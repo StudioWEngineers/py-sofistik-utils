@@ -6,14 +6,14 @@ from pandas import DataFrame
 
 # local library specific imports
 from . group_data import Groups
-from . sofistik_classes import CSPRI
 from . sofistik_dll import SofDll
+from . sofistik_classes import CQUAD
 
 
-class SpringData:
+class QuadData:
     """This class provides methods and a data structure to:
 
-        * access keys ``170/00`` of the CDB file;
+        * access keys ``200/00`` of the CDB file;
         * store the retrieved data in a convenient format;
         * provide access to the data after the CDB is closed.
 
@@ -24,12 +24,10 @@ class SpringData:
         * ``ELEM_ID`` element number
         * ``N1`` id of the first node
         * ``N2``: id of the second node
-        * ``CP``: axial stiffness
-        * ``CT``: lateral stiffness
-        * ``CM``: rotational stiffness
-        * ``DX``: normal direction, X-component
-        * ``DY``: normal direction, Y-component
-        * ``DZ``: normal direction, Z-component
+        * ``N3``: id of the second node
+        * ``N4``: id of the second node
+        * ``MNO``: material number
+        * ``NRA``: type of element
 
         The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
         fast lookups via the `get` method. The index column is not dropped from
@@ -40,20 +38,15 @@ class SpringData:
             Not all available quantities are retrieved and stored. In
             particular:
 
-            * material or work law number
-            * reference area
-            * prestress
-            * slip
-            * maximum tension force
-            * yielding load
-            * reference axis
-            * friction coefficient
-            * cohesion coefficient
-            * dilatancy factor
-            * transversal slip
+            * thickness
+            * Jacobi Determinant
+            * thickness
+            * bedding factor
+            * tangential bedding factor
+            * transformation matrix
+            * reinforcement material number
 
-            are currently not included, together with quantities for coupled
-            damping elements.
+            are currently not included.
 
             This is a deliberate design choice and may be changed in the future
             without breaking the existing API.
@@ -65,16 +58,13 @@ class SpringData:
                 "ELEM_ID",
                 "N1",
                 "N2",
-                "CP",
-                "CT",
-                "CM",
-                "DX",
-                "DY",
-                "DZ"
+                "N3",
+                "N4",
+                "MNO",
+                "NRA"
             ]
         )
         self._dll = dll
-        self._echo_level = 0
 
     def clear(self) -> None:
         """Clear all the loaded data.
@@ -87,23 +77,21 @@ class SpringData:
             quantity: str,
             default: float | int | None = None
     ) -> float | int:
-        """Retrieve the requested spring quantity.
+        """Retrieve the requested quad quantity.
 
         Parameters
         ----------
         element_id : int
-            Spring element number
+            Cable element number
         quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"N1"``
             - ``"N2"``
-            - ``"CP"``
-            - ``"CT"``
-            - ``"CM"``
-            - ``"DX"``
-            - ``"DY"``
-            - ``"DZ"``
+            - ``"N3"``
+            - ``"N4"``
+            - ``"MNO"``
+            - ``"NRA"``
 
         default : float or int or None, default None
             Value to return if the requested quantity is not found
@@ -125,13 +113,13 @@ class SpringData:
             if default is not None:
                 return default
             raise LookupError(
-                f"Spring data entry not found for element id {element_id}, "
+                f"Quad data entry not found for element id {element_id}, "
                 f"and quantity {quantity}!"
             ) from e
 
     def get_data(self, deep: bool = True) -> DataFrame:
         """Return the :class:`pandas.DataFrame` containing the loaded key
-        ``170/00``.
+        ``200/00``.
 
         Parameters
         ----------
@@ -143,39 +131,13 @@ class SpringData:
         """
         return self._data.copy(deep=deep)
 
-    def has_stiffness(self, element_id: int, component: str = "CP") -> bool:
-        """Return whether the specified stiffness component of a spring element
-        is non-zero.
-
-        Parameters
-        ----------
-        element_id : int
-            Spring element number
-        component : str, default "CP"
-            Stiffness component to test. Must be one of:
-
-            - ``"CP"``
-            - ``"CT"``
-            - ``"CM"``
-
-        Returns
-        -------
-        bool
-            True if the requested stiffness component exists and is non-zero.
-            False if the component is zero or the element is not found.
-        """
-        try:
-            return self._data.at[element_id, component] != 0.0
-        except (KeyError, ValueError):
-            return False
-
     def load(self) -> None:
-        """Retrieve all spring data. If the key does not exist or it is empty,
-        a warning is raised only if ``echo_level > 0``.
+        """Retrieve all quad data. If the key does not exist or it is empty, a
+        warning is raised only if ``echo_level > 0``.
         """
-        if self._dll.key_exist(170, 0):
-            spring = CSPRI()
-            record_length = c_int(sizeof(spring))
+        if self._dll.key_exist(200, 0):
+            quad = CQUAD()
+            rec_length = c_int(sizeof(quad))
             return_value = c_int(0)
 
             data: list[dict[str, float | int]] = []
@@ -183,14 +145,14 @@ class SpringData:
             while return_value.value < 2:
                 return_value.value = self._dll.get(
                     1,
-                    170,
+                    200,
                     0,
-                    byref(spring),
-                    byref(record_length),
+                    byref(quad),
+                    byref(rec_length),
                     0 if first_call else 1
                 )
 
-                record_length = c_int(sizeof(spring))
+                rec_length = c_int(sizeof(quad))
                 first_call = False
                 if return_value.value >= 2:
                     break
@@ -198,32 +160,29 @@ class SpringData:
                 data.append(
                     {
                         "GROUP":    0,
-                        "ELEM_ID":  spring.m_nr,
-                        "N1":       spring.m_node[0],
-                        "N2":       spring.m_node[1],
-                        "CP":       spring.m_cp,
-                        "CT":       spring.m_cq,
-                        "CM":       spring.m_cm,
-                        "DX":       spring.m_t[0],
-                        "DY":       spring.m_t[1],
-                        "DZ":       spring.m_t[2]
+                        "ELEM_ID":  quad.m_nr,
+                        "N1":       quad.m_node[0],
+                        "N2":       quad.m_node[1],
+                        "N3":       quad.m_node[2],
+                        "N4":       quad.m_node[3],
+                        "MNO":      quad.m_mat,
+                        "NRA":      quad.m_nra
                     }
                 )
+
+            df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
+            elem_ids = df["ELEM_ID"]
 
             # assigning groups
             group_data = Groups(self._dll)
             group_data.load()
 
-            temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
-            elem_ids = temp_df["ELEM_ID"]
-
-            for grp, grp_range in group_data.iterator("SPRING"):
+            for grp, grp_range in group_data.iterator("QUAD"):
                 if grp_range.stop == 0:
                     continue
-
                 left = elem_ids.searchsorted(grp_range.start, side="left")
                 right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
-                temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
+                df.loc[df.index[left:right], "GROUP"] = grp
 
             # set indices for fast lookup and merge data
-            self._data = temp_df.set_index(["ELEM_ID"], drop=False)
+            self._data = df.set_index(["ELEM_ID"], drop=False)

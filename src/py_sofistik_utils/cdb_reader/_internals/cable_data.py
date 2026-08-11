@@ -2,10 +2,10 @@
 from ctypes import byref, c_int, sizeof
 
 # third party library imports
-from pandas import concat, DataFrame
+from pandas import DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CCABL
 
@@ -70,7 +70,7 @@ class CableData:
     def get(
             self,
             element_id: int,
-            quantity: str = "L0",
+            quantity: str,
             default: float | int | None = None
     ) -> float | int:
         """Retrieve the requested cable quantity.
@@ -79,7 +79,7 @@ class CableData:
         ----------
         element_id : int
             Cable element number
-        quantity : str, default "L0"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"N1"``
@@ -134,8 +134,6 @@ class CableData:
             record_length = c_int(sizeof(cabl))
             return_value = c_int(0)
 
-            self.clear()
-
             data: list[dict[str, float | int]] = []
             first_call = True
             while return_value.value < 2:
@@ -165,13 +163,13 @@ class CableData:
                 )
 
             # assigning groups
-            group_data = _GroupData(self._dll)
+            group_data = Groups(self._dll)
             group_data.load()
 
             df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
             elem_ids = df["ELEM_ID"]
 
-            for grp, grp_range in group_data.iterator_cable():
+            for grp, grp_range in group_data.iterator("CABLE"):
                 if grp_range.stop == 0:
                     continue
 
@@ -179,11 +177,5 @@ class CableData:
                 right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
                 df.loc[df.index[left:right], "GROUP"] = grp
 
-            # set indices for fast lookup
-            df = df.set_index(["ELEM_ID"], drop=False)
-
-            # merge data
-            if self._data.empty:
-                self._data = df
-            else:
-                self._data = concat([self._data, df])
+            # set indices for fast lookup and merge data
+            self._data = df.set_index(["ELEM_ID"], drop=False)

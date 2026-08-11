@@ -5,13 +5,13 @@ from ctypes import byref, c_int, sizeof
 from pandas import DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM, CBEAM_SCT
 from . sofistik_utilities import decode_beam_end_release
 
 
-class _BeamData:
+class BeamData:
     """This class provides methods and a data structure to:
 
         * access keys ``100/00`` of the CDB file;
@@ -96,7 +96,7 @@ class _BeamData:
     def get(
             self,
             element_id: int,
-            quantity: str = "LENGTH",
+            quantity: str,
             default: float | int | None = None
     ) -> float | int | str:
         """Retrieve the requested beam quantity.
@@ -105,7 +105,7 @@ class _BeamData:
         ----------
         element_id : int
             Beam element number
-        quantity : str, default "LENGTH"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``"N1"``
@@ -267,13 +267,13 @@ class _BeamData:
                 )
 
             # assigning groups
-            group_data = _GroupData(self._dll)
+            group_data = Groups(self._dll)
             group_data.load()
 
             df = DataFrame(conv_data).sort_values("ELEM_ID", kind="mergesort")
             elem_ids = df["ELEM_ID"]
 
-            for grp, grp_range in group_data.iterator_beam():
+            for grp, grp_range in group_data.iterator("BEAM"):
                 if grp_range.stop == 0:
                     continue
                 left = elem_ids.searchsorted(grp_range.start, side="left")

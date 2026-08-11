@@ -9,7 +9,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISP
 
 
-class _NodeResult:
+class NodeResult:
     """
     The ``NodeResults`` class provides abstractions to load and access information
     about the nodal results, contained in keys ``24/LC`` of the CDB file.
@@ -81,7 +81,7 @@ class _NodeResult:
             self,
             node_id: int,
             load_case: int,
-            quantity: str = "UX",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested nodal result.
@@ -92,7 +92,7 @@ class _NodeResult:
             Node number
         load_case : int
             Load case number
-        quantity : str, default "UX"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``UX``

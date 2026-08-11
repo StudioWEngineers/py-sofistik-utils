@@ -5,13 +5,13 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . beam_data import _BeamData
-from . group_data import _GroupData
+from . beam_data import BeamData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_FOR
 
 
-class BeamResults:
+class BeamResult:
     """
     This class provides methods and a data structure to:
 
@@ -46,10 +46,11 @@ class BeamResults:
         Not all available quantities are retrieved and stored. In
         particular:
 
-        * the maximum suspension of cable across axis and its components XXXXXXXXXXXX
-          along the global X, Y and Z axes
-        * vertical suspension of cable in load direction
-        * nonlinear effects
+        * displacements and rotations in local coordinates
+        * twist angle
+        * 3rd torsional moment
+        * axial and transverse beddings
+        * local y and z components of the transverse beddings
 
         are currently not included. This is a deliberate design choice and
         may be changed in the future without breaking the existing API.
@@ -103,7 +104,7 @@ class BeamResults:
             element_id: int,
             load_case: int,
             position: float,
-            quantity: str = "N",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested beam result.
@@ -116,7 +117,7 @@ class BeamResults:
             Load case number
         position : float
             Relative position of the output station along the beam (0 to 1)
-        quantity : str, default "N"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``N``
@@ -192,13 +193,13 @@ class BeamResults:
                 data.extend(self._load(load_case))
 
         # assigning groups
-        group_data = _GroupData(self._dll)
+        group_data = Groups(self._dll)
         group_data.load()
 
         df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_beam():
+        for grp, grp_range in group_data.iterator("BEAM"):
             if grp_range.stop == 0:
                 continue
             left = elem_ids.searchsorted(grp_range.start, side="left")
@@ -206,9 +207,11 @@ class BeamResults:
             df.loc[df.index[left:right], "GROUP"] = grp
 
         # calculating adimensional length
-        beam_data = _BeamData(self._dll)
+        beam_data = BeamData(self._dll)
         beam_data.load()
-        elem_to_factor = {_: beam_data.get(_) for _ in df["ELEM_ID"].unique()}
+        elem_to_factor = {
+            _: beam_data.get(_, "LENGTH") for _ in df["ELEM_ID"].unique()
+        }
         factors = df["ELEM_ID"].map(elem_to_factor).fillna(1.0).astype(float)
         df["POS_REL"] = (df["POS_REL"] / factors).round(2)
 

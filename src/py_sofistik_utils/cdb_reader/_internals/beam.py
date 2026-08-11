@@ -4,10 +4,9 @@
 from pandas import DataFrame
 
 # local library specific imports
-from . beam_data import _BeamData
-from . beam_load import _BeamLoad
-from . beam_results import BeamResults
-from . beam_stresses import _BeamStress
+from . beam_data import BeamData
+from . beam_result import BeamResult
+from . beam_stress import BeamStress
 from . cross_section_data import CrossSectionalData
 from . sofistik_dll import SofDll
 
@@ -15,22 +14,20 @@ from . sofistik_dll import SofDll
 class Beam:
     """
     The ``Beam`` class is a wrapper that manages informations about beams
-    through member variables of classes ``_BeamData``, ``_BeamLoad``,
-    ``_BeamResult`` and ``_BeamStresses``.
-    It provides easy abstractions for commonly used data manipulations, e.g,
-    calculating the strain energy.
+    through member variables of classes ``_BeamData``, ``_BeamResult`` and
+    ``_BeamStresses``. It provides easy abstractions for commonly used data
+    manipulations, e.g, calculating the strain energy or displacements in
+    local coordinates.
     """
 
-    data: _BeamData
-    loads: _BeamLoad
-    results: BeamResults
-    stresses: _BeamStress
+    data: BeamData
+    results: BeamResult
+    stresses: BeamStress
 
     def __init__(self, dll: SofDll) -> None:
-        self.data = _BeamData(dll)
-        self.loads = _BeamLoad(dll)
-        self.results = BeamResults(dll)
-        self.stresses = _BeamStress(dll)
+        self.data = BeamData(dll)
+        self.results = BeamResult(dll)
+        self.stresses = BeamStress(dll)
 
         self._calculated_u_lc: set[int] = set()
         self._dll = dll
@@ -61,8 +58,8 @@ class Beam:
 
         # Load properties
         prop_nmb = list(
-            set(self.data.data()["PROP_END_1"].unique()) |
-            set(self.data.data()["PROP_END_2"].unique())
+            set(self.data.get_data()["PROP_END_1"].unique()) |
+            set(self.data.get_data()["PROP_END_2"].unique())
         )
         properties = CrossSectionalData(self._dll)
         properties.load([int(_) for _ in prop_nmb])
@@ -71,7 +68,7 @@ class Beam:
         self.results.load(load_cases)
 
         # Initialize data
-        data = self.results.data().reset_index(drop=True)
+        data = self.results.get_data().reset_index(drop=True)
         required_columns = [
             "LENGTH", "PROP_END_1", "PROP_END_2", "EM", "A", "IY", "IZ", "U"
         ]
@@ -90,7 +87,9 @@ class Beam:
             ).fillna(1).astype(int)
         )
         data["LENGTH"] = (
-            data["ELEM_ID"].map({_: self.data.get(_) for _ in ids}).fillna(1.0)
+            data["ELEM_ID"].map(
+                {_: self.data.get(_, "LENGTH") for _ in ids}
+            ).fillna(1.0)
         )
 
         # Precompute property mappings

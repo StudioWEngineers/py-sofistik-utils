@@ -1,10 +1,3 @@
-"""
-SOFiSTiKCDBReader
------------------
-
-The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only access to a
-SOFiSTiK cdb file and serialize its content.
-"""
 # standard library imports
 
 # third party library imports
@@ -13,32 +6,36 @@ SOFiSTiK cdb file and serialize its content.
 from . _internals.beam import Beam
 from . _internals.cable import Cables
 from . _internals.cross_section_data import CrossSectionalData
-from . _internals.group_data import _GroupData
-from . _internals.group_lc_data import _GroupLCData
-from . _internals.load_cases import _LoadCases
-from . _internals.node import _Node
-from . _internals.plate_data import _PlateData
-from . _internals.sec_group_lc_data import _SecondaryGroupLCData
-from . _internals.spring import _Spring
+from . _internals.group_data import Groups
+from . _internals.group_lc_data import GroupsLC
+from . _internals.load_case import LoadCase
+from . _internals.node import Node
+from . _internals.quad import Quads
+from . _internals.sec_group_lc_data import SecondaryGroupsLC
+from . _internals.spring import Spring
 from . _internals.sofistik_dll import SofDll
-from . _internals.truss import _Truss
+from . _internals.truss import Truss
 
 
 class SOFiSTiKCDBReader:
-    """The ``SOFiSTiKCDBReader`` class provides methods and data structure to read-only
-    access to a SOFiSTiK cdb file and serialize its content.
+    """The ``SOFiSTiKCDBReader`` class provides efficient, read-only access to
+    SOFiSTiK CDB files together with convenient data structures for fast
+    querying, serialization, and interoperability with tools such as Pandas.
     """
+    # elements
     beams: Beam
-    cable: Cables
-    grp_data: _GroupData
-    grp_lc_data: _GroupLCData
-    load_case: _LoadCases
-    node: _Node
-    plate_data: _PlateData
-    cross_section: CrossSectionalData
-    sec_grp_lc_data: _SecondaryGroupLCData
-    spring: _Spring
-    truss: _Truss
+    cables: Cables
+    nodes: Node
+    quads: Quads
+    springs: Spring
+    trusses: Truss
+
+    # other cdb data
+    cross_sections: CrossSectionalData
+    groups: Groups
+    groups_lc: GroupsLC
+    load_cases: LoadCase
+    sec_groups_lc: SecondaryGroupsLC
 
     def __init__(
             self,
@@ -47,72 +44,26 @@ class SOFiSTiKCDBReader:
             path_to_dlls: str,
             version: int = 2023
     ) -> None:
-        """The initializer of the ``SOFiSTiKCDBReader`` class.
-        """
+        self._dll = SofDll(path_to_dlls, 0, version)
         self._echo_level = 0
+
         self.full_name = path_to_cdb + file_name + ".cdb"
         self.is_open = False
 
-        self._dll = SofDll(path_to_dlls, self.get_echo_level(), version)
-
+        # elements
         self.beams = Beam(self._dll)
+        self.cables = Cables(self._dll)
+        self.nodes = Node(self._dll)
+        self.quads = Quads(self._dll)
+        self.springs = Spring(self._dll)
+        self.trusses = Truss(self._dll)
 
-        self.cable = Cables(self._dll)
-
-        self.grp_data = _GroupData(self._dll)
-        self.grp_lc_data = _GroupLCData(self._dll)
-        self.sec_grp_lc_data = _SecondaryGroupLCData(self._dll)
-
-        self.node = _Node(self._dll)
-
-        self.plate_data = _PlateData(self._dll)
-
-        self.spring = _Spring(self._dll)
-
-        self.load_case = _LoadCases(self._dll)
-        self.cross_section = CrossSectionalData(self._dll)
-
-        self.truss = _Truss(self._dll)
-
-    def clear(self) -> None:
-        """Clear all the loaded data and results.
-        """
-        #self.beam_res.clear_all_forces()
-        #self.beam_geo.clear_connectivity()
-        self.cable.data.clear()
-        self.cable.load.clear_all()
-        self.cable.result.clear_all()
-        self.grp_data.clear()
-        self.grp_lc_data.clear_all()
-        self.sec_grp_lc_data.clear_all()
-        self.node.data.clear()
-        self.node.results.clear_all()
-        self.spring.data.clear()
-        self.spring.result.clear_all()
-        #self.load_case.clear_all()
-        #self.properties.clear_all_values()
-
-    def clear_data(self) -> None:
-        """Clear all the loaded data.
-        """
-        #self.beam_geo.clear_connectivity()
-        self.cable.data.clear()
-        self.grp_data.clear()
-        self.grp_lc_data.clear_all()
-        self.sec_grp_lc_data.clear_all()
-        self.node.data.clear()
-        self.spring.data.clear()
-        #self.load_case.clear_all()
-        #self.properties.clear_all_values()
-
-    def clear_results(self) -> None:
-        """Clear all the loaded results.
-        """
-        #self.beam_res.clear_all_forces()
-        self.cable.result.clear_all()
-        self.node.results.clear_all()
-        self.spring.result.clear_all()
-        #self.load_case.clear_all()
+        # other cdb data
+        self.cross_sections = CrossSectionalData(self._dll)
+        self.groups = Groups(self._dll)
+        self.groups_lc = GroupsLC(self._dll)
+        self.load_cases = LoadCase(self._dll)
+        self.sec_groups_lc = SecondaryGroupsLC(self._dll)
 
     def close(self) -> None:
         """Close the CDB database.
@@ -121,26 +72,21 @@ class SOFiSTiKCDBReader:
         self.is_open = False
 
     def get_echo_level(self) -> int:
-        """return the ``echo_level`` for this instance of ``SOFiSTiKCDBReader``.
+        """Return the ``echo_level`` of this instance of ``SOFiSTiKCDBReader``.
         """
         return self._echo_level
 
-    def initialize(self) -> None:
-        """Open the CDB file.
-        """
-        self.open()
-
     def open(self) -> None:
-        """Open a CDB database always in a read-only mode! This method is supposed to be
-        called before any other call.
+        """Load the required SOFiSTiK dlls and open a CDB database in a
+        read-only mode.
         """
         if not self.is_open:
             self._dll.initialize()
-            self._dll.open_cdb(self.full_name, 93)
+            self._dll.open_cdb(self.full_name)
             self.is_open = True
 
     def set_echo_level(self, new_echo_level: int) -> None:
-        """Set the ``echo_level`` for this instance of ``SOFiSTiKCDBReader``.
+        """Set the ``echo_level``.
         """
         self._echo_level = new_echo_level
         self._dll.set_echo_level(new_echo_level)

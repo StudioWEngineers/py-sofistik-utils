@@ -5,12 +5,12 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CSPRI_RES
 
 
-class _SpringResult:
+class SpringResult:
     """This class provides methods and a data structure to:
 
         * access keys ``170/LC`` of the CDB file;
@@ -186,13 +186,13 @@ class _SpringResult:
                 temp_list.extend(self._load(load_case))
 
         # assigning groups
-        group_data = _GroupData(self._dll)
+        group_data = Groups(self._dll)
         group_data.load()
 
         temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = temp_df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_spring():
+        for grp, grp_range in group_data.iterator("SPRING"):
             if grp_range.stop == 0:
                 continue
 

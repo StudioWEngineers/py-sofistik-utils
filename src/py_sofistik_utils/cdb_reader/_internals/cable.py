@@ -19,10 +19,10 @@ class Cables:
     cable definitions, applied loads, and analysis results.
     """
     data: CableData
-    load: CableLoad
-    result: CableResult
+    loads: CableLoad
+    results: CableResult
 
     def __init__(self, dll: SofDll) -> None:
         self.data = CableData(dll)
-        self.load = CableLoad(dll)
-        self.result = CableResult(dll)
+        self.loads = CableLoad(dll)
+        self.results = CableResult(dll)

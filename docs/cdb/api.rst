@@ -30,29 +30,29 @@ associated public API.
     :template: class-template.rst
 
     Beam
-    _BeamData
-    _BeamLoad
-    BeamResults
+    BeamData
+    BeamResult
+    BeamStress
     Cables
     CableData
     CableLoad
     CableResult
     CrossSectionalData
-    _BeamStress
-    _GroupData
-    _GroupLCData
-    _LoadCases
-    _Node
-    _NodeData
+    Groups
+    GroupsLC
+    LoadCase
+    Node
+    NodeData
     NodeLoad
-    _NodeResult
-    _NodeResidual
-    _PlateData
-    _SecondaryGroupLCData
-    _Spring
-    _SpringData
-    _SpringResult
-    _Truss
-    _TrussData
-    _TrussLoad
-    _TrussResult
+    NodeResult
+    NodeResidual
+    Quads
+    QuadData
+    SecondaryGroupsLC
+    Spring
+    SpringData
+    SpringResult
+    Truss
+    TrussData
+    TrussLoad
+    TrussResult

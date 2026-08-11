@@ -2,23 +2,23 @@
 from ctypes import byref, c_int, sizeof
 
 # third party library imports
-from pandas import concat, DataFrame
+from pandas import DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CTRUS
 
 
-class _TrussData:
+class TrussData:
     """This class provides methods and a data structure to:
 
         * access keys ``150/00`` of the CDB file;
         * store the retrieved data in a convenient format;
         * provide access to the data after the CDB is closed.
 
-        The underlying data structure is a :class:`pandas.DataFrame` with the following
-        columns:
+        The underlying data structure is a :class:`pandas.DataFrame` with the
+        following columns:
 
         * ``GROUP`` element group
         * ``ELEM_ID`` element number
@@ -28,12 +28,14 @@ class _TrussData:
         * ``PROPERTY``: property number (cross-section)
         * ``GAP``: slip of the element
 
-        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable fast lookups
-        via the `get` method. The index column is not dropped from the ``DataFrame``.
+        The ``DataFrame`` uses a MultiIndex with level ``ELEM_ID`` to enable
+        fast lookups via the `get` method. The index column is not dropped from
+        the ``DataFrame``.
 
         .. note::
 
-            Not all available quantities are retrieved and stored. In particular:
+            Not all available quantities are retrieved and stored. In
+            particular:
 
             * normal direction
             * prestress
@@ -43,12 +45,12 @@ class _TrussData:
 
             are currently not included.
 
-            This is a deliberate design choice and may be changed in the future without
-            breaking the existing API.
+            This is a deliberate design choice and may be changed in the future
+            without breaking the existing API.
     """
     def __init__(self, dll: SofDll) -> None:
         self._data = DataFrame(
-            columns = [
+            columns=[
                 "GROUP",
                 "ELEM_ID",
                 "N1",
@@ -92,8 +94,8 @@ class _TrussData:
         Returns
         -------
         value : float or int
-            The requested quantity if found. Otherwise, returns ``default`` when it is not
-            None.
+            The requested quantity if found. Otherwise, returns ``default``
+            when it is not None.
 
         Raises
         ------
@@ -111,28 +113,27 @@ class _TrussData:
             ) from e
 
     def get_data(self, deep: bool = True) -> DataFrame:
-        """Return the :class:`pandas.DataFrame` containing the loaded key ``150/00``.
+        """Return the :class:`pandas.DataFrame` containing the loaded key
+        ``150/00``.
 
         Parameters
         ----------
         deep : bool, default True
-            When ``deep=True``, a new object will be created with a copy of the calling
-            object's data and indices. Modifications to the data or indices of the
-            copy will not be reflected in the original object (refer to
-            :meth:`pandas.DataFrame.copy` documentation for details).
+            When ``deep=True``, a new object will be created with a copy of the
+            calling object's data and indices. Modifications to the data or
+            indices of the copy will not be reflected in the original object
+            (refer to :meth:`pandas.DataFrame.copy` documentation for details).
         """
         return self._data.copy(deep=deep)
 
     def load(self) -> None:
-        """Retrieve all truss data. If the key does not exist or it is empty, a warning is
-        raised only if ``echo_level > 0``.
+        """Retrieve all truss data. If the key does not exist or it is empty, a
+        warning is raised only if ``echo_level > 0``.
         """
         if self._dll.key_exist(150, 0):
             truss = CTRUS()
             record_length = c_int(sizeof(truss))
             return_value = c_int(0)
-
-            self.clear()
 
             data: list[dict[str, float | int]] = []
             first_call = True
@@ -164,13 +165,13 @@ class _TrussData:
                 )
 
             # assigning groups
-            group_data = _GroupData(self._dll)
+            group_data = Groups(self._dll)
             group_data.load()
 
             temp_df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
             elem_ids = temp_df["ELEM_ID"]
 
-            for grp, grp_range in group_data.iterator_truss():
+            for grp, grp_range in group_data.iterator("TRUSS"):
                 if grp_range.stop == 0:
                     continue
 
@@ -178,11 +179,5 @@ class _TrussData:
                 right = elem_ids.searchsorted(grp_range.stop - 1, side="right")
                 temp_df.loc[temp_df.index[left:right], "GROUP"] = grp
 
-            # set indices for fast lookup
-            temp_df = temp_df.set_index(["ELEM_ID"], drop=False)
-
-            # merge data
-            if self._data.empty:
-                self._data = temp_df
-            else:
-                self._data = concat([self._data, temp_df])
+            # set indices for fast lookup and merge data
+            self._data = temp_df.set_index(["ELEM_ID"], drop=False)

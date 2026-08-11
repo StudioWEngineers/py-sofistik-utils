@@ -68,7 +68,7 @@ class NodeLoad:
             self,
             node_id: int,
             load_case: int,
-            quantity: str = "PZ",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested nodal load.
@@ -79,7 +79,7 @@ class NodeLoad:
             Node number
         load_case : int
             Load case number
-        quantity : str, default "PZ"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``PX``
@@ -110,9 +110,13 @@ class NodeLoad:
         LookupError
             If the requested load is not found and ``default`` is None.
         """
-        value = self._data.loc[(node_id, load_case), quantity]
         try:
-            return value if isinstance(value, (int, float)) else value.sum()  # type: ignore
+            value = self._data.loc[(node_id, load_case), quantity]
+            return (
+                value
+                if isinstance(value, (int, float))
+                else value.sum()  # type: ignore
+            )
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default

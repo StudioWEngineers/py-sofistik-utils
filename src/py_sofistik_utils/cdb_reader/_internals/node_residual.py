@@ -9,7 +9,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CN_DISPI
 
 
-class _NodeResidual:
+class NodeResidual:
     """This class provides methods and a data structure to:
 
         * access keys ``170/LC`` of the CDB file;
@@ -88,7 +88,7 @@ class _NodeResidual:
             self,
             node_id: int,
             load_case: int,
-            quantity: str = "UX",
+            quantity: str,
             default: float | None = None
     ) -> float:
         """Retrieve the requested nodal result.
@@ -99,7 +99,7 @@ class _NodeResidual:
             Node number
         load_case : int
             Load case number
-        quantity : str, default "UX"
+        quantity : str
             Quantity to retrieve. Must be one of:
 
             - ``UX``

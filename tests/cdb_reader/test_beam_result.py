@@ -51,9 +51,9 @@ class SOFiSTiKCDBReaderBeamResultTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "BEAM_RESULTS",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
-        self.cdb.initialize()
+        self.cdb.open()
         self.cdb.beams.results.load(self.load_cases)
 
     def tearDown(self) -> None:
@@ -75,7 +75,7 @@ class SOFiSTiKCDBReaderBeamResultTestSuite(TestCase):
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):
             self.assertEqual(
-                self.cdb.beams.results.get(202, 1001, 0.40),
+                self.cdb.beams.results.get(202, 1001, 0.40, "N"),
                 97.24059295654297
             )
 

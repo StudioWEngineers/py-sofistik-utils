@@ -10,7 +10,7 @@ from . sofistik_classes import CNODE
 from . sofistik_utilities import decode_nodal_boundary_condition
 
 
-class _NodeData:
+class NodeData:
     """This class provides methods and a data structure to:
 
         * access keys ``2/00`` of the CDB file;

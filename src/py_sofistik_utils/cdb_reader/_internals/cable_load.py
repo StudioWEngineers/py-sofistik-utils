@@ -5,7 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_classes import CCABL_LOA
 from . sofistik_dll import SofDll
 
@@ -141,16 +141,24 @@ class CableLoad:
             The requested load if found. Otherwise, returns ``default`` when it
             is not None.
 
+        Notes
+        -----
+        If there are multiple entries for the same node and load case, this
+        method returns the sum of all corresponding values. To access the
+        individual entries without aggregation, use the `get_data` method.
+
         Raises
         ------
         LookupError
             If the requested load is not found and ``default`` is None.
         """
         try:
-            return self._data.at[
-                (element_id, load_case, load_type),
-                point
-            ]  # type: ignore
+            value = self._data.loc[(element_id, load_case, load_type), point]
+            return (
+                value
+                if isinstance(value, (int, float))
+                else value.sum()  # type: ignore
+            )
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
@@ -200,13 +208,13 @@ class CableLoad:
                 data.extend(self._load(load_case))
 
         # assigning groups
-        group_data = _GroupData(self._dll)
+        group_data = Groups(self._dll)
         group_data.load()
 
         df = DataFrame(data).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_cable():
+        for grp, grp_range in group_data.iterator("CABLE"):
             if grp_range.stop == 0:
                 continue
 
@@ -222,6 +230,7 @@ class CableLoad:
             self._data = df
         else:
             self._data = concat([self._data, df])
+            self._data.sort_index(inplace=True)
         self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:

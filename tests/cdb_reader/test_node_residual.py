@@ -85,10 +85,10 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
             CDB_PATH,  # type: ignore
             "NODE_RESIDUAL",
             DLL_PATH,  # type: ignore
-            int(VERSION)  # type: ignore
+            VERSION  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.node.residuals.load(self.lcs)
+        self.cdb.open()
+        self.cdb.nodes.residuals.load(self.lcs)
 
         self.data = (
             DataFrame(_DATA, columns=_COLUMNS)
@@ -99,23 +99,23 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
         self.cdb.close()
 
     def test_data(self) -> None:
-        assert_frame_equal(self.data, self.cdb.node.residuals.get_data())
+        assert_frame_equal(self.data, self.cdb.nodes.residuals.get_data())
 
     def test_get_displacements(self) -> None:
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "UX"),
+                    self.cdb.nodes.residuals.get(12, load_case, "UX"),
                     self.data.UX[(12, load_case)]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.residuals.clear(1000)
-        self.cdb.node.residuals.load(1000)
+        self.cdb.nodes.residuals.clear(1000)
+        self.cdb.nodes.residuals.load(1000)
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "UY"),
+                    self.cdb.nodes.residuals.get(12, load_case, "UY"),
                     self.data.UY[(12, load_case)]
                 )
 
@@ -123,17 +123,17 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "PX"),
+                    self.cdb.nodes.residuals.get(12, load_case, "PX"),
                     self.data.PX[(12, load_case)]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.residuals.clear_all()
-        self.cdb.node.residuals.load(self.lcs)
+        self.cdb.nodes.residuals.clear_all()
+        self.cdb.nodes.residuals.load(self.lcs)
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "PY"),
+                    self.cdb.nodes.residuals.get(12, load_case, "PY"),
                     self.data.PY[(12, load_case)]
                 )
 
@@ -141,17 +141,17 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "MB"),
+                    self.cdb.nodes.residuals.get(12, load_case, "MB"),
                     self.data.MB[(12, load_case)]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.residuals.clear_all()
-        self.cdb.node.residuals.load(self.lcs)
+        self.cdb.nodes.residuals.clear_all()
+        self.cdb.nodes.residuals.load(self.lcs)
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "MZ"),
+                    self.cdb.nodes.residuals.get(12, load_case, "MZ"),
                     self.data.MZ[(12, load_case)]
                 )
 
@@ -159,16 +159,16 @@ class SOFiSTiKCDBReaderNodeResidualsTestSuite(TestCase):
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "URY"),
+                    self.cdb.nodes.residuals.get(12, load_case, "URY"),
                     self.data.URY[(12, load_case)]
                 )
 
         # second run to check pointer rewinding
-        self.cdb.node.residuals.clear_all()
-        self.cdb.node.residuals.load(self.lcs)
+        self.cdb.nodes.residuals.clear_all()
+        self.cdb.nodes.residuals.load(self.lcs)
         for load_case in self.lcs:
             with self.subTest(load_case=load_case):
                 self.assertEqual(
-                    self.cdb.node.residuals.get(12, load_case, "URB"),
+                    self.cdb.nodes.residuals.get(12, load_case, "URB"),
                     self.data.URB[(12, load_case)]
                 )

@@ -1,7 +1,7 @@
 .. _usage_cdb_reader:
 
-CDB Reader
-==========
+Basic usage
+===========
 
 Methods for loading and accessing data from a CDB file are provided by the
 `SOFiSTiKCDBReader` class.

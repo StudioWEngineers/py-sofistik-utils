@@ -7,7 +7,7 @@ Expected CDB file name: ``CABLE_LOAD.cdb``
 
 Runs with: SOFiSTiK 2025
 
-Version: 1
+Version: 2
 
 .. code-block:: text
 
@@ -19,7 +19,7 @@ Version: 1
     END
 
     +PROG SOFIMSHA
-    HEAD GEOMETRY REV-1-SOF-2025
+    HEAD GEOMETRY REV-2-SOF-2025
         SYST 3D GDIV 10 GDIR NEGZ
 
         LET#COUNT 1
@@ -55,6 +55,7 @@ Version: 1
             CABL GRP 500 TYPE PYP -6.0
         LC 7 TITL 'LC-6-PZP'
             CABL 5009 TYPE PZP -7.0
+            CABL 5009 TYPE PZP -2.0
         LC 8 TITL 'LC-8-EX'
             CABL 5001 TYPE EX -8.0
             CABL 5014 TYPE EX -8.0

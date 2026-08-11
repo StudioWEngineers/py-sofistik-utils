@@ -5,12 +5,12 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . group_data import _GroupData
+from . group_data import Groups
 from . sofistik_classes import CTRUS_LOA
 from . sofistik_dll import SofDll
 
 
-class _TrussLoad:
+class TrussLoad:
     """The ``_TrussLoad`` class provides methods and data structure to:
     * access and load the keys ``161/LC`` of the CDB file;
     * store these data in a convenient format;
@@ -107,15 +107,24 @@ class _TrussLoad:
             The requested load if found. Otherwise, returns ``default`` when it
             is not None.
 
+        Notes
+        -----
+        If there are multiple entries for the same node and load case, this
+        method returns the sum of all corresponding values. To access the
+        individual entries without aggregation, use the `get_data` method.
+
         Raises
         ------
         LookupError
             If the requested load is not found and ``default`` is None.
         """
         try:
-            return self._data.at[
-                (element_id, load_case, load_type), point
-            ]  # type: ignore
+            value = self._data.loc[(element_id, load_case, load_type), point]
+            return (
+                value
+                if isinstance(value, (int, float))
+                else value.sum()  # type: ignore
+            )
         except (KeyError, ValueError) as e:
             if default is not None:
                 return default
@@ -165,13 +174,13 @@ class _TrussLoad:
                 temp_list.extend(self._load(load_case))
 
         # assigning groups
-        group_data = _GroupData(self._dll)
+        group_data = Groups(self._dll)
         group_data.load()
 
         temp_df = DataFrame(temp_list).sort_values("ELEM_ID", kind="mergesort")
         elem_ids = temp_df["ELEM_ID"]
 
-        for grp, grp_range in group_data.iterator_truss():
+        for grp, grp_range in group_data.iterator("TRUSS"):
             if grp_range.stop == 0:
                 continue
 
@@ -190,6 +199,7 @@ class _TrussLoad:
             self._data = temp_df
         else:
             self._data = concat([self._data, temp_df])
+            self._data.sort_index(inplace=True)
         self._loaded_lc.update(load_cases)
 
     def set_echo_level(self, echo_level: int) -> None:
@@ -222,7 +232,7 @@ class _TrussLoad:
                 break
 
             try:
-                type_ = _TrussLoad._LOAD_TYPE_MAP[trus.m_typ]
+                type_ = TrussLoad._LOAD_TYPE_MAP[trus.m_typ]
             except KeyError as e:
                 raise RuntimeError(
                     f"Unknown truss load type {trus.m_typ} for element "
