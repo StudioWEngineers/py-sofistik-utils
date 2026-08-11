@@ -11,7 +11,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_FOR
 
 
-class BeamResults:
+class BeamResult:
     """
     This class provides methods and a data structure to:
 

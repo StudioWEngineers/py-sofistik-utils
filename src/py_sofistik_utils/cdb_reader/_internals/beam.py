@@ -5,8 +5,8 @@ from pandas import DataFrame
 
 # local library specific imports
 from . beam_data import BeamData
-from . beam_results import BeamResults
-from . beam_stresses import BeamStress
+from . beam_result import BeamResult
+from . beam_stress import BeamStress
 from . sofistik_dll import SofDll
 
 
@@ -20,12 +20,12 @@ class Beam:
     """
 
     data: BeamData
-    results: BeamResults
+    results: BeamResult
     stresses: BeamStress
 
     def __init__(self, dll: SofDll) -> None:
         self.data = BeamData(dll)
-        self.results = BeamResults(dll)
+        self.results = BeamResult(dll)
         self.stresses = BeamStress(dll)
 
         self._calculated_lc: set[int] = set()

@@ -8,7 +8,7 @@ from . _internals.cable import Cables
 from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
 from . _internals.group_lc_data import GroupsLC
-from . _internals.load_cases import LoadCases
+from . _internals.load_case import LoadCase
 from . _internals.node import Node
 from . _internals.quad import Quads
 from . _internals.sec_group_lc_data import SecondaryGroupsLC
@@ -34,7 +34,7 @@ class SOFiSTiKCDBReader:
     cross_sections: CrossSectionalData
     groups: Groups
     groups_lc: GroupsLC
-    load_cases: LoadCases
+    load_cases: LoadCase
     sec_groups_lc: SecondaryGroupsLC
 
     def __init__(
@@ -62,7 +62,7 @@ class SOFiSTiKCDBReader:
         self.cross_sections = CrossSectionalData(self._dll)
         self.groups = Groups(self._dll)
         self.groups_lc = GroupsLC(self._dll)
-        self.load_cases = LoadCases(self._dll)
+        self.load_cases = LoadCase(self._dll)
         self.sec_groups_lc = SecondaryGroupsLC(self._dll)
 
     def close(self) -> None:

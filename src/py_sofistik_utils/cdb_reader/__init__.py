@@ -1,7 +1,7 @@
 from . _internals.beam import Beam
 from . _internals.beam_data import BeamData
-from . _internals.beam_results import BeamResults
-from . _internals.beam_stresses import BeamStress
+from . _internals.beam_result import BeamResult
+from . _internals.beam_stress import BeamStress
 from . _internals.cable import Cables
 from . _internals.cable_data import CableData
 from . _internals.cable_load import CableLoad
@@ -9,7 +9,7 @@ from . _internals.cable_result import CableResult
 from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
 from . _internals.group_lc_data import GroupsLC
-from . _internals.load_cases import LoadCases
+from . _internals.load_case import LoadCase
 from . _internals.node import Node
 from . _internals.node_data import NodeData
 from . _internals.node_load import NodeLoad
@@ -32,7 +32,7 @@ __all__ = [
     "SOFiSTiKCDBReader",
     "Beam",
     "BeamData",
-    "BeamResults",
+    "BeamResult",
     "BeamStress",
     "Cables",
     "CableData",
@@ -41,7 +41,7 @@ __all__ = [
     "CrossSectionalData",
     "Groups",
     "GroupsLC",
-    "LoadCases",
+    "LoadCase",
     "Node",
     "NodeData",
     "NodeLoad",

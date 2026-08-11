@@ -31,7 +31,7 @@ associated public API.
 
     Beam
     BeamData
-    BeamResults
+    BeamResult
     BeamStress
     Cables
     CableData
@@ -40,7 +40,7 @@ associated public API.
     CrossSectionalData
     Groups
     GroupsLC
-    LoadCases
+    LoadCase
     Node
     NodeData
     NodeLoad
