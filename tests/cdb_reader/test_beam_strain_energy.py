@@ -45,8 +45,7 @@ class SOFiSTiKCDBReaderBeamStrainEnergyTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             int(VERSION)  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.set_echo_level(1)
+        self.cdb.open()
         self.cdb.beams.calculate_strain_energy([1000, 1001, 1002])
 
     def tearDown(self) -> None:
@@ -129,8 +128,7 @@ class SOFiSTiKCDBReaderBeamStrainEnergyWithDIVTestSuite(TestCase):
             DLL_PATH,  # type: ignore
             int(VERSION)  # type: ignore
         )
-        self.cdb.initialize()
-        self.cdb.set_echo_level(1)
+        self.cdb.open()
         self.cdb.beams.calculate_strain_energy([1000, 1001, 1002])
 
     def tearDown(self) -> None:
