@@ -30,9 +30,9 @@ associated public API.
     :template: class-template.rst
 
     Beam
-    _BeamData
+    BeamData
     BeamResults
-    _BeamStress
+    BeamStress
     Cables
     CableData
     CableLoad
@@ -40,7 +40,7 @@ associated public API.
     CrossSectionalData
     Groups
     GroupsLC
-    _LoadCases
+    LoadCases
     Node
     NodeData
     NodeLoad
@@ -49,10 +49,10 @@ associated public API.
     Quads
     QuadData
     SecondaryGroupsLC
-    _Spring
-    _SpringData
-    _SpringResult
-    _Truss
-    _TrussData
-    _TrussLoad
-    _TrussResult
+    Spring
+    SpringData
+    SpringResult
+    Truss
+    TrussData
+    TrussLoad
+    TrussResult

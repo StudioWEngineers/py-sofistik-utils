@@ -10,7 +10,7 @@ from . sofistik_classes import CTRUS_RES
 from . sofistik_dll import SofDll
 
 
-class _TrussResult:
+class TrussResult:
     """This class provides methods and a data structure to:
 
         * access keys ``152/LC`` of the CDB file;

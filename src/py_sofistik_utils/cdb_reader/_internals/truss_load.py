@@ -10,7 +10,7 @@ from . sofistik_classes import CTRUS_LOA
 from . sofistik_dll import SofDll
 
 
-class _TrussLoad:
+class TrussLoad:
     """The ``_TrussLoad`` class provides methods and data structure to:
     * access and load the keys ``161/LC`` of the CDB file;
     * store these data in a convenient format;
@@ -232,7 +232,7 @@ class _TrussLoad:
                 break
 
             try:
-                type_ = _TrussLoad._LOAD_TYPE_MAP[trus.m_typ]
+                type_ = TrussLoad._LOAD_TYPE_MAP[trus.m_typ]
             except KeyError as e:
                 raise RuntimeError(
                     f"Unknown truss load type {trus.m_typ} for element "

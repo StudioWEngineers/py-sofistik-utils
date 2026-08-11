@@ -5,7 +5,7 @@ from ctypes import byref, c_int, sizeof
 from pandas import concat, DataFrame
 
 # local library specific imports
-from . beam_data import _BeamData
+from . beam_data import BeamData
 from . group_data import Groups
 from . sofistik_dll import SofDll
 from . sofistik_classes import CBEAM_FOR
@@ -207,7 +207,7 @@ class BeamResults:
             df.loc[df.index[left:right], "GROUP"] = grp
 
         # calculating adimensional length
-        beam_data = _BeamData(self._dll)
+        beam_data = BeamData(self._dll)
         beam_data.load()
         elem_to_factor = {
             _: beam_data.get(_, "LENGTH") for _ in df["ELEM_ID"].unique()

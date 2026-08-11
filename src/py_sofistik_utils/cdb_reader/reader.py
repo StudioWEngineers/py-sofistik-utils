@@ -8,13 +8,13 @@ from . _internals.cable import Cables
 from . _internals.cross_section_data import CrossSectionalData
 from . _internals.group_data import Groups
 from . _internals.group_lc_data import GroupsLC
-from . _internals.load_cases import _LoadCases
+from . _internals.load_cases import LoadCases
 from . _internals.node import Node
 from . _internals.quad import Quads
 from . _internals.sec_group_lc_data import SecondaryGroupsLC
-from . _internals.spring import _Spring
+from . _internals.spring import Spring
 from . _internals.sofistik_dll import SofDll
-from . _internals.truss import _Truss
+from . _internals.truss import Truss
 
 
 class SOFiSTiKCDBReader:
@@ -27,14 +27,14 @@ class SOFiSTiKCDBReader:
     cables: Cables
     nodes: Node
     quads: Quads
-    springs: _Spring
-    trusses: _Truss
+    springs: Spring
+    trusses: Truss
 
     # other cdb data
     cross_sections: CrossSectionalData
     groups: Groups
     groups_lc: GroupsLC
-    load_cases: _LoadCases
+    load_cases: LoadCases
     sec_groups_lc: SecondaryGroupsLC
 
     def __init__(
@@ -55,14 +55,14 @@ class SOFiSTiKCDBReader:
         self.cables = Cables(self._dll)
         self.nodes = Node(self._dll)
         self.quads = Quads(self._dll)
-        self.springs = _Spring(self._dll)
-        self.trusses = _Truss(self._dll)
+        self.springs = Spring(self._dll)
+        self.trusses = Truss(self._dll)
 
         # other cdb data
         self.cross_sections = CrossSectionalData(self._dll)
         self.groups = Groups(self._dll)
         self.groups_lc = GroupsLC(self._dll)
-        self.load_cases = _LoadCases(self._dll)
+        self.load_cases = LoadCases(self._dll)
         self.sec_groups_lc = SecondaryGroupsLC(self._dll)
 
     def close(self) -> None:

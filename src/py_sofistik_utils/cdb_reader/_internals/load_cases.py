@@ -10,7 +10,7 @@ from . sofistik_dll import SofDll
 from . sofistik_classes import CLC_CTRL
 
 
-class _LoadCases:
+class LoadCases:
     """
     The ``_LoadCases`` class provides methods and data structure to:
 

@@ -11,7 +11,7 @@ from . sofistik_classes import CBEAM, CBEAM_SCT
 from . sofistik_utilities import decode_beam_end_release
 
 
-class _BeamData:
+class BeamData:
     """This class provides methods and a data structure to:
 
         * access keys ``100/00`` of the CDB file;

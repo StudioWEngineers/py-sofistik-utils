@@ -3,12 +3,12 @@
 # third party library imports
 
 # local library specific imports
-from . spring_data import _SpringData
-from . spring_result import _SpringResult
+from . spring_data import SpringData
+from . spring_result import SpringResult
 from . sofistik_dll import SofDll
 
 
-class _Spring:
+class Spring:
     """
     High-level wrapper for spring-related data access and operations.
 
@@ -17,9 +17,9 @@ class _Spring:
     point for reading, manipulating and evaluating spring definitions, applied
     loads, and analysis results.
     """
-    data: _SpringData
-    result: _SpringResult
+    data: SpringData
+    result: SpringResult
 
     def __init__(self, dll: SofDll) -> None:
-        self.data = _SpringData(dll)
-        self.result = _SpringResult(dll)
+        self.data = SpringData(dll)
+        self.result = SpringResult(dll)

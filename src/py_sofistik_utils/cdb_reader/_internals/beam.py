@@ -4,9 +4,9 @@
 from pandas import DataFrame
 
 # local library specific imports
-from . beam_data import _BeamData
+from . beam_data import BeamData
 from . beam_results import BeamResults
-from . beam_stresses import _BeamStress
+from . beam_stresses import BeamStress
 from . sofistik_dll import SofDll
 
 
@@ -19,14 +19,14 @@ class Beam:
     local coordinates.
     """
 
-    data: _BeamData
+    data: BeamData
     results: BeamResults
-    stresses: _BeamStress
+    stresses: BeamStress
 
     def __init__(self, dll: SofDll) -> None:
-        self.data = _BeamData(dll)
+        self.data = BeamData(dll)
         self.results = BeamResults(dll)
-        self.stresses = _BeamStress(dll)
+        self.stresses = BeamStress(dll)
 
         self._calculated_lc: set[int] = set()
         self._data = DataFrame(columns=["LOAD_CASE", "ID", "X", "Y", "Z"])

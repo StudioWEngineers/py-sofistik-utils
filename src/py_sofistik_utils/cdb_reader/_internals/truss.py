@@ -3,13 +3,13 @@
 # third party library imports
 
 # local library specific imports
-from . truss_data import _TrussData
-from . truss_load import _TrussLoad
-from . truss_result import _TrussResult
+from . truss_data import TrussData
+from . truss_load import TrussLoad
+from . truss_result import TrussResult
 from . sofistik_dll import SofDll
 
 
-class _Truss:
+class Truss:
     """
     High-level wrapper for truss-related data access and operations.
 
@@ -18,11 +18,11 @@ class _Truss:
     provides a structured entry point for reading, manipulating and evaluating
     truss definitions, applied loads, and analysis results.
     """
-    data: _TrussData
-    load: _TrussLoad
-    result: _TrussResult
+    data: TrussData
+    load: TrussLoad
+    result: TrussResult
 
     def __init__(self, dll: SofDll) -> None:
-        self.data = _TrussData(dll)
-        self.load = _TrussLoad(dll)
-        self.result = _TrussResult(dll)
+        self.data = TrussData(dll)
+        self.load = TrussLoad(dll)
+        self.result = TrussResult(dll)

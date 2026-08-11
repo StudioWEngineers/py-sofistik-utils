@@ -10,7 +10,7 @@ from . sofistik_classes import CSPRI
 from . sofistik_dll import SofDll
 
 
-class _SpringData:
+class SpringData:
     """This class provides methods and a data structure to:
 
         * access keys ``170/00`` of the CDB file;
