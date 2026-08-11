@@ -2,8 +2,8 @@
 SOFiSTiKUtilities
 -----------------
 
-The `SOFiSTiKUtilities` module provides functions and helpers to be used that can be used
-across all the classes and modules.
+The `SOFiSTiKUtilities` module provides functions and helpers to be used that
+can be used across all the classes and modules.
 """
 # standard library imports
 
@@ -18,8 +18,8 @@ def decode_cdb_status(status: int) -> str:
     Parameters
     ----------
     status: int
-        The status of the cdb file as obtained from the original SOFiSTiK function
-        `sof_cdb_status`.
+        The status of the cdb file as obtained from the original SOFiSTiK
+        function `sof_cdb_status`.
     """
     value = ""
 
@@ -42,6 +42,7 @@ def decode_cdb_status(status: int) -> str:
         value += "\n\tCDBase is active"
 
     return value[value.find("\n") + 1:]
+
 
 def decode_beam_end_release(itp2: int) -> str:
     """Decode the beam end release conditions for the given beam end.
@@ -76,11 +77,13 @@ def decode_beam_end_release(itp2: int) -> str:
 
     return value
 
+
 def decode_nodal_boundary_condition(kfix: int) -> str:
     """Decode the nodal boundary conditions.
 
-    This function is basically the one provided in the SOFiSTiK online documentation, with
-    minor modifications to reflect latest changes in Python. Refer to:
+    This function is basically the one provided in the SOFiSTiK online
+    documentation, with minor modifications to reflect latest changes in
+    Python. Refer to:
 
     https://docs.sofistik.com/2024/en/cdb_interfaces/python/examples/python_example3.html
 
@@ -128,6 +131,7 @@ def decode_nodal_boundary_condition(kfix: int) -> str:
 
     return value
 
+
 def get_element_type(element_code: int) -> str:
     """Return the element type according to SOFiSTiK nomenclature.
     Refer to section 018/-2 in SOFiHELP - CDBase.
@@ -154,11 +158,12 @@ def get_element_type(element_code: int) -> str:
         case _:
             raise RuntimeError(f"Unknown element type \"{element_code}\"!")
 
+
 def long_to_str(long: int) -> str:
     """Convert an `int` (SOFiSTiK returns a `c_long` actually) to a `str`.
 
-    This function is basically the one shipped with SOFiSTiK installation package in the
-    example file `decode_encode_py.py`.
+    This function is basically the one shipped with SOFiSTiK installation
+    package in the example file `decode_encode_py.py`.
     """
     decode = ""
 
