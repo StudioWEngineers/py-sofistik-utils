@@ -18,7 +18,6 @@ Python
 The following Python packages are required and will be installed automatically via pip:
 
 - `pandas <https://pandas.pydata.org/>`_ 3.0 or newer
-- `numpy <https://numpy.org/>`_ 2.2 or newer
 
 SOFiSTiK
 ~~~~~~~~

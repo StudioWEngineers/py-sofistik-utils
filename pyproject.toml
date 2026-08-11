@@ -26,7 +26,6 @@ classifiers = [
   "Development Status :: 4 - Beta"
 ]
 dependencies = [
-  "numpy>=2.2.0",
   "pandas>=3.0.0"
 ]
 
