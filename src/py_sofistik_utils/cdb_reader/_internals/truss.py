@@ -19,10 +19,10 @@ class Truss:
     truss definitions, applied loads, and analysis results.
     """
     data: TrussData
-    load: TrussLoad
-    result: TrussResult
+    loads: TrussLoad
+    results: TrussResult
 
     def __init__(self, dll: SofDll) -> None:
         self.data = TrussData(dll)
-        self.load = TrussLoad(dll)
-        self.result = TrussResult(dll)
+        self.loads = TrussLoad(dll)
+        self.results = TrussResult(dll)

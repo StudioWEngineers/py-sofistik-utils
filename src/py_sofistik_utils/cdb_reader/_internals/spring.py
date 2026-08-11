@@ -18,8 +18,8 @@ class Spring:
     loads, and analysis results.
     """
     data: SpringData
-    result: SpringResult
+    results: SpringResult
 
     def __init__(self, dll: SofDll) -> None:
         self.data = SpringData(dll)
-        self.result = SpringResult(dll)
+        self.results = SpringResult(dll)

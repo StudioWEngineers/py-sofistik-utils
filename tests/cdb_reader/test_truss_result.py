@@ -42,7 +42,7 @@ class SOFiSTiKCDBReaderTrussResultTestSuite(TestCase):
             VERSION  # type: ignore
         )
         self.cdb.open()
-        self.cdb.trusses.result.load(1000)
+        self.cdb.trusses.results.load(1000)
 
     def tearDown(self) -> None:
         self.cdb.close()
@@ -52,61 +52,61 @@ class SOFiSTiKCDBReaderTrussResultTestSuite(TestCase):
             DataFrame(_DATA, columns=_COLUMNS)
             .set_index(["ELEM_ID", "LOAD_CASE"], drop=False)
         )
-        assert_frame_equal(data, self.cdb.trusses.result.get_data(), rtol=1E-10)
+        assert_frame_equal(data, self.cdb.trusses.results.get_data(), rtol=1E-10)
 
     def test_get(self) -> None:
         with self.subTest(msg="Axial force"):
             self.assertEqual(
-                self.cdb.trusses.result.get(23, 1000, "AXIAL_FORCE"),
+                self.cdb.trusses.results.get(23, 1000, "AXIAL_FORCE"),
                 150
             )
 
         with self.subTest(msg="Axial displacement"):
             self.assertEqual(
-                self.cdb.trusses.result.get(31, 1000, "AXIAL_DISPLACEMENT"),
+                self.cdb.trusses.results.get(31, 1000, "AXIAL_DISPLACEMENT"),
                 0.0016841789474710822
             )
 
         with self.subTest(msg="Non existing entry without default"):
             with self.assertRaises(LookupError):
-                self.cdb.trusses.result.get(31, 1000, "NON-EXISTING")
+                self.cdb.trusses.results.get(31, 1000, "NON-EXISTING")
 
         with self.subTest(msg="Non existing entry with default"):
             self.assertEqual(
-                self.cdb.trusses.result.get(31, 1000, "NON-EXISTING", 5),
+                self.cdb.trusses.results.get(31, 1000, "NON-EXISTING", 5),
                 5
             )
 
     def test_get_after_clear(self) -> None:
-        self.cdb.trusses.result.clear(1000)
+        self.cdb.trusses.results.clear(1000)
         with self.subTest(msg="Check clear method"):
             with self.assertRaises(LookupError):
-                self.cdb.trusses.result.get(23, 1000, "AXIAL_FORCE")
+                self.cdb.trusses.results.get(23, 1000, "AXIAL_FORCE")
 
-        self.cdb.trusses.result.load(1000)
+        self.cdb.trusses.results.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.trusses.result.get(23, 1000, "AXIAL_FORCE"),
+                self.cdb.trusses.results.get(23, 1000, "AXIAL_FORCE"),
                 150
             )
 
     def test_get_after_clear_all(self) -> None:
-        self.cdb.trusses.result.clear_all()
+        self.cdb.trusses.results.clear_all()
         with self.subTest(msg="Check clear_all method"):
             with self.assertRaises(LookupError):
-                self.cdb.trusses.result.get(23, 1000, "AXIAL_FORCE")
+                self.cdb.trusses.results.get(23, 1000, "AXIAL_FORCE")
 
-        self.cdb.trusses.result.load(1000)
+        self.cdb.trusses.results.load(1000)
         with self.subTest(msg="Check indexes management"):
             self.assertEqual(
-                self.cdb.trusses.result.get(23, 1000, "AXIAL_FORCE"),
+                self.cdb.trusses.results.get(23, 1000, "AXIAL_FORCE"),
                 150
             )
 
     def test_load_with_duplicated_load_cases(self) -> None:
-        self.cdb.trusses.result.clear_all()
-        self.cdb.trusses.result.load([1000, 1000])
+        self.cdb.trusses.results.clear_all()
+        self.cdb.trusses.results.load([1000, 1000])
         self.assertEqual(
-            self.cdb.trusses.result.get(31, 1000, "AXIAL_FORCE"),
+            self.cdb.trusses.results.get(31, 1000, "AXIAL_FORCE"),
             200
         )
