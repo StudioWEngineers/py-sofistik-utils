@@ -2,7 +2,7 @@
 from ctypes import byref, c_int, sizeof
 
 # third party library imports
-from pandas import concat, DataFrame
+from pandas import DataFrame
 
 # local library specific imports
 from . group_data import Groups
