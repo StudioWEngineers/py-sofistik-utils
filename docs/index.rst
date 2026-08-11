@@ -51,7 +51,7 @@ for the terms and conditions of use.
     :hidden:
 
     installation
-    usage
+    cdb_reader
 
 .. toctree::
     :caption: Testing

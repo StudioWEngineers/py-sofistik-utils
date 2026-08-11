@@ -1,7 +1,7 @@
-.. _usage:
+.. _cdb_reader:
 
-Usage
-=====
+CDB Reader
+==========
 
 *py-sofistik-utils* consists of multiple loosely coupled subpackages. Each of them
 addresses a distinct functionality and can be used independently of the others.
@@ -14,4 +14,4 @@ Further details for each subpackage are available in the following dedicated sec
     :maxdepth: 1
     :hidden:
 
-    cdb/usage
+    cdb/basic_usage
