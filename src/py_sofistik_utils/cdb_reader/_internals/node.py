@@ -26,8 +26,6 @@ class Node:
     results: NodeResult
 
     def __init__(self, dll: SofDll) -> None:
-        """The initializer of the ``Nodes`` class.
-        """
         self.data = NodeData(dll)
         self.loads = NodeLoad(dll)
         self.residuals = NodeResidual(dll)
@@ -46,8 +44,8 @@ class Node:
         if not self.results.is_loaded(load_case):
             self.results.load(load_case)
 
-        coord = self.data.get_all_coordinates()
-        disp = self.results.get_all_displacements(load_case)
+        coord = self.data.get_data()
+        disp = self.results.get_data().xs(load_case, level="LOAD_CASE")
 
         for col in ["UX", "UY", "UZ"]:
             coord[col] = coord["ID"].map(disp.set_index("ID")[col]).fillna(0.0)
@@ -57,14 +55,15 @@ class Node:
 
         coord.insert(loc=0, column="LOAD_CASE", value=load_case)
         coord = coord.drop(
-            columns=["X0", "Y0", "Z0", "UX", "UY", "UZ"]
-        ).reset_index(drop=True)
+            columns=["X0", "Y0", "Z0", "UX", "UY", "UZ", "KFIX", "IS_USED"]
+        ).reset_index(drop=True).set_index(["LOAD_CASE", "ID"], drop=False)
 
         self._calculated_lc.add(load_case)
         if self._data.empty:
             self._data = coord
         else:
             self._data = concat([self._data, coord], ignore_index=True)
+            self._data.sort_index(inplace=True)
 
     def clear(self, load_case: int) -> None:
         """Clear the results for the given ``load case``.
@@ -72,7 +71,9 @@ class Node:
         if not self.is_deflected_configuration_calculated(load_case):
             return
 
-        self._data = self._data.drop(self._data[self._data.LOAD_CASE == load_case].index)
+        self._data = self._data.drop(
+            self._data[self._data.LOAD_CASE == load_case].index
+        )
         self._calculated_lc.remove(load_case)
 
     def clear_all(self) -> None:
@@ -88,13 +89,13 @@ class Node:
         """Return the deformed configuration for the given ``load_case``.
         """
         if not self.is_deflected_configuration_calculated(load_case):
-            raise LookupError(f"Load case {load_case} has not been calculated!")
+            raise LookupError(f"Load case {load_case} has not been calculated")
 
         lc_mask = self._data["LOAD_CASE"] == load_case
-        return self._data.loc[lc_mask, ("ID", "X", "Y", "Z")].copy(deep=True)
+        return self._data.loc[lc_mask].copy(deep=True)
 
     def is_deflected_configuration_calculated(self, load_case: int) -> bool:
-        """Return ``True`` if the deflected configuration has been calculated for the
-        given ``load_case``.
+        """Return `True` if the deflected configuration has been calculated
+        for the given ``load_case``.
         """
         return load_case in self._calculated_lc

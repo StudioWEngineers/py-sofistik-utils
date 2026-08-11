@@ -15,3 +15,4 @@ Further details for each subpackage are available in the following dedicated sec
     :hidden:
 
     cdb/basic_usage
+    cdb/post_process
