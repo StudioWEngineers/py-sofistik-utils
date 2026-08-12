@@ -185,7 +185,9 @@ class Groups:
             If the given ``group_name`` is not found.
         """
         try:
-            return self._data.index[self._data["GROUP_NAME"] == group_name][0]  # type: ignore
+            return (  # type: ignore
+                self._data.index[self._data["GROUP_NAME"] == group_name][0]
+            )
         except (KeyError, ValueError) as e:
             raise LookupError(
                 f"Group number not found for group name {group_name}!"
@@ -225,7 +227,7 @@ class Groups:
             rec_length = c_int(sizeof(group))
             return_value = c_int(0)
 
-            data: dict[int, dict[str, float | int | str]] = {}
+            data: dict[int, dict[str, int | str]] = {}
             first_call = True
             while return_value.value < 2:
                 return_value.value = self._dll.get(
