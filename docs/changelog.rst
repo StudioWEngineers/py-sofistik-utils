@@ -6,6 +6,11 @@ Changelog
 *py-sofistik-utils* uses a `semantic versioning <http://semver.org>`__ policy
 for its API.
 
+Version 0.2.0 (T.B.A.)
+---------------------------------
+
+-
+
 Version 0.1.0 (November 12, 2026)
 ---------------------------------
 
