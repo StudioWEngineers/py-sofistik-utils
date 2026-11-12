@@ -12,7 +12,7 @@ if version_info < (3, 12):
 from py_sofistik_utils.cdb_reader import SOFiSTiKCDBReader
 
 
-__version__ = "0.0.1-dev1"
+__version__ = "0.1.0"
 
 __all__ = (
     "__version__",

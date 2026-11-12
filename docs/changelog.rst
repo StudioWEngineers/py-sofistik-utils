@@ -6,8 +6,8 @@ Changelog
 *py-sofistik-utils* uses a `semantic versioning <http://semver.org>`__ policy
 for its API.
 
-Version 0.1.0 (T.B.A.)
-----------------------
+Version 0.1.0 (November 12, 2026)
+---------------------------------
 
 - Initial release of the py-sofistik-utils codebase.
 - Add test coverage for the all the SOFiSTiKCDBReader classes. All Teddy files
