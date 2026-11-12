@@ -10,7 +10,7 @@ on:
 jobs:
   check_relevant_changes:
     name: check for relevant changes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
@@ -96,7 +96,7 @@ jobs:
   # dummy job to have a green badge in case check_relevant_changes != true
   ci_status:
     name: CI status
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: check_relevant_changes
     if: always()
     steps:
