@@ -7,7 +7,7 @@ Expected CDB file name: ``CABLE_LOAD.cdb``
 
 Runs with: SOFiSTiK 2025
 
-Version: 2
+Version: 1
 
 .. code-block:: text
 
