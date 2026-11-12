@@ -85,11 +85,13 @@ class BeamData:
             ]
         )
         self._dll = dll
+        self._is_loaded = False
 
     def clear(self) -> None:
         """Clear all the loaded data.
         """
         self._data = self._data[0:0]
+        self._is_loaded = False
 
     def get(
             self,
@@ -147,6 +149,10 @@ class BeamData:
                 f"and quantity {quantity}!"
             ) from e
 
+    def is_loaded(self) -> bool:
+        """Return ``True`` if beam data have been loaded, ``False`` otherwise.
+        """
+        return self._is_loaded
     def get_data(self, deep: bool = True) -> DataFrame:
         """Return the :class:`pandas.DataFrame` containing the loaded key
         ``100/00``.
@@ -276,3 +282,4 @@ class BeamData:
 
             # set indices for fast lookup and override existing data, if any
             self._data = df.set_index(["ELEM_ID"], drop=False)
+            self._is_loaded = True
